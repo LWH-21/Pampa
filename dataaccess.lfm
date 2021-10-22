@@ -1,0 +1,57 @@
+object MainData: TMainData
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  Height = 663
+  HorizontalOffset = 232
+  VerticalOffset = 224
+  Width = 1550
+  object SQLConnector: TSQLConnector
+    Connected = False
+    LoginPrompt = True
+    AfterConnect = SQLConnectorAfterConnect
+    AfterDisconnect = SQLConnectorAfterDisconnect
+    DatabaseName = 'D:\DEV\Lazarus\Pampa\SqlLite\Pampa.db'
+    KeepConnection = True
+    CharSet = 'UTF8'
+    OnLog = SQLConnectorLog
+    ConnectorType = 'MSSQLServer'
+    Left = 128
+    Top = 16
+  end
+  object ODBC: TODBCConnection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    Transaction = Tran
+    OnLog = SQLConnectorLog
+    Left = 176
+    Top = 16
+  end
+  object Tran: TSQLTransaction
+    Active = False
+    Database = ODBC
+    Left = 56
+    Top = 16
+  end
+  object ZConnection: TZConnection
+    ControlsCodePage = cCP_UTF8
+    AutoEncodeStrings = True
+    ClientCodepage = 'UTF-8'
+    Properties.Strings = (
+      'AutoEncodeStrings=ON'
+      'codepage=UTF-8'
+    )
+    TransactIsolationLevel = tiReadCommitted
+    SQLHourGlass = True
+    Port = 0
+    Protocol = 'sqlite'
+    Left = 56
+    Top = 96
+  end
+  object OpenDialog1: TOpenDialog
+    Title = 'Ouvrir le fichier de configuration'
+    Filter = 'Fichier XML|*.XML'
+    Left = 119
+    Top = 83
+  end
+end

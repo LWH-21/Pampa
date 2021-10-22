@@ -1,0 +1,82 @@
+inherited Fr_Person: TFr_Person
+  Height = 663
+  Width = 1566
+  ClientHeight = 663
+  ClientWidth = 1566
+  OnResize = FormResize
+  DesignLeft = 164
+  DesignTop = 140
+  object PageControl1: TPageControl[0]
+    Left = 0
+    Height = 623
+    Top = 40
+    Width = 1566
+    Align = alBottom
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    PopupMenu = PopupMenu1
+    TabOrder = 0
+    TabPosition = tpRight
+    OnChange = PageControl1Change
+    OnResize = PageControl1Resize
+  end
+  object Bsearch: TBitBtn[1]
+    Left = 96
+    Height = 30
+    Top = 8
+    Width = 75
+    Caption = '...'
+    OnClick = BsearchClick
+    TabOrder = 2
+  end
+  object DBCode: TDBEdit[2]
+    Left = 8
+    Height = 23
+    Top = 12
+    Width = 80
+    DataField = 'SY_CODE'
+    DataSource = Source
+    ReadOnly = True
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 1
+    OnChange = DBCodeChange
+  end
+  object Panel1: TPanel[3]
+    Left = 180
+    Height = 30
+    Top = 8
+    Width = 1373
+    Anchors = [akTop, akLeft, akRight]
+    BevelInner = bvLowered
+    BevelOuter = bvLowered
+    ClientHeight = 30
+    ClientWidth = 1373
+    TabOrder = 3
+    object DBidentite: TDBText
+      Left = 7
+      Height = 15
+      Top = 6
+      Width = 55
+      DataField = 'SY_LASTNAME'
+      DataSource = Source
+      ParentColor = False
+    end
+  end
+  object Source: TDataSource[4]
+    Left = 16
+    Top = 144
+  end
+  object PopupMenu1: TPopupMenu[5]
+    Left = 135
+    Top = 147
+    object MenuItem1: TMenuItem
+      Caption = 'Ajouter un onglet'
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'Modifier l''onglet courant'
+    end
+    object MenuItem3: TMenuItem
+      Caption = 'Supprimer l''onglet'
+    end
+  end
+end

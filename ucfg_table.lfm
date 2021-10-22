@@ -1,0 +1,343 @@
+inherited FCfg_Table: TFCfg_Table
+  Left = 733
+  Height = 651
+  Top = 192
+  Width = 738
+  Caption = 'FCfg_Table'
+  ClientHeight = 651
+  ClientWidth = 738
+  OnClose = FormClose
+  OnCreate = FormCreate
+  object CB_table: TComboBox[0]
+    Left = 8
+    Height = 23
+    Top = 8
+    Width = 608
+    ItemHeight = 15
+    OnChange = CB_tableChange
+    Sorted = True
+    Style = csDropDownList
+    TabOrder = 0
+  end
+  object DBGrid1: TDBGrid[1]
+    Left = 8
+    Height = 220
+    Top = 40
+    Width = 696
+    Color = clWindow
+    Columns = <    
+      item
+        MaxSize = 50
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Clé'
+        Width = 50
+        FieldName = 'ID'
+      end    
+      item
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Nom'
+        Width = 200
+        FieldName = 'COLNAME'
+      end    
+      item
+        MaxSize = 300
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Description'
+        Width = 300
+        FieldName = 'EXTERNAL_NAME'
+      end    
+      item
+        ButtonStyle = cbsCheckboxColumn
+        MaxSize = 100
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Système'
+        Width = 100
+        ValueChecked = 'Y'
+        ValueUnchecked = 'N'
+        FieldName = 'SYSCOL'
+      end    
+      item
+        ButtonStyle = cbsPickList
+        PickList.Strings = (
+          'CHAR=Chaine de caractères'
+          'NB=Nombre'
+          'DT=DATE'
+        )
+        Title.Alignment = taCenter
+        Title.Caption = 'Type de données'
+        Width = 0
+        Visible = False
+        FieldName = 'TYPE_COL'
+      end    
+      item
+        Title.Caption = 'COLLEN'
+        Visible = False
+        FieldName = 'COLLEN'
+      end    
+      item
+        Title.Caption = 'PRECIS'
+        Visible = False
+        FieldName = 'PRECIS'
+      end    
+      item
+        Title.Caption = 'MASK'
+        Visible = False
+        FieldName = 'MASK'
+      end    
+      item
+        Title.Caption = 'CHARCASE'
+        Visible = False
+        FieldName = 'CHARCASE'
+      end    
+      item
+        Title.Caption = 'DEFVAL'
+        Visible = False
+        FieldName = 'DEFVAL'
+      end    
+      item
+        Title.Caption = 'CTRL'
+        Visible = False
+        FieldName = 'CTRL'
+      end    
+      item
+        Title.Caption = 'VALLIST'
+        Visible = False
+        FieldName = 'VALLIST'
+      end    
+      item
+        Title.Caption = 'LASTUSER'
+        Visible = False
+        FieldName = 'LASTUSER'
+      end    
+      item
+        Title.Caption = 'ROWVERSION'
+        Visible = False
+        FieldName = 'ROWVERSION'
+      end>
+    DataSource = DataSource1
+    Options = [dgTitles, dgIndicator, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit]
+    TabOrder = 1
+  end
+  object PageControl1: TPageControl[2]
+    Left = 16
+    Height = 328
+    Top = 264
+    Width = 688
+    ActivePage = TabSheet1
+    TabIndex = 0
+    TabOrder = 2
+    object TabSheet1: TTabSheet
+      Caption = 'TabSheet1'
+      ClientHeight = 300
+      ClientWidth = 680
+      object DBLookupComboBox1: TDBLookupComboBox
+        Left = 96
+        Height = 23
+        Top = 64
+        Width = 237
+        DataField = 'TYPE_COL'
+        DataSource = DataSource1
+        KeyField = 'CODE'
+        ListField = 'LIBELLE'
+        ListFieldIndex = 0
+        ListSource = DataSource2
+        LookupCache = False
+        ReadOnly = True
+        TabOrder = 0
+      end
+      object DBColname: TDBEdit
+        Left = 96
+        Height = 23
+        Top = 16
+        Width = 232
+        DataField = 'COLNAME'
+        DataSource = DataSource1
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 1
+      end
+      object DBExternal_name: TDBEdit
+        Left = 96
+        Height = 23
+        Top = 40
+        Width = 568
+        DataField = 'EXTERNAL_NAME'
+        DataSource = DataSource1
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 2
+      end
+      object Label1: TLabel
+        Left = 0
+        Height = 15
+        Top = 16
+        Width = 33
+        Caption = 'Nom :'
+        ParentColor = False
+      end
+      object Label2: TLabel
+        Left = 0
+        Height = 15
+        Top = 40
+        Width = 66
+        Caption = 'Description :'
+        ParentColor = False
+      end
+      object Label3: TLabel
+        Left = 0
+        Height = 15
+        Top = 64
+        Width = 30
+        Caption = 'Type :'
+        ParentColor = False
+      end
+      object DBCheckBox1: TDBCheckBox
+        Left = 400
+        Height = 23
+        Top = 16
+        Width = 264
+        Caption = 'Colonne système'
+        DataField = 'SYSCOL'
+        DataSource = DataSource1
+        ReadOnly = True
+        TabOrder = 3
+        ValueChecked = 'Y'
+        ValueUnchecked = 'N'
+      end
+      object Label4: TLabel
+        Left = 0
+        Height = 15
+        Top = 91
+        Width = 47
+        Caption = 'Longeur:'
+        ParentColor = False
+      end
+      object DBCollen: TDBEdit
+        Left = 96
+        Height = 23
+        Top = 91
+        Width = 80
+        DataField = 'COLLEN'
+        DataSource = DataSource1
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 4
+      end
+      object Label5: TLabel
+        Left = 216
+        Height = 15
+        Top = 91
+        Width = 54
+        Caption = 'Précision :'
+        ParentColor = False
+      end
+      object DBPrecis: TDBEdit
+        Left = 296
+        Height = 23
+        Top = 91
+        Width = 80
+        DataField = 'PRECIS'
+        DataSource = DataSource1
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 5
+      end
+      object DBEdit1: TDBEdit
+        Left = 96
+        Height = 23
+        Top = 128
+        Width = 80
+        DataField = 'CHARCASE'
+        DataSource = DataSource1
+        ReadOnly = True
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 6
+      end
+      object DBEdit2: TDBEdit
+        Left = 116
+        Height = 23
+        Top = 178
+        Width = 80
+        DataField = 'ID'
+        DataSource = DataSource1
+        CharCase = ecNormal
+        MaxLength = 0
+        TabOrder = 7
+      end
+    end
+  end
+  object Btn_modify: TBitBtn[3]
+    Left = 16
+    Height = 30
+    Top = 600
+    Width = 112
+    Caption = 'Modifier'
+    Images = MainForm.Images
+    OnClick = Btn_modifyClick
+    TabOrder = 3
+  end
+  object Btn_close: TBitBtn[4]
+    Left = 352
+    Height = 30
+    Top = 600
+    Width = 104
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 4
+  end
+  object Btn_add: TBitBtn[5]
+    Left = 136
+    Height = 30
+    Top = 600
+    Width = 96
+    Caption = 'Ajouter'
+    Images = MainForm.Images
+    ImageIndex = 9
+    TabOrder = 5
+  end
+  object Btn_del: TBitBtn[6]
+    Left = 232
+    Height = 30
+    Top = 600
+    Width = 112
+    Caption = 'Supprimer'
+    Images = MainForm.Images
+    ImageIndex = 8
+    TabOrder = 6
+  end
+  object DataSource1: TDataSource[7]
+    Left = 624
+    Top = 600
+  end
+  object BufDataset1: TBufDataset[8]
+    FieldDefs = <    
+      item
+        Name = 'CODE'
+        DataType = ftString
+        Size = 4
+      end    
+      item
+        Name = 'LIBELLE'
+        DataType = ftString
+        Size = 100
+      end>
+    Left = 592
+    Top = 600
+  end
+  object DataSource2: TDataSource[9]
+    DataSet = BufDataset1
+    Left = 656
+    Top = 600
+  end
+end

@@ -1,0 +1,932 @@
+unit DA_table;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, strutils, DateUtils, DB, SQLDB, DataAccess, Variants, Dialogs, Forms, Controls, lwdata,
+  LConvEncoding,LazUTF8,ZDataset, ZSqlUpdate,
+  UException;
+
+type
+
+  { TDA_table }
+
+  TDA_table = class(TDataModule)
+  private
+  protected
+
+  public
+    table: string;
+    cle: string;
+    checkcrc: boolean;
+
+
+    function getcrc(R: TDataSet): longint;
+    procedure init(D: TMainData);
+    procedure Read(R: TDataSet; id: longint);
+    function codeCalc(base, firstname, lastname : shortstring) : shortstring;
+
+    function getCurrentId  : longint;
+    function getNextId : integer;
+    function normalize ( s : string) : string;
+    function Write(R: TDataSet; var id: longint): TDbErrcode;
+    function Delete(R: TDataSet; var id: longint): TDbErrcode;
+    function Insert(R: TDataSet): TDbErrcode;
+    function Test(R: TDataset; action: char; var nbwarnings, nberr: integer; var msg: string): boolean;
+    procedure apply_style(R : TDataSet; st : TUpdateStatus); virtual;
+    procedure search(crit : string; R : TDataset);virtual ; abstract;
+    procedure setDefault(R : TDataSet); virtual;
+
+  end;
+
+
+
+implementation
+
+{$R *.lfm}
+
+uses Main, RessourcesStrings;
+
+const
+  crc32_table: array[byte] of cardinal = (
+    $00000000, $77073096, $ee0e612c, $990951ba, $076dc419,
+    $706af48f, $e963a535, $9e6495a3, $0edb8832, $79dcb8a4,
+    $e0d5e91e, $97d2d988, $09b64c2b, $7eb17cbd, $e7b82d07,
+    $90bf1d91, $1db71064, $6ab020f2, $f3b97148, $84be41de,
+    $1adad47d, $6ddde4eb, $f4d4b551, $83d385c7, $136c9856,
+    $646ba8c0, $fd62f97a, $8a65c9ec, $14015c4f, $63066cd9,
+    $fa0f3d63, $8d080df5, $3b6e20c8, $4c69105e, $d56041e4,
+    $a2677172, $3c03e4d1, $4b04d447, $d20d85fd, $a50ab56b,
+    $35b5a8fa, $42b2986c, $dbbbc9d6, $acbcf940, $32d86ce3,
+    $45df5c75, $dcd60dcf, $abd13d59, $26d930ac, $51de003a,
+    $c8d75180, $bfd06116, $21b4f4b5, $56b3c423, $cfba9599,
+    $b8bda50f, $2802b89e, $5f058808, $c60cd9b2, $b10be924,
+    $2f6f7c87, $58684c11, $c1611dab, $b6662d3d, $76dc4190,
+    $01db7106, $98d220bc, $efd5102a, $71b18589, $06b6b51f,
+    $9fbfe4a5, $e8b8d433, $7807c9a2, $0f00f934, $9609a88e,
+    $e10e9818, $7f6a0dbb, $086d3d2d, $91646c97, $e6635c01,
+    $6b6b51f4, $1c6c6162, $856530d8, $f262004e, $6c0695ed,
+    $1b01a57b, $8208f4c1, $f50fc457, $65b0d9c6, $12b7e950,
+    $8bbeb8ea, $fcb9887c, $62dd1ddf, $15da2d49, $8cd37cf3,
+    $fbd44c65, $4db26158, $3ab551ce, $a3bc0074, $d4bb30e2,
+    $4adfa541, $3dd895d7, $a4d1c46d, $d3d6f4fb, $4369e96a,
+    $346ed9fc, $ad678846, $da60b8d0, $44042d73, $33031de5,
+    $aa0a4c5f, $dd0d7cc9, $5005713c, $270241aa, $be0b1010,
+    $c90c2086, $5768b525, $206f85b3, $b966d409, $ce61e49f,
+    $5edef90e, $29d9c998, $b0d09822, $c7d7a8b4, $59b33d17,
+    $2eb40d81, $b7bd5c3b, $c0ba6cad, $edb88320, $9abfb3b6,
+    $03b6e20c, $74b1d29a, $ead54739, $9dd277af, $04db2615,
+    $73dc1683, $e3630b12, $94643b84, $0d6d6a3e, $7a6a5aa8,
+    $e40ecf0b, $9309ff9d, $0a00ae27, $7d079eb1, $f00f9344,
+    $8708a3d2, $1e01f268, $6906c2fe, $f762575d, $806567cb,
+    $196c3671, $6e6b06e7, $fed41b76, $89d32be0, $10da7a5a,
+    $67dd4acc, $f9b9df6f, $8ebeeff9, $17b7be43, $60b08ed5,
+    $d6d6a3e8, $a1d1937e, $38d8c2c4, $4fdff252, $d1bb67f1,
+    $a6bc5767, $3fb506dd, $48b2364b, $d80d2bda, $af0a1b4c,
+    $36034af6, $41047a60, $df60efc3, $a867df55, $316e8eef,
+    $4669be79, $cb61b38c, $bc66831a, $256fd2a0, $5268e236,
+    $cc0c7795, $bb0b4703, $220216b9, $5505262f, $c5ba3bbe,
+    $b2bd0b28, $2bb45a92, $5cb36a04, $c2d7ffa7, $b5d0cf31,
+    $2cd99e8b, $5bdeae1d, $9b64c2b0, $ec63f226, $756aa39c,
+    $026d930a, $9c0906a9, $eb0e363f, $72076785, $05005713,
+    $95bf4a82, $e2b87a14, $7bb12bae, $0cb61b38, $92d28e9b,
+    $e5d5be0d, $7cdcefb7, $0bdbdf21, $86d3d2d4, $f1d4e242,
+    $68ddb3f8, $1fda836e, $81be16cd, $f6b9265b, $6fb077e1,
+    $18b74777, $88085ae6, $ff0f6a70, $66063bca, $11010b5c,
+    $8f659eff, $f862ae69, $616bffd3, $166ccf45, $a00ae278,
+    $d70dd2ee, $4e048354, $3903b3c2, $a7672661, $d06016f7,
+    $4969474d, $3e6e77db, $aed16a4a, $d9d65adc, $40df0b66,
+    $37d83bf0, $a9bcae53, $debb9ec5, $47b2cf7f, $30b5ffe9,
+    $bdbdf21c, $cabac28a, $53b39330, $24b4a3a6, $bad03605,
+    $cdd70693, $54de5729, $23d967bf, $b3667a2e, $c4614ab8,
+    $5d681b02, $2a6f2b94, $b40bbe37, $c30c8ea1, $5a05df1b,
+    $2d02ef8d);
+
+function crc32(crc: cardinal; buf: Pbyte; len: cardinal): longint;
+
+var
+  r: cardinal;
+
+begin
+  if buf = nil then
+    exit(0);
+
+  crc := crc xor $FFFFFFFF;
+  while (len >= 8) do
+  begin
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    Dec(len, 8);
+  end;
+
+  while (len > 0) do
+  begin
+    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
+    Inc(buf);
+    Dec(len);
+  end;
+  r := crc xor $FFFFFFFF;
+  if r > 2147483647 then
+    r := r - 2147483647;
+  Result := r;
+end;
+
+
+
+function TDA_table.getcrc(R: TDataSet): longint; (* ********************** *)
+
+var
+  i: integer;
+  c: longint;
+  nom, ret: string;
+  cd: TColumnDesc;
+  a: PByte;
+  n: string;
+
+begin
+  assert(assigned(R), 'Requête non assignée');
+  assert(table > '', 'Table non renseignée');
+  ret := '';
+  for i := 0 to R.FieldCount - 1 do
+  begin
+    nom := (R.fields[i].FieldName).ToUpper;
+    if (nom > '') and (nom <> 'SY_CRC') then
+    begin
+      cd := Maindata.tablesdesc.Find(table, nom);
+      assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
+      if (cd.col_name<>'SY_ID') and (cd.col_name<>'SY_CRC') and (cd.col_name<>'SY_ROWVERSION') and (cd.col_name<>'SY_LASTUSER') then
+      begin
+        //o := VartoStr(R.fields[i].OldValue);
+        n := VartoStr(R.fields[i].newvalue);
+        ret := ret + trimRight(n);
+      end;
+    end;
+  end;
+  ret := ret + '     ';
+  a := @ret[1];
+  i := length(ret) - 2;
+  c := crc32(0, a, i);
+  Result := c;
+end;
+
+procedure TDA_table.init(D: TMainData);(* ************************************ *)
+begin
+
+//  RechQuery.Transaction := Data.Transaction;
+end;
+
+procedure TDA_table.Read(R: Tdataset; id: longint);(* ********************** *)
+
+var
+  sselect: string;
+  sinsert : string;
+  svalues : string;
+  supdate: string;
+  sdelete: string;
+  swhere: string;
+  scrc : string;
+  nbupd, nbselect: integer;
+  i: integer;
+  cd: TColumnDesc;
+  castmemo,s : shortstring;
+  upd : TZUpdateSQL;
+
+begin
+  assert(assigned(R), 'Requête non assignée');
+  assert(table > '', 'Table non renseignée');
+  if not MainData.isConnected then exit;
+  Screen.Cursor := crHourGlass;
+  MainForm.setMicroHelp(rs_read+' ['+table+'] : '+inttostr(id));
+  if not assigned(R) then
+  begin
+    Maindata.readDataSet(R,'',false);
+  end;
+  R.Close;
+  castmemo:=Maindata.getSyntax('CASTMEMO','TRIM(%s)');
+ { if R is TSqlQuery then
+  begin
+    TSqlQuery(R).database := MainData.Database;
+    TSqlQuery(R).UsePrimaryKeyAsKey := False;
+  end else
+  if R is TZQuery then
+  begin
+       TZquery(R).Connection:=MainData.ZConnection;
+  end; }
+  if MainData.isConnected then
+  begin
+
+    sselect := 'SELECT ';
+    supdate := 'UPDATE ' + table + ' SET ';
+    sdelete := 'DELETE FROM ' + table;
+    sinsert := 'INSERT INTO '+table+' (';
+    scrc:='';
+    svalues:='';
+
+    nbupd := 0;
+    nbselect := 0;
+
+    swhere := ' WHERE ' + cle + ' = ' + IntToStr(id);
+
+    i := 0;
+    while i < Maindata.tablesdesc.Count do
+    begin
+      cd := Maindata.tablesdesc[i];
+      if cd.table_name = table then
+      begin
+        Inc(nbselect);
+        if nbselect > 1 then
+        begin
+          sselect := sselect + ', ';
+        end;
+        if (cd.col_type='CHAR')  then
+        begin
+            s:=StringReplace(castmemo,'%s',cd.col_name,[rfReplaceAll]);
+            sselect := sselect + ' '+s+' as ' + cd.col_name;
+        end else
+        begin
+             sselect := sselect + cd.col_name;
+        end;
+        if cd.col_name<>'SY_ID' then
+        begin
+          if nbupd > 0 then
+            supdate := supdate + ', ';
+          supdate := supdate + cd.col_name + '=:' + cd.col_name;
+          Inc(nbupd);
+        end;
+        if cd.col_name='SY_CRC' then
+        begin
+          scrc:=scrc+' AND SY_CRC = :OLD_SY_CRC';
+        end;
+        // todo : lwj-A revoir : le test ne marche pas
+        if cd.col_name='SY_ROWVERSION' then
+        begin
+          //scrc:=scrc+' AND SY_ROWVERSION = :OLD_SY_ROWVERSION';
+        end;
+        if nbselect>1 then sinsert:=sinsert+', ';
+        sinsert:=sinsert+cd.col_name;
+        if nbselect>1 then svalues:=svalues+', ';
+        svalues:=svalues+':'+cd.col_name;
+      end;
+      Inc(i);
+    end;
+    sselect := sselect + ' FROM ' + table + ' ' + swhere;
+    supdate := supdate + swhere+' '+scrc;
+    sdelete := sdelete + ' ' + swhere+scrc;
+    sinsert:=sinsert+') VALUES ('+svalues+')';
+  end;
+
+  try
+    if R is TSqlQuery then
+    begin
+      TSqlQuery(R).sql.text:=sselect;
+      TSqlQuery(R).UpdateSql.text:=supdate;
+      TSqlQuery(R).DeleteSQL.text:=sdelete;
+      TSqlQuery(R).InsertSQL.text:=sinsert;
+      TSqlQuery(R).prepare;
+    end else
+    if R is TZQuery then
+    begin
+         TZquery(R).sql.text:=sselect;
+         upd:=TZquery(R).UpdateObject;
+         if not assigned(upd) then
+         begin
+             upd:=TZUpdateSQL.Create(R);
+         end;
+         upd.DeleteSQL.Text:=sdelete;
+         upd.ModifySQL.Text:=supdate;
+         upd.InsertSQL.Text:=sinsert;
+         TZquery(R).UpdateObject:=upd;
+         TZquery(R).prepare;
+         TZquery(R).ReadOnly:=false;
+    end;
+  except
+    on E: Exception do Error(E, dber_sql, sselect);
+  end;
+
+  try
+    R.Open;
+  except
+    on E: Exception do
+      Error(E, dber_sql, sselect);
+  end;
+  for i:=0 to R.Fields.Count - 1 do
+  begin
+       if (R.Fields[i].Name<>'SY_ID') and (R.Fields[i].Name<>'SY_CRC') and (R.Fields[i].Name<>'SY_LASTUSER') and (R.Fields[i].Name<>'SY_ROWVERSION') then
+       R.Fields[i].ReadOnly:=false;
+  end;
+  if R is TSqlQuery then TSqlTransaction(TSQLquery(R).Transaction).CommitRetaining ;
+  MainForm.setMicroHelp(rs_ready,0);
+  Screen.Cursor := crDefault;
+end;
+
+function TDA_table.Delete(R: TDataSet; var id: longint): TDbErrcode;
+
+begin
+  assert(assigned(R), 'Query not assigned');
+  assert(R.RecordCount <= 1, 'Just one update allowed');
+  //assert(assigned(R.Transaction), 'Transaction not assigned');
+  //assert(R.Transaction is TSQLTransaction, 'Transaction is not TSQLTransation');
+ { Result := cber_nothing;
+  if not MainData.isConnected then exit;
+  R.Delete;
+  Result := dber_none;}
+end;
+
+function TDA_table.getCurrentId  : longint;
+
+var queryid : TDataSet;
+    SQueryId : String;
+
+begin
+   QueryId:=nil;
+   SqueryId:=Maindata.getQuery('QID01','SELECT ID FROM LWH_ID WHERE ENTITY =''%t'';');
+   SqueryId:=SqueryId.Replace('%t',table);
+   MainData.readDataSet(QueryId,SQueryID,true);
+   if queryid.RecordCount=1 then
+   begin
+       result:=queryid.fields[0].AsInteger;
+       inc(result);
+   end else
+   begin
+     result:=1;
+   end;
+   queryid.close;
+   queryid.free;
+end;
+
+function TDA_table.getNextId : integer;
+
+var queryid : TDataSet;
+    SQueryId : String;
+
+begin
+    QueryId:=nil;
+    SqueryId:=Maindata.getQuery('QID01','SELECT ID FROM LWH_ID WHERE ENTITY =''%t'';');
+    SqueryId:=SqueryId.Replace('%t',table);
+    MainData.readDataSet(QueryId,SQueryID,true);
+    if queryid.RecordCount=1 then
+    begin
+       result:=queryid.fields[0].AsInteger;
+       inc(result);
+       queryid.close;
+       SqueryId:=Maindata.getQuery('QID02','UPDATE LWH_ID SET ID=%r WHERE ENTITY =''%t'';');
+       SqueryId:=SqueryId.Replace('%t',table);
+       SqueryId:=SqueryId.Replace('%r',inttostr(result));
+       MainData.DoScript(SQueryId);
+    end else
+    begin
+      result:=1;
+      queryid.close;
+      SqueryId:=Maindata.getQuery('QID03','INSERT INTO LWH_ID (ENTITY, ID) VALUES (''%t'', %r);');
+      SqueryId:=SqueryId.Replace('%t',table);
+      SqueryId:=SqueryId.Replace('%r',inttostr(result));
+      MainData.DoScript(SQueryId);
+    end;
+    queryid.free;
+end;
+
+function TDA_table.codeCalc(base,firstname, lastname : shortstring) : shortstring;
+
+var QueryCode: TDataset;
+    sql : string;
+    n : longint;
+
+begin
+     QueryCode:=nil;
+     base:=trim(base);
+     if base<=' ' then
+     begin
+       base:=trim(lastname)+trim(firstname);
+     end;
+     base:=AnsiUpperCase(base);
+     base:=normalize(base);
+     base:=ReplaceStr(base,' ','');
+     base:=leftstr(base,4);
+
+     while length(base)<6 do base:=base+'0';
+     base:=leftstr(base,6)+'1';
+
+
+     sql:=Maindata.getQuery('QID04','SELECT SY_CODE from %t where SY_CODE=''%code'' ');
+     sql:=sql.Replace('%t',table);
+     sql:=sql.Replace('%code',base);
+     MainData.readDataSet(QueryCode,sql,true);
+     if querycode.RecordCount=0 then
+     begin
+       result:=base;
+       querycode.close;
+       querycode.free;
+       exit;
+     end;
+     querycode.close;
+     sql:=MainData.getQuery('QID05','SELECT MAX(SY_CODE) from %t where SY_CODE LIKE ''%code%'' ');
+     sql:=sql.Replace('%t',table);
+     sql:=sql.Replace('%code',leftstr(base,4));
+     MainData.readDataSet(QueryCode,sql,true);
+     sql := querycode.fields[0].asString;
+     sql:=sql.substring(4,10);
+     if trystrtoint(sql,n) then
+     begin
+       inc(n);
+       result:=leftstr(base,4);
+       base:=inttostr(n);
+       while length(base)<4 do base:='0'+base;
+       result:=result+base;
+     end;
+end;
+
+function TDA_table.Insert(R: TDataSet): TDbErrcode;
+
+var
+  cd: TColumnDesc;
+  fname : string;
+  i: integer;
+  l: longint;
+  f: real;
+
+begin
+  assert(assigned(R), 'Query not assigned');
+  assert((R is TSQLQuery) or (R is TZQuery),'Invalid data set type');
+ // assert(assigned(R.Transaction), 'Transaction not assigned');
+//  assert(R.Transaction is TSQLTransaction, 'Transaction is not TSQLTransation');
+  MainForm.setMicroHelp(rs_insert+' ['+table+']');
+  Result := cber_nothing;
+  if not MainData.isConnected then exit;
+
+  Screen.Cursor := crHourGlass;
+
+  if R.FieldCount = 0 then
+  begin
+    Read(R, -1);
+  end;
+
+  try
+    R.Append;
+    for i := 0 to R.FieldCount - 1 do
+    begin
+      fname := R.fields[i].FieldName;
+      if fname > '' then
+      begin
+        cd := Maindata.tablesdesc.Find(table, fname);
+        assert(assigned(cd), 'Description du champ ' + fname + ' non trouvée');
+        assert(cd.col_name = fname, 'Description du champ ' + fname + ' non trouvée');
+        if fname='SY_ID' then
+        begin
+                R.fields[i].asInteger := getCurrentId;
+        end;
+        if fname <> cle then
+        begin
+          if cd.defval > ' ' then
+          begin
+            if (cd.col_type = 'CHAR') or (cd.col_type = 'VARCHAR') then
+              R.fields[i].asString := cd.defval;
+            if (cd.col_type = 'INT') then
+              if TryStrToInt(cd.defval, l) then
+                R.fields[i].asInteger := l;
+            if (cd.col_type = 'DECIMAL') then
+              if TryStrTofloat(cd.defval, f) then
+                R.fields[i].AsFloat := f;
+          end;
+        end;
+      end;
+    end;
+    Result := dber_none;
+  except
+    on E: Exception do
+    begin
+      Error(e, dber_sql, '');
+      Result := dber_sql;
+    end;
+  end;
+  MainForm.setMicroHelp(rs_ready,0);
+  Screen.Cursor := crDefault;
+end;
+
+procedure TDA_table.setDefault(R : TDataset);
+
+var i : integer;
+     fname : shortstring;
+     firstname, lastname : shortstring;
+     cd: TColumnDesc;
+
+begin
+   assert(assigned(R), 'Query not assigned');
+   assert(R.RecordCount <= 1, 'Just one update allowed');
+   for i := 0 to R.FieldCount - 1 do
+   begin
+     fname := R.fields[i].FieldName;
+     if fname > '' then
+     begin
+       cd := Maindata.tablesdesc.Find(table, fname);
+       assert(assigned(cd), 'Description du champ ' + fname + ' non trouvée');
+       assert(cd.col_name = fname, 'Description du champ ' + fname + ' non trouvée');
+       if cd.col_name='SY_CODE' then
+       begin
+              R.Edit;
+              firstname:=R.FieldByname('SY_FIRSTNAME').AsString;
+              lastname:=R.FieldByname('SY_LASTNAME').AsString;
+              R.fields[i].asString:=codeCalc(R.fields[i].asString,firstname, lastname);
+       end;
+
+     end;
+   end;
+end;
+
+procedure TDA_table.apply_style(R : TDataSet; st : TUpdateStatus);
+
+var i : integer;
+    nom : string;
+    n,n1 : string;
+    cd: TColumnDesc;
+
+begin
+  if (st<>usmodified) and (st<>usInserted) then exit;
+  assert(assigned(R), 'Query not assigned');
+  assert(R.RecordCount <= 1, 'Just one update allowed');
+  for i := 0 to R.FieldCount - 1 do
+  begin
+    nom := (R.fields[i].FieldName).ToUpper;
+    if nom > '' then
+    begin
+      cd := Maindata.tablesdesc.Find(table, nom);
+      assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
+      assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
+      n := trimRight(VartoStr(R.fields[i].newvalue));
+      n1:=n;
+      if (cd.col_type='CHAR') then
+      begin
+            n1:=trim(n);
+            n1:=leftstr(n1,cd.col_lenght);
+            //if cd.style='NAME' then n1:=AnsiProperCase(n1,StdWordDelims+['-']);
+      end;
+      if n<>n1 then
+      begin
+           R.Edit;
+           R.fields[i].Value:=n1;
+           R.post;
+      end;
+    end;
+  end;
+end;
+
+function TDA_table.normalize ( s : string) : string;
+
+var i : integer;
+    c : String;
+
+begin
+  result:='';
+  for i := 1 to UTF8Length(s) do
+  begin
+     c := UTF8copy(s,i,1);
+     if c > 'z' then
+     begin
+       if (c='À') or (c='Á') or (c='Â') or (c='Ã') or (c='Ä') or (c='Å') or (c='Æ') then c:='A' else
+       if (c='à') or (c='á') or (c='â') or (c='ã') or (c='ä') or (c='å') or (c='æ') then c:='a' else
+       if (c='ß') then c:='B' else
+       if (c='Ç') then c:='C' else
+       if (c='ç') then c:='c' else
+       if (c='Ð') then c:='D' else
+       if (c='ð') then c:='d' else
+       if (c='È') or (c='É') or (c='Ê') or (c='Ë') then c:='E' else
+       if (c='è') or (c='é') or (c='ê') or (c='ë') then c:='e' else
+       if (c='Ì') or (c='Í') or (c='Î') or (c='Ï') then c:='I' else
+       if (c='ì') or (c='í') or (c='î') or (c='ï') then c:='i' else
+       if (c='Ñ') then c:='N' else
+       if (c='ñ') then c:='n' else
+       if (c='Ò') or (c='Ó') or (c='Ô') or (c='Õ') or (c='Ö') or (c='Œ') or (c='Ø') then c:='O' else
+       if (c='ò') or (c='ó') or (c='ô') or (c='õ') or (c='ö') or (c='œ') or (c='ø') then c:='o' else
+       if (c='Ù') or (c='Ú') or (c='Û') or (c='Ü') then c:='U' else
+       if (c='ù') or (c='ú') or (c='û') or (c='ü') then c:='u' else
+       if (c='Ý') or (c='Ÿ') then c:='Y' else
+       if (c='ý') or (c='ÿ') then c:='y' else
+       c:=' ';
+     end;
+     result:=result+c;
+  end;
+end;
+
+// https://wiki.freepascal.org/Databases
+function TDA_table.Write(R: TDataSet; var id: longint): TDbErrcode;
+
+var
+  ncrc: longint;
+  testcrc: longint;
+  oldcrc: longint;
+  testrowversion : tdatetime;
+  oldrowversion : tdatetime;
+  testolduser : shortstring;
+  olduser : shortstring;
+  i, nbwherecrc: integer;
+  squerycrc: string;
+  reselect: string;
+  nbreselect: integer;
+  cd: TColumnDesc;
+  nom, o, n: string;
+  Querycrc: TDataSet;
+  st: TUpdateStatus;
+
+begin
+  assert(assigned(R), 'Query not assigned');
+  assert((R is TSqlQuery) or (R is TZquery),'Invalid dataset type');
+  assert(R.RecordCount <= 1, 'Just one update allowed');
+  MainForm.setMicroHelp(rs_write+' ['+table+'] : '+inttostr(id));
+  Result := cber_nothing;
+  if not MainData.isConnected then exit;
+  Screen.Cursor := crHourGlass;
+
+
+  if checkcrc then
+  begin
+    try
+      ncrc := getcrc(R);
+    except
+      ncrc := random(2147483647);
+    end;
+    R.FieldByName('SY_CRC').newvalue := ncrc;
+  end;
+
+  if R.Modified then
+    R.post;
+
+  st := R.UpdateStatus;
+  case st of
+    usUnmodified :
+    begin
+        Screen.Cursor := crDefault;
+        MainForm.setMicroHelp(rs_ready,0);
+        exit;
+    end;
+    usInserted   : setDefault(R);
+  end;
+
+  apply_style(R, st);
+
+  if not R.Active then
+    exit;
+  if R.FieldCount = 0 then
+    exit;
+
+  reselect := 'SELECT ' + cle + ' FROM ' + table + ' WHERE ';
+
+
+
+  nbwherecrc := 0;
+  testcrc := 0;
+  nbreselect := 0;
+
+
+  squerycrc := 'SELECT SY_CRC, SY_ROWVERSION, SY_LASTUSER FROM ' + table + ' WHERE ';
+  for i := 0 to R.FieldCount - 1 do
+  begin
+    nom := (R.fields[i].FieldName).ToUpper;
+    if nom > '' then
+    begin
+      cd := Maindata.tablesdesc.Find(table, nom);
+      assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
+      assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
+      o := trimRight(VartoStr(R.fields[i].OldValue));
+      n := trimRight(VartoStr(R.fields[i].newvalue));
+      if nom = cle then
+      begin
+        if not TryStrToInt(o, id) then
+          id := -1;
+      end;
+      if nom = 'SY_CRC' then
+      begin
+        oldcrc:=0;
+        try
+           if not MainData.IsNullOrEmpty(o) then trystrtoint(o,oldcrc);
+        except
+        end;
+
+        if not (st in [usDeleted]) then
+        begin
+          if nbreselect > 0 then
+            reselect := reselect + ' AND ';
+          reselect := reselect + ' SY_CRC=' + IntToStr(ncrc);
+          Inc(nbreselect);
+        end;
+      end
+      else
+      if cd.col_name='SY_ID' then
+      begin
+        if (nom='SY_ID') and (st=usInserted) then
+        begin
+          R.Edit;
+          id :=  getnextid;
+          R.Fields[i].AsInteger:=id;
+        end;
+        //R.fields[i].ReadOnly := True;
+        if nbwherecrc > 0 then
+          squerycrc := squerycrc + ' AND ';
+        squerycrc := squerycrc + nom + ' = ' + o;
+        Inc(nbwherecrc);
+      end
+      else
+      IF nom='SY_ROWVERSION' then
+      begin
+        oldrowversion:=EncodeDate(1963,08,03);
+        try
+           if not MainData.IsNullOrEmpty(o) then
+           trystrtodatetime(o,oldrowversion);
+        except
+        end;
+      end else
+      if nom='SY_LASTUSER' then
+      begin
+           try
+              olduser:='';
+              if not MainData.IsNullOrEmpty(o) then olduser:=o;
+           except
+           end;
+      end else
+      if o <> n then
+      begin
+        if (o = '') and (n > ' ') then
+        begin
+          if nbreselect > 0 then
+            reselect := reselect + ' AND ';
+          if (cd.col_type = 'CHAR') then
+            reselect := reselect + nom + ' =''' + n + ''' ';
+          if (cd.col_type = 'NUM') then
+            reselect := reselect + nom + ' =' + n + ' ';
+          //if (cd.type_col='DATE')
+          Inc(nbreselect);
+        end;
+      end;
+    end;
+  end;
+  //  test(R,action,nbwar,nberr,msg);
+
+  if (st in [usModified, usDeleted]) and (checkcrc) then
+  begin
+    try
+       if MainData.cmode='ZEO' then
+      begin
+        Querycrc:=TZReadOnlyQuery.create(self);
+        TZReadOnlyQuery(Querycrc).connection:=Maindata.ZConnection;
+        TZReadOnlyQuery(Querycrc).SQL.Add(squerycrc);
+      end else
+      begin
+        Querycrc:=TSQLQuery.create(self);
+        TSQLQuery(Querycrc).DataBase:=MainData.Database;
+        TSQLQuery(Querycrc).transaction:=MainData.tran;
+        TSQLQuery(Querycrc).SQL.Add(squerycrc);
+      end;
+      querycrc.Open;
+      if querycrc.RecordCount = 1 then
+      begin
+        try
+          testcrc:=0;
+          try
+             if not querycrc.FieldByName('SY_CRC').IsNull then testcrc := querycrc.FieldByName('SY_CRC').AsLongint;
+          except
+          end;
+
+          testolduser:='';
+          try
+             if  not querycrc.FieldByName('SY_LASTUSER').IsNull then testolduser:=querycrc.FieldByName('SY_LASTUSER').AsString;
+          except
+          end;
+
+          testrowversion:=EncodeDate(1963,08,03);
+          try
+             if  not querycrc.FieldByName('SY_ROWVERSION').IsNull then testrowversion:=querycrc.FieldByName('SY_ROWVERSION').AsDateTime;
+          except
+          end;
+        except
+          testcrc := 0;
+          testolduser:='';
+          testrowversion:=EncodeDate(1963,08,03);
+        end;
+      end;
+    finally
+      if MainData.cmode='BDE' then MainData.tran.Commit;
+      Querycrc.Close;
+      Querycrc.Free;
+    end;
+    // Todo : lwh-Tester une différence plus faible
+    if (oldcrc <> testcrc) or (testolduser<>olduser) or (not sameDate(oldrowversion,testrowversion)) then
+    begin
+      Result := dber_crc;
+      R.Close;
+      R.Open;
+      raise TCrcException.Create(table + ' ' + IntToStr(id)+' User : '+testolduser+' Date :'+dateTostr(testrowversion));
+      exit;
+    end;
+  end;
+  try
+    Result := dber_none;
+    if R is TSqlQuery then TSqlquery(R).ApplyUpdates(0) else
+    if R is TZquery then TZquery(R).ApplyUpdates;
+
+
+  except
+    on E: Exception do
+    begin
+      Error(e, dber_sql, '');
+      Result := dber_sql;
+      exit;
+    end;
+  end;
+  if MainData.cmode='DBE' then TSqlTransaction(TSqlQuery(R).Transaction).CommitRetaining ;
+
+{  if st in [usInserted] then
+  begin
+    try
+      Querycrc := TSqlQuery.Create(self);
+      Querycrc.database := R.database;
+      Querycrc.transaction := R.transaction;
+      Querycrc.sql.Text := reselect;
+      Querycrc.Open;
+      if Querycrc.RecordCount = 1 then
+      begin
+        id := StrToInt(Querycrc.FieldByName(cle).OldValue);
+      end
+      else
+      begin
+        Querycrc.Close;
+        reselect := 'SELECT MAX(' + cle + ') as IDM  FROM ' + table;
+        Querycrc.sql.Text := reselect;
+        Querycrc.Open;
+        if Querycrc.RecordCount = 1 then
+        begin
+          id := StrToInt(Querycrc.FieldByName('IDM').OldValue);
+        end;
+      end;
+      Querycrc.Close;
+    finally
+      Querycrc.Free;
+    end;
+  end; }
+
+  if not (st in [usDeleted]) then Read(R,id);
+
+  Result := dber_none;
+  MainForm.setMicroHelp(rs_ready,0);
+  Screen.Cursor := crDefault;
+end;
+
+
+function TDA_table.Test(R: TDataSet; action: char; var nbwarnings, nberr: integer;
+  var msg: string): boolean;
+
+var
+  i: integer;
+  nom: string;
+  ret: boolean;
+  cd: TColumnDesc;
+
+begin
+  assert(assigned(R), 'Requête non assignée');
+  assert(table > '', 'Table non renseignée');
+  ret := True;
+  if R.modified then
+  begin
+    for i := 0 to R.FieldCount - 1 do
+    begin
+      nom := R.fields[i].FieldName;
+      if nom > '' then
+      begin
+        cd := Maindata.tablesdesc.Find(table, nom);
+        assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
+        assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
+
+
+        if nom = 'SY_CRC' then
+        begin
+          R.fields[i].newvalue := getcrc(R);
+        end;
+        {if o <> n then
+        begin
+          if (n = '') and (not cd.nullable) then
+          begin
+            msg := msg + 'Le champ "' + cd.nom_externe +
+              '" doit être renseigné.' + sLineBreak;
+            ret := False;
+          end;
+        end;  }
+      end;
+    end;
+  end;
+  Test := ret;
+end;
+
+end.

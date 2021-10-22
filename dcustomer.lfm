@@ -1,0 +1,7 @@
+object Customer: TCustomer
+  OldCreateOrder = False
+  Height = 150
+  HorizontalOffset = 778
+  VerticalOffset = 200
+  Width = 150
+end

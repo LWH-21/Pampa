@@ -1,0 +1,74 @@
+inherited Fr_planning: TFr_planning
+  Height = 485
+  Width = 859
+  ClientHeight = 485
+  ClientWidth = 859
+  OnResize = FrameResize
+  object plan: TPaintBox32[0]
+    Left = 0
+    Height = 440
+    Top = 45
+    Width = 838
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Constraints.MinHeight = 400
+    Constraints.MinWidth = 800
+    TabOrder = 0
+    OnPaintBuffer = planPaintBuffer
+  end
+  object ScrollBar1: TScrollBar[1]
+    Left = 841
+    Height = 395
+    Top = 56
+    Width = 17
+    Anchors = [akTop, akRight, akBottom]
+    Kind = sbVertical
+    PageSize = 0
+    TabOrder = 1
+  end
+  object Edit1: TEdit[2]
+    Left = 8
+    Height = 23
+    Top = 19
+    Width = 80
+    TabOrder = 2
+    Text = 'Edit1'
+  end
+  object SpeedButton1: TSpeedButton[3]
+    Left = 98
+    Height = 22
+    Top = 19
+    Width = 23
+    OnClick = SpeedButton1Click
+  end
+  object Ed_date: TEdit[4]
+    Left = 696
+    Height = 23
+    Top = 19
+    Width = 80
+    ReadOnly = True
+    TabOrder = 3
+    Text = 'Ed_date'
+  end
+  object SpeedButton2: TSpeedButton[5]
+    Left = 664
+    Height = 22
+    Top = 19
+    Width = 23
+    OnClick = SpeedButton2Click
+  end
+  object SpeedButton3: TSpeedButton[6]
+    Left = 784
+    Height = 22
+    Top = 19
+    Width = 23
+    OnClick = SpeedButton3Click
+  end
+  object Ed_name: TEdit[7]
+    Left = 128
+    Height = 23
+    Top = 19
+    Width = 528
+    TabOrder = 4
+    Text = 'Ed_name'
+  end
+end

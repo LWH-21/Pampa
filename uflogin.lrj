@@ -1,0 +1,10 @@
+{"version":1,"strings":[
+{"hash":5463550,"name":"tflogin.caption","sourcebytes":[76,111,103,105,110],"value":"Login"},
+{"hash":69006586,"name":"tflogin.label1.caption","sourcebytes":[85,116,105,108,105,115,97,116,101,117,114,32,58],"value":"Utilisateur :"},
+{"hash":195479938,"name":"tflogin.ed_user.text","sourcebytes":[69,100,95,117,115,101,114],"value":"Ed_user"},
+{"hash":79325140,"name":"tflogin.ed_pwd.text","sourcebytes":[69,100,95,112,119,100],"value":"Ed_pwd"},
+{"hash":182997461,"name":"tflogin.cb_pwd.caption","sourcebytes":[65,102,102,105,99,104,101,114,32,108,101,32,109,111,116,32,100,101,32,112,97,115,115,101],"value":"Afficher le mot de passe"},
+{"hash":15480074,"name":"tflogin.label2.caption","sourcebytes":[77,111,116,32,100,101,32,112,97,115,115,101,32,58],"value":"Mot de passe :"},
+{"hash":60021969,"name":"tflogin.combobox1.text","sourcebytes":[67,111,109,98,111,66,111,120,49],"value":"ComboBox1"},
+{"hash":157088586,"name":"tflogin.label3.caption","sourcebytes":[80,114,111,102,105,108,32,58],"value":"Profil :"}
+]}

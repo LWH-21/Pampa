@@ -1,0 +1,9 @@
+object W_F: TW_F
+  Left = 0
+  Height = 310
+  Top = 0
+  Width = 253
+  TabOrder = 0
+  DesignLeft = 643
+  DesignTop = 154
+end

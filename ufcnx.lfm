@@ -1,0 +1,259 @@
+inherited FCnx: TFCnx
+  Left = 692
+  Height = 469
+  Top = 77
+  Width = 538
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'FCnx'
+  ClientHeight = 469
+  ClientWidth = 538
+  OnClose = FormClose
+  OnCreate = FormCreate
+  object CB_cnx: TComboBox[0]
+    Left = 88
+    Height = 33
+    Top = 16
+    Width = 432
+    ItemHeight = 0
+    OnChange = CB_cnxChange
+    Style = csDropDownList
+    TabOrder = 0
+  end
+  object Label1: TLabel[1]
+    Left = 8
+    Height = 15
+    Top = 21
+    Width = 44
+    Caption = 'Profil :'
+    ParentColor = False
+  end
+  object Label2: TLabel[2]
+    Left = 8
+    Height = 15
+    Top = 48
+    Width = 130
+    Caption = 'Type de connexion :'
+    ParentColor = False
+  end
+  object Label3: TLabel[3]
+    Left = 8
+    Height = 15
+    Top = 80
+    Width = 59
+    Caption = 'Syntaxe :'
+    ParentColor = False
+  end
+  object Label4: TLabel[4]
+    Left = 8
+    Height = 15
+    Top = 112
+    Width = 119
+    Caption = 'Base de données :'
+    ParentColor = False
+  end
+  object BitBtn_ok: TBitBtn[5]
+    Left = 8
+    Height = 30
+    Top = 432
+    Width = 75
+    Caption = '&OK'
+    Default = True
+    ModalResult = 1
+    OnClick = BitBtn_okClick
+    TabOrder = 1
+  end
+  object DBCboxConnectortype: TDBComboBox[6]
+    Left = 152
+    Height = 29
+    Top = 48
+    Width = 368
+    DataField = 'CONNECTORTYPE'
+    DataSource = Source
+    ItemHeight = 0
+    Items.Strings = (
+      'FireBIrd'
+      'MSSQLServer'
+      'MySQL 4.0'
+      'MySQL 4.1'
+      'MySQL 5.0'
+      'MySQL 5.1'
+      'MySQL 5.5'
+      'MySQL 5.6'
+      'MySQL 5.7'
+      'ODBC'
+      'PostgreSQL'
+      'SQLite3'
+      'Sybase'
+    )
+    MaxLength = 0
+    Style = csDropDownList
+    TabOrder = 2
+  end
+  object DBCboxSyntax: TDBComboBox[7]
+    Left = 152
+    Height = 29
+    Top = 80
+    Width = 368
+    DataField = 'SQLSYNTAX'
+    DataSource = Source
+    ItemHeight = 0
+    Items.Strings = (
+      'FIREBIRD'
+      'MYSQL'
+      'POSTRESQL'
+      'SQLITE'
+      'SQLSERVER'
+      'STDT'
+    )
+    MaxLength = 0
+    Style = csDropDownList
+    TabOrder = 3
+  end
+  object DBEd_Databasename: TDBEdit[8]
+    Left = 152
+    Height = 28
+    Top = 112
+    Width = 368
+    DataField = 'DATABASENAME'
+    DataSource = Source
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 4
+  end
+  object DBEd_Hostname: TDBEdit[9]
+    Left = 152
+    Height = 28
+    Top = 144
+    Width = 368
+    DataField = 'HOSTNAME'
+    DataSource = Source
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 5
+  end
+  object DBEd_driver: TDBEdit[10]
+    Left = 152
+    Height = 28
+    Top = 176
+    Width = 368
+    DataField = 'DRIVER'
+    DataSource = Source
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 6
+  end
+  object DBEd_FileDsn: TDBEdit[11]
+    Left = 152
+    Height = 28
+    Top = 208
+    Width = 368
+    DataField = 'FILEDSN'
+    DataSource = Source
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 7
+  end
+  object DBEd_Params: TDBEdit[12]
+    Left = 152
+    Height = 28
+    Top = 240
+    Width = 368
+    DataField = 'PARAMS'
+    DataSource = Source
+    CharCase = ecNormal
+    MaxLength = 0
+    TabOrder = 8
+  end
+  object Label5: TLabel[13]
+    Left = 8
+    Height = 15
+    Top = 144
+    Width = 76
+    Caption = 'Hostname :'
+    ParentColor = False
+  end
+  object Label6: TLabel[14]
+    Left = 8
+    Height = 15
+    Top = 176
+    Width = 48
+    Caption = 'Driver :'
+    ParentColor = False
+  end
+  object Label7: TLabel[15]
+    Left = 8
+    Height = 15
+    Top = 208
+    Width = 60
+    Caption = 'FileDSN :'
+    ParentColor = False
+  end
+  object Label8: TLabel[16]
+    Left = 10
+    Height = 15
+    Top = 240
+    Width = 58
+    Caption = 'Params :'
+    ParentColor = False
+  end
+  object Btn_test: TBitBtn[17]
+    Left = 88
+    Height = 30
+    Top = 432
+    Width = 136
+    Caption = 'Tester la connexion'
+    OnClick = Btn_testClick
+    TabOrder = 9
+  end
+  object Source: TDataSource[18]
+    DataSet = MData
+    left = 304
+    top = 424
+  end
+  object MData: TBufDataset[19]
+    FieldDefs = <    
+      item
+        Name = 'NAME'
+        DataType = ftString
+        Size = 100
+      end    
+      item
+        Name = 'CONNECTORTYPE'
+        DataType = ftString
+        Size = 100
+      end    
+      item
+        Name = 'SQLSYNTAX'
+        DataType = ftString
+        Size = 100
+      end    
+      item
+        Name = 'DATABASENAME'
+        DataType = ftString
+        Size = 255
+      end    
+      item
+        Name = 'HOSTNAME'
+        DataType = ftString
+        Size = 255
+      end    
+      item
+        Name = 'DRIVER'
+        DataType = ftString
+        Size = 255
+      end    
+      item
+        Name = 'PARAMS'
+        DataType = ftString
+        Size = 255
+      end    
+      item
+        Name = 'FILEDSN'
+        DataType = ftString
+        Size = 255
+      end>
+    left = 256
+    top = 424
+  end
+end

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <General>
+      <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
+      <Title Value="Pampa"/>
+      <Scaled Value="True"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <XPManifest>
+        <DpiAware Value="True"/>
+        <TextName Value="LWH.Pampa"/>
+        <TextDesc Value="Planification"/>
+      </XPManifest>
+    </General>
+    <LazDoc Paths="FPdoc"/>
+    <i18n>
+      <EnableI18N Value="True"/>
+      <OutDir Value="lang"/>
+    </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <Language Value="040C"/>
+      <Attributes pvaDebug="True"/>
+      <StringTable CompanyName="LWH" InternalName="Pampa" ProductName="Pampa"/>
+    </VersionInfo>
+    <BuildModes Count="1">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0"/>
+    </RunParams>
+    <RequiredPackages Count="11">
+      <Item1>
+        <PackageName Value="zcomponent"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="lr_zeosdb"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="lazreport"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="DateTimeCtrls"/>
+      </Item4>
+      <Item5>
+        <PackageName Value="virtualtreeview_package"/>
+      </Item5>
+      <Item6>
+        <PackageName Value="SynEdit"/>
+      </Item6>
+      <Item7>
+        <PackageName Value="pl_Graphics32"/>
+      </Item7>
+      <Item8>
+        <PackageName Value="LazControls"/>
+      </Item8>
+      <Item9>
+        <PackageName Value="MemDSLaz"/>
+      </Item9>
+      <Item10>
+        <PackageName Value="FCL"/>
+      </Item10>
+      <Item11>
+        <PackageName Value="LCL"/>
+      </Item11>
+    </RequiredPackages>
+    <Units Count="20">
+      <Unit0>
+        <Filename Value="Pampa.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MainForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Main"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="dataaccess.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MainData"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <UnitName Value="DataAccess"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="dintervenant.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Intervenant"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <UnitName Value="Dintervenant"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="frechintervenant.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="RechIntervenant"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="FRechIntervenant"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="w_f.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="W_A"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="da_table.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DA_table"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <UnitName Value="DA_table"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="uexception.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FException"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UException"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="fru_intervenant.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Fr_Intervenant"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Fru_intervenant"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="uhistomanager.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UHistoManager"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="ressourcesstrings.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="RessourcesStrings"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="fru_planning.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Fr_planning"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Fru_planning"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="ufbdd.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Fbdd"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFbdd"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="utw_tab.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="W_Tab"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UTW_Tab"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="ufhistosup.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FHistoSup"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="ufbookmark.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FBookmark"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFbookmark"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="ufr_histo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Fr_Histo"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <UnitName Value="UFr_histo"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="datapanel.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DataPanel"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="ufcustomdp.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FCustomDP"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFCustomDp"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="ucfg_table.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FCfg_Table"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UCfg_table"/>
+      </Unit19>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value=".\DEBIAN\Pampa"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <OptimizationLevel Value="0"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <UseHeaptrc Value="True"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+    <Other>
+      <Verbosity>
+        <ShowHintsForUnusedUnitsInMainSrc Value="True"/>
+      </Verbosity>
+      <CompilerMessages>
+        <IgnoredMessages idx5026="True" idx5024="True"/>
+      </CompilerMessages>
+      <CustomOptions Value="-dDEBUG"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="5">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+      <Item4>
+        <Name Value="EODBCException"/>
+      </Item4>
+      <Item5>
+        <Name Value="EDatabaseError"/>
+      </Item5>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

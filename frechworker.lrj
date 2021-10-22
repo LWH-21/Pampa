@@ -1,0 +1,12 @@
+{"version":1,"strings":[
+{"hash":124833220,"name":"tsearch.caption","sourcebytes":[82,101,99,104,101,114,99,104,101,32,73,110,116,101,114,118,101,110,97,110,116],"value":"Recherche Intervenant"},
+{"hash":248027730,"name":"tsearch.bsearch.caption","sourcebytes":[67,104,101,114,99,104,101,114],"value":"Chercher"},
+{"hash":32111956,"name":"tsearch.grid.columns[0].title.caption","sourcebytes":[73,78,84,69,82,86,69,78,65,78,84,95,73,68],"value":"INTERVENANT_ID"},
+{"hash":295813,"name":"tsearch.grid.columns[1].title.caption","sourcebytes":[67,79,68,69],"value":"CODE"},
+{"hash":21309,"name":"tsearch.grid.columns[2].title.caption","sourcebytes":[78,79,77],"value":"NOM"},
+{"hash":89563965,"name":"tsearch.grid.columns[3].title.caption","sourcebytes":[80,82,69,78,79,77],"value":"PRENOM"},
+{"hash":80516034,"name":"tsearch.b_cancel.caption","sourcebytes":[70,101,114,109,101,114],"value":"Fermer"},
+{"hash":1371,"name":"tsearch.b_ok.caption","sourcebytes":[79,107],"value":"Ok"},
+{"hash":78569410,"name":"tsearch.b_create.caption","sourcebytes":[67,114,195,169,101,114],"value":"Cr\u00E9er"},
+{"hash":164345425,"name":"tsearch.button1.caption","sourcebytes":[66,117,116,116,111,110,49],"value":"Button1"}
+]}

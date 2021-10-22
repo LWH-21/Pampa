@@ -1,0 +1,15 @@
+{"version":1,"strings":[
+{"hash":196931621,"name":"tfbookmark.caption","sourcebytes":[77,97,114,113,117,101,114,32,108,97,32,112,97,103,101],"value":"Marquer la page"},
+{"hash":187821653,"name":"tfbookmark.ts_bookmark.caption","sourcebytes":[77,97,114,113,117,101,45,80,97,103,101],"value":"Marque-Page"},
+{"hash":131628404,"name":"tfbookmark.groupbox1.caption","sourcebytes":[69,109,112,108,97,99,101,109,101,110,116],"value":"Emplacement"},
+{"hash":95406722,"name":"tfbookmark.button2.caption","sourcebytes":[77,111,100,105,102,105,101,114],"value":"Modifier"},
+{"hash":125352194,"name":"tfbookmark.button4.caption","sourcebytes":[83,117,112,112,114,105,109,101,114],"value":"Supprimer"},
+{"hash":4960369,"name":"tfbookmark.edit1.text","sourcebytes":[69,100,105,116,49],"value":"Edit1"},
+{"hash":128011714,"name":"tfbookmark.btn_new.caption","sourcebytes":[78,111,117,118,101,97,117,32,100,111,115,115,105,101,114],"value":"Nouveau dossier"},
+{"hash":349706,"name":"tfbookmark.lb_name.caption","sourcebytes":[78,111,109,58],"value":"Nom:"},
+{"hash":104644131,"name":"tfbookmark.ts_stickers.caption","sourcebytes":[71,111,109,101,116,116,101,115],"value":"Gomettes"},
+{"hash":5073205,"name":"tfbookmark.drawgrid3.columns[0].title.caption","sourcebytes":[70,111,114,109,101],"value":"Forme"},
+{"hash":174861442,"name":"tfbookmark.drawgrid3.columns[1].title.caption","sourcebytes":[67,111,117,108,101,117,114],"value":"Couleur"},
+{"hash":4294967295,"name":"tfbookmark.drawgrid3.columns[2].title.caption","sourcebytes":[],"value":""},
+{"hash":146305475,"name":"tfbookmark.ts_labels.caption","sourcebytes":[69,116,105,113,117,101,116,116,101,115],"value":"Etiquettes"}
+]}

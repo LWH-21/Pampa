@@ -1,0 +1,7 @@
+{"version":1,"strings":[
+{"hash":80317634,"name":"tfexception.caption","sourcebytes":[69,114,114,101,117,114],"value":"Erreur"},
+{"hash":4960369,"name":"tfexception.edit1.text","sourcebytes":[69,100,105,116,49],"value":"Edit1"},
+{"hash":4960370,"name":"tfexception.edit2.text","sourcebytes":[69,100,105,116,50],"value":"Edit2"},
+{"hash":4960371,"name":"tfexception.edit3.text","sourcebytes":[69,100,105,116,51],"value":"Edit3"},
+{"hash":257856766,"name":"tfexception.bt_halt.caption","sourcebytes":[65,114,114,195,170,116,101,114,32,108,39,97,112,112,108,105,99,97,116,105,111,110],"value":"Arr\u00EAter l'application"}
+]}
