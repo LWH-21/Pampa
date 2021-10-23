@@ -41,6 +41,7 @@ resourcestring
   rs_non='&Non';
   rs_new='Nouveau';
   rs_oui='&Oui';
+  rs_planning='Planning';
   rs_quit='Fermeture de Pampa';
   rs_read='Lecture';
   rs_ready='Prêt';

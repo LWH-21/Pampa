@@ -155,7 +155,9 @@ function TPlanning.IsoStrToDate(s : shortstring) : TdateTime;
 var y,m,d : integer;
 
 begin
+  {$IFDEF WINDOWS}
   if not TryIsostrtodate(s,result) then
+  {$ENDIF}
   begin
        if TryStrToInt(copy(s,1,4),y) and tryStrToInt(copy(s,5,2),m) and TryStrToInt(copy(s,7,2),d) then
          result:=EncodeDate(y,m,d);

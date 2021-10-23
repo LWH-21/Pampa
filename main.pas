@@ -192,7 +192,7 @@ type
     procedure OpenFrame(F: TW_F; mode : char);
     procedure notify(Sender : Tcomponent; ev :TNotifySet);
     procedure log (msg : string);
-    procedure OpenWindow(code : shortstring);
+    procedure OpenWindow(code : shortstring;json : string='');
     procedure setMicroHelp(s : shortstring; t : integer = 3);
     procedure updatePanel(sender : Tform);
   end;
@@ -795,7 +795,7 @@ begin
 end;
 
 
-procedure TMainForm.OpenWindow(code : shortstring);
+procedure TMainForm.OpenWindow(code : shortstring;json : string='');
 
 var  find : boolean;
      f : TW_F;
@@ -824,16 +824,17 @@ begin
 
    if not find then
    begin
-     if (copy(code,1,4)='FWOR') or (copy(code,1,4)='FCUS') then
+     if (copy(code,1,4)='FWOR') or (copy(code,1,4)='FCUS') or (copy(code,1,3)='PLN') then
      begin
        try
          id:=Hex2Dec(copy(code,6,10));
          if id>=0 then
          begin
            if copy(code,1,4)='FWOR' then F := TFr_Person.Create(self, worker) else
-           if copy(code,1,4)='FCUS' then F := TFr_Person.Create(self, customer);
-           F.ID := id;
-           OpenFrame(F,'N');
+           if copy(code,1,4)='FCUS' then F := TFr_Person.Create(self, customer) else
+           if copy(code,1,3)='PLN' then F := TFr_Planning.Create(self);
+           F.init(id,json);
+           OpenFrame(F,' ');
          end;
        except
           on e : exception do log(e.ToString);
@@ -847,6 +848,7 @@ procedure TMainForm.MhistoClick(Sender: TObject);
 var n : integer;
     cl,code : shortString;
     id : longint;
+    j : string;
 
 
 
@@ -861,8 +863,8 @@ begin
        begin
          if trystrToInt(copy(TMenuItem(sender).Name,7,2),n) then
          begin
-           HistoManager.getMenuInfo(n,code,cl,id);
-           openwindow(code);
+           HistoManager.getMenuInfo(n,code,cl,id,j);
+           openwindow(code,j);
          end;
        end;
      end;

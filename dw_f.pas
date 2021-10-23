@@ -15,9 +15,11 @@ type
     id : longint;
 
     procedure init(Data: PtrInt); virtual;
+    procedure init(s_id : longint;j : string);virtual;abstract;
     function CanClose : boolean;virtual;
     procedure close;virtual;
     function getcode : shortstring;virtual;
+    function getinfos : shortstring;virtual;abstract;
     function IsModified : boolean; virtual;
     procedure open;virtual; abstract;
     procedure save(Data: PtrInt);virtual;

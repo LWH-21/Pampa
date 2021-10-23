@@ -40,9 +40,11 @@ type
     constructor Create(AOwner: TComponent; t : TDA_table);
     function CanClose: boolean; override;
     procedure init(Data: PtrInt); override;
+    procedure init(s_id : longint;j : string);override;
     procedure InitIhm;
     function IsModified: boolean; override;
     function getcode : shortstring;override;
+    function getinfos : shortstring;override;
     procedure open;override;
     procedure save(Data: PtrInt); override;
     function Search(var num : longint) : integer;
@@ -336,6 +338,12 @@ begin
   end;
 end;
 
+procedure TFr_Person.init(s_id : longint;j : string);
+
+begin
+  id:=s_id;
+end;
+
 procedure TFr_Person.InitIhm;
 
 var  ts : ttabsheet;
@@ -426,6 +434,11 @@ function TFr_Person.getcode : shortstring;
 
 begin
   result:='F'+copy(table.table,1,3)+'|'+intToHex(id,4);
+end;
+
+function TFr_Person.getinfos : shortstring;
+begin
+  result:='';
 end;
 
 procedure TFr_Person.open;

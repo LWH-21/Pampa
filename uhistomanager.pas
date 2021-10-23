@@ -18,6 +18,7 @@ Type
             code : shortstring;
             rownum : integer;
             caption : shortstring;
+            json : string;
            end;
 
   THisto = class
@@ -38,7 +39,7 @@ Type
         constructor create;
         procedure AddHisto(win : TW_F; id : longint; actions : shortstring);
         function getCaption(s : string) : shortstring;
-        procedure getMenuInfo(n : integer; var code, c : shortstring; var id : longint);
+        procedure getMenuInfo(n : integer; var code, c : shortstring; var id : longint; var j : string);
         procedure save;
         procedure UpdateMainMenu;
         Procedure LoadHisto;
@@ -78,6 +79,7 @@ begin
        hmenu[i].code:='';
        hmenu[i].rownum:=-1;
        hmenu[i].dt:='';
+       hmenu[i].json:='';
   end;
   sql:='';
   changed:=false;
@@ -115,6 +117,7 @@ begin
              hmenu[num].code:='';
              hmenu[num].rownum:=-1;
              hmenu[num].caption:='';
+             hmenu[num].json:='';
          end;
          query.close;
 
@@ -142,6 +145,7 @@ begin
                      hmenu[num].code:=code;
                      hmenu[num].rownum:=query.RecNo;
                      hmenu[num].caption:=getcaption(query.FieldByName('JSON').asString);
+                     hmenu[num].json:=query.FieldByName('JSON').AsString;
                 end;
               end;
               query.Next;
@@ -283,6 +287,7 @@ begin
     histo.Add('username',MainForm.username);
     histo.Add('caption',win.caption);
     histo.Add('actions',actions);
+    histo.Add('infos',win.getinfos);
     obj:=TJsonObject.Create;
     obj.Add('histo',histo);
     result:=obj.FormatJson([foSingleLineArray,foSingleLineObject,foDoNotQuoteMembers,foUseTabchar,foSkipWhiteSpace],1);
@@ -302,7 +307,7 @@ begin
     freeAndNil(fjson);
 end;
 
-procedure THistoManager.getMenuInfo(n : integer; var code, c : shortstring; var id : longint);
+procedure THistoManager.getMenuInfo(n : integer; var code, c : shortstring; var id : longint; var j : string);
 
 var p : integer;
     s : string;
@@ -316,6 +321,7 @@ begin
        if hmenu[n].visible then
        begin
             code:=hmenu[n].code;
+            j:=hmenu[n].json;
             p:=pos('|',code);
             if p>0 then
             begin
