@@ -7,6 +7,8 @@ excerpt: "A demo of Markdown and HTML includes"
 aside: true
 ---
 
+test carousel
+
 {% include carousel.html height="50" unit="%" duration="7" %}
 
 
