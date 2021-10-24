@@ -1,9 +1,13 @@
 ---
 title: Pampa
 feature_text: |
-  ## Pampa
- Plannification de l'Aide Ménagère aux Personnes âgées
-feature_image: "https://picsum.photos/1300/400?image=989"
-excerpt: "Alembic is a starting point for [Jekyll](https://jekyllrb.com/) projects. Rather than starting from scratch, this boilerplate is designed to get the ball rolling immediately. Install it, configure it, tweak it, push it."
+  Plannification
+feature_image: "https://picsum.photos/2560/600?blur=2?grayscale"
+excerpt: "A demo of Markdown and HTML includes"
+aside: true
 ---
 
+{% include carousel.html height="50" unit="%" duration="7" %}
+
+
+<small>A small element</small>
