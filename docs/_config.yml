@@ -36,7 +36,7 @@ plugins:
 
 # 3. Gem settings
 paginate: 2 # jekyll-paginate > items per page
-paginate_path: blog/page:num # jekyll-paginate > blog page
+paginate_path: https://lwh-21.github.io/Pampa/docs/blog/page:num # jekyll-paginate > blog page
 jekyll-mentions: https://twitter.com # jekyll-mentions > service used when @replying
 twitter:
   username: LWH # jekyll-seo-tag > Owners twitter username
@@ -58,7 +58,7 @@ sass:
   style: compressed # Style compression
 permalink: pretty  # Permalink style (/YYYY/MM/DD/page-name/)
 excerpt_separator: <!-- more --> # Marks end of excerpt in posts
-timezone: Europe/London # Timezone for blog posts and alike
+timezone: Europe/Paris # Timezone for blog posts and alike
 
 # 5. Collections
 collections:
@@ -94,10 +94,10 @@ defaults:
 encoding: utf-8 # Make sure the encoding is right
 lang: en-GB # Set the site language
 title: "Pampa" # Site name or title, also used in jekyll-seo-tag
-logo: "/assets/logos/logo.svg" # Site logo, also used in jekyll-seo-tag
+logo: "https://lwh-21.github.io/Pampa/docs/assets/logos/logo.svg" # Site logo, also used in jekyll-seo-tag
 description: "Plannification de l'Aide Ménagère aux personnes âgées" # Site description and default description, also used in jekyll-seo-tag
-url: "https://lwh-21.github.io/Pampa/" # Site url, also used in jekyll-seo-tag
-baseurl: ""
+url: "https://lwh-21.github.io/Pampa" # Site url, also used in jekyll-seo-tag
+baseurl: "Pampa/docs"
 repo: "https://github.com/LWH-21/Pampa/"
 email: "lwh@free.fr"
 # disqus: "alembic-1" # Blog post comments, uncomment the option and set the site ID from your Disqus account
@@ -121,16 +121,16 @@ favicons: # Favicons are also used in the manifest file. Syntax is 'size: path'
 
 # 9. Site navigation
 navigation_header:
-- title: Home
-  url: /
+- title: Accueil
+  url: https://lwh-21.github.io/Pampa/docs/
 - title: Elements
-  url: /elements/
+  url: https://lwh-21.github.io/Pampa/docs/elements/
 - title: Blog
-  url: /blog/
+  url: https://lwh-21.github.io/Pampa/docs/blog/
 - title: Categories
-  url: /categories/
+  url: https://lwh-21.github.io/Pampa/docs/categories/
 - title: Search
-  url: /search/
+  url: https://lwh-21.github.io/Pampa/docs/search/
 
 navigation_footer:
 - title: LWH
