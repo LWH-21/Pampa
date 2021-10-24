@@ -7,16 +7,7 @@ excerpt: "A demo of Markdown and HTML includes"
 aside: true
 ---
 
-# Heading 1
+{% include carousel.html height="50" unit="%" duration="7" %}
 
-## Heading 2
-
-### Heading 3
-
-#### Heading 4
-
-##### Heading 5
-
-###### Heading 6
 
 <small>A small element</small>
