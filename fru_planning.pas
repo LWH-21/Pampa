@@ -68,6 +68,16 @@ implementation
 
 uses Main;
 
+function TFr_planning.CanClose : boolean;
+
+begin
+  if id>0 then
+  begin
+    MainForm.HistoManager.AddHisto(self, id, 'R');
+  end;
+  result:=true;
+end;
+
 procedure TFr_planning.init(Data: PtrInt);
 
 begin
@@ -337,12 +347,7 @@ begin
 
 end;
 
-function TFr_planning.CanClose : boolean;
 
-begin
-
-     result:=true;
-end;
 
 procedure TFr_planning.remplir_planning;
 

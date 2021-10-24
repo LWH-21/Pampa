@@ -1,5 +1,4 @@
 {"version":1,"strings":[
-{"hash":4960369,"name":"tfr_planning.edit1.text","sourcebytes":[69,100,105,116,49],"value":"Edit1"},
 {"hash":195406053,"name":"tfr_planning.ed_date.text","sourcebytes":[69,100,95,100,97,116,101],"value":"Ed_date"},
-{"hash":195446901,"name":"tfr_planning.ed_name.text","sourcebytes":[69,100,95,110,97,109,101],"value":"Ed_name"}
+{"hash":177994481,"name":"tfr_planning.dateedit1.text","sourcebytes":[68,97,116,101,69,100,105,116,49],"value":"DateEdit1"}
 ]}
