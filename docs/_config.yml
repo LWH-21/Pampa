@@ -96,8 +96,8 @@ lang: en-GB # Set the site language
 title: "Pampa" # Site name or title, also used in jekyll-seo-tag
 logo: "/assets/logos/logo.svg" # Site logo, also used in jekyll-seo-tag
 description: "Plannification de l'Aide Ménagère aux personnes âgées" # Site description and default description, also used in jekyll-seo-tag
-url: "https://lwh-21.github.io/Pampa/docs" # Site url, also used in jekyll-seo-tag
-baseurl: ""
+url: "https://lwh-21.github.io" # Site url, also used in jekyll-seo-tag
+baseurl: "/Pampa/docs"
 repo: "https://github.com/LWH-21/Pampa/"
 email: "lwh@free.fr"
 # disqus: "alembic-1" # Blog post comments, uncomment the option and set the site ID from your Disqus account
