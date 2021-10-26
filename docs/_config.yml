@@ -18,13 +18,13 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Pampa1
+title: Pampa2
 email: lwh@free.fr
 description: >- # this means to ignore newlines until "baseurl:"
   Logiciel de plannification de l'Aide-Ménagère aux personnes âgées
 domain : "lwh-21.github.io"
 url: "https://lwh-21.github.io" # Site url, also used in jekyll-seo-tag
-baseurl: "/Pampa/docs"
+baseurl: "/Pampa"
 repo: "https://github.com/LWH-21/Pampa/"
 github_username:  LWH-21
 
