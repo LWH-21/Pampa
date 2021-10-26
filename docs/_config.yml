@@ -22,10 +22,11 @@ title: Pampa
 email: lwh@free.fr
 description: >- # this means to ignore newlines until "baseurl:"
   Logiciel de plannification de l'Aide-Ménagère aux personnes âgées
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+domain : "lwh-21.github.io"
+url: "https://lwh-21.github.io" # Site url, also used in jekyll-seo-tag
+baseurl: "/Pampa"
+repo: "https://github.com/LWH-21/Pampa/"name: jekyllrb
+github_username:  LWH-21
 
 # Build settings
 theme: minima
