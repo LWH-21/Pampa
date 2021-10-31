@@ -3,7 +3,7 @@
     <div class="row p20">
       {% if site.copyright.name %}
       <div class="col-md-4 text-center mt25">
-        Tous droits réservés:
+        &copy;
         <a target="_blank" href="{{site.copyright.link}}"
           >{{site.copyright.name}}</a
         >
@@ -12,11 +12,7 @@
 
       <div class="col-md-4 text-center mt25">
         {% if site.built-by %}
-        <a target="_blank" href="http://webjeda.com"
-          ><img
-            src="https://img.shields.io/badge/Built%20by-webjeda-blue.svg"
-            alt="{{site.built-by}}"
-        /></a>
+        {{site.built-by}}
         {% endif %}
       </div>
       <div class="col-md-4 text-center mt25">
