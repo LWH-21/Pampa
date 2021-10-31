@@ -52,11 +52,11 @@ default-image: webjeda-logo-big.jpg # If there is no featured image in a post th
 
 #footer
 
-built-by: LWH
+built-by: Loewenguth Pascal
 
 copyright:
    name: LWH
-   link: 'http://lwh@free.fr'
+   link: 'http://lwh.free.fr'
 
 # Build settings
 markdown: kramdown
