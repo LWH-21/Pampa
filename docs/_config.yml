@@ -87,7 +87,7 @@ fb-page-title:
 
 # Sass style
 sass:
-  style: nested  #compressed
+  style: compressed
 
 # Ruby Gems
 plugins: 
