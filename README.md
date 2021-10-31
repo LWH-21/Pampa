@@ -5,6 +5,7 @@ En cours de développement. Echéance prévue : 1er semestre 2022.
 
 Pampa est un logiciel de plannification de l'Aide-Ménagère aux personnes âgées. Développé en Pascal Objet (Lazarus), il est prévu pour fonctionner avec plusieurs SGBD : SQLite, MySQL, Postgresql, MariaDB et Firebird.
 
+Voir [https://lwh-21.github.io/Pampa/](https://lwh-21.github.io/Pampa/).
 
 --
 
