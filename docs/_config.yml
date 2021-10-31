@@ -85,7 +85,9 @@ fb-app-id:
 fb-page-url: 
 fb-page-title: 
 
-
+# Sass style
+sass:
+  style: compressed
 
 # Ruby Gems
 plugins: 
