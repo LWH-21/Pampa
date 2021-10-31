@@ -5,6 +5,9 @@ unit UHistoManager;
 interface
 
 uses
+  {$IFDEF TESTS}
+  TestUnit,
+  {$ENDIF}
   SysUtils,StrUtils,DateUtils,Classes,
   DB,SQLDB,DataAccess,ZDataset,
   fpjson,jsonparser,
@@ -29,7 +32,7 @@ Type
         constructor create(c : shortstring; d,f : TdateTime);
   end;
 
-  THistoManager = class
+  THistoManager = class{$IFDEF TESTS}(TInterfacedObject,ITestInterface){$ENDIF}
 
   public
         query : Tdataset;
@@ -46,6 +49,11 @@ Type
         procedure LoadHisto(tv : TTreeView; Node : TTreeNode; user : shortstring);
         function createjson(win : TW_F; id : longint; actions : shortstring) : string;
         destructor destroy;override;
+
+        {$IFDEF TESTS}
+        procedure TestBDD;
+        procedure TestProcedures;
+        {$ENDIF}
 
   end;
 
@@ -400,6 +408,7 @@ begin
          tmp1.code:=key;
          tmp1.rownum:=query.recno;
          tmp1.caption:=win.Caption;
+         tmp1.json:=query.FieldByName('JSON').asString;
          i:=1;find:=false;
          while (i<11) and (not find) do
          begin
@@ -497,6 +506,25 @@ begin
   freeandnil(query);
   inherited;
 end;
+
+{$IFDEF TESTS}
+procedure THistoManager.TestBDD;
+
+var sql : string;
+
+begin
+  // Test if queries exists
+  sql:=Maindata.getQuery('Q0006','');
+  if sql<=' ' then
+  begin
+
+  end;
+end;
+
+procedure THistoManager.TestProcedures;
+begin
+end;
+{$ENDIF}
 
 end.
 

@@ -1,0 +1,55 @@
+inherited F_planning_01: TF_planning_01
+  Left = 449
+  Height = 460
+  Top = 250
+  Width = 792
+  Caption = 'F_planning_01'
+  ClientHeight = 460
+  ClientWidth = 792
+  OnClose = FormClose
+  OnShow = FormShow
+  object BitBtn1: TBitBtn[0]
+    Left = 8
+    Height = 30
+    Top = 416
+    Width = 75
+    Caption = 'BitBtn1'
+    TabOrder = 0
+  end
+  object Ed_code: TEdit[1]
+    Left = 56
+    Height = 23
+    Top = 7
+    Width = 80
+    TabOrder = 1
+  end
+  object Ed_lib: TEdit[2]
+    Left = 144
+    Height = 23
+    Top = 9
+    Width = 560
+    TabOrder = 2
+  end
+  object Cb_customer: TComboBox[3]
+    Left = 59
+    Height = 23
+    Top = 40
+    Width = 644
+    ItemHeight = 15
+    TabOrder = 3
+  end
+  object DBGrid1: TDBGrid[4]
+    Left = 16
+    Height = 100
+    Top = 104
+    Width = 680
+    Color = clWindow
+    Columns = <>
+    DataSource = DataSource1
+    TabOrder = 4
+  end
+  object DataSource1: TDataSource[5]
+    Left = 720
+    Top = 112
+  end
+end

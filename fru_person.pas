@@ -72,6 +72,7 @@ begin
   assert(assigned(t),'Table is not assigned');
   id := -2;
   table:=t;
+  updatemode:=um_create;
   if MainData.cmode='ZEO' then
   begin
        query:=TZQuery.create(self);
@@ -107,6 +108,7 @@ var ts : TTabSheet;
 begin
   if not CanClose then
     exit;
+  updatemode:=um_read;
   case Search(id) of
     mrOk:
     begin
@@ -121,6 +123,7 @@ begin
         begin
           Caption :=rs_new;
           Maction:='C';
+          updatemode:=um_create;
           table.Insert(Query);
         end
         else
@@ -144,10 +147,24 @@ begin
     mrYes:
     begin
       Caption :=rs_new;
+      updatemode:=um_create;
       Maction:='C';
       Query.Close;
       table.Insert(Query);
     end;
+    mrCancel :
+    begin
+      Close;
+      if self.Parent is TTabSheet then
+      begin
+           try
+              ts := self.Parent as TTabSheet;
+              if assigned(ts) then ts.free;
+           except
+           end;
+      end;
+      exit;
+    end
     else
     begin
       if Query.RecordCount = 0 then
@@ -328,6 +345,7 @@ end;
 procedure TFr_Person.init(Data: PtrInt);
 
 begin
+  updatemode:=um_read;
   if id = -2 then
   begin
     BsearchClick(self);
@@ -341,7 +359,9 @@ end;
 procedure TFr_Person.init(s_id : longint;j : string);
 
 begin
+  updatemode:=um_read;
   id:=s_id;
+  init(0);
 end;
 
 procedure TFr_Person.InitIhm;
@@ -446,6 +466,7 @@ procedure TFr_Person.open;
 begin
   assert(id>0,'ID NOT > 0');
   Maction:='R';
+  updatemode:=um_read;
   try
     table.Read(Query,id);
     if query.RecordCount = 1 then
@@ -476,7 +497,8 @@ begin
     begin
       self.SetFocus;
       if (Maction='R') and (Query.Modified) then Maction:='U';
-      Result := table.Write(Query,id);
+      if updatemode=um_read then updatemode:=um_update;
+      Result := table.Write(Query,id,updatemode);
       if result=dber_none then
       begin
            if Maction='C' then

@@ -22,7 +22,6 @@ type
     DataSource1: TDataSource;
     Critere: TEdit;
     Grid: TDBGrid;
-    ZReadOnlyQuery1: TZReadOnlyQuery;
     procedure BNewClick(Sender: TObject);
     procedure BsearchClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);

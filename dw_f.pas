@@ -5,12 +5,15 @@ unit dw_f;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs,ExtCtrls,StdCtrls, ComCtrls;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs,ExtCtrls,StdCtrls, ComCtrls,
+  Da_table;
 
 type
   TW_F = class(TFrame)
   private
 
+  protected
+    updatemode : Tupdate_mode;
   public
     id : longint;
 

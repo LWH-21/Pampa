@@ -5,12 +5,12 @@ unit Fru_planning;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, GR32,
+  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, GR32, Graphics,
   LCLType, EditBtn,
   DB,DataAccess,
   ressourcesStrings,
   fpjson,jsonparser,
-  GR32_Image, dw_f, DWorker, Dateutils, FSearch, DPlanning;
+  GR32_Image, dw_f, DWorker, Dateutils, FSearch, DPlanning, UF_planning_01;
 
 type
 
@@ -19,17 +19,20 @@ type
   { TFr_planning }
 
   TFr_planning = class(TW_F)
+    Bt_open_planning: TButton;
+    Plan_pb: TPaintBox;
     SB_previous: TBitBtn;
     Ed_date: TDateEdit;
 
     Ed_code: TEdit;
     Ed_name: TEdit;
-    plan: TPaintBox32;
+    //plan: TPaintBox32;
     SB_next: TBitBtn;
     ScrollBar1: TScrollBar;
     SB_rech: TSpeedButton;
 
 
+    procedure Bt_open_planningClick(Sender: TObject);
     procedure Ed_dateChange(Sender: TObject);
     procedure FrameResize(Sender: TObject);
     procedure planPaintBuffer(Sender: TObject);
@@ -39,14 +42,10 @@ type
 
   private
     mode : TPlanMode;
-
+    header,hline,limite : integer;
     startdate : tdatetime;
     col : TInterventions;
-    lines : array[1..255] of record
-                                  sy_id : longint;
-                                  caption:shortstring;
-                                  colums : array[1..31] of TIntervention;
-                            end;
+    mat : TLPlanning;
 
 
   public
@@ -57,7 +56,7 @@ type
     procedure init(Data: PtrInt); override;
     procedure init(p_id : longint;j : string);override;
     procedure remplir_planning;
-    procedure reset_planning;
+
     procedure setid(p_id : longint);
     destructor Destroy;override;
   end;
@@ -104,7 +103,7 @@ begin
   mode:=pm_week;
   Caption := rs_planning;
   startdate:=Today();
-  reset_planning;
+
   if assigned(col) then freeandnil(col);
   if j>' ' then
   begin
@@ -156,11 +155,15 @@ procedure TFr_planning.planPaintBuffer(Sender: TObject);
 var w,h : integer;
 
 begin
-  w:=plan.Width;
-  h:=Plan.height;
+  w:=plan_pb.Width;
+  h:=Plan_pb.height;
 
-  Plan.Buffer.Clear(color32(255,255,250,255));
-  plan.Buffer.FrameRectS(0,1,w,h-1,color32(255,0,0,0));
+  plan_pb.Canvas.Clear;
+  plan_pb.Canvas.Pen.Color:=clBlack;
+  plan_pb.Canvas.pen.Width:=1;
+  plan_pb.Canvas.Brush.Color:=$00E6FFFF;
+  plan_pb.Canvas.FrameRect(0,0,w,h);
+  plan_pb.canvas.Rectangle(0,0,w,h);
 
   case mode of
        pm_week : draw_week;
@@ -170,17 +173,29 @@ end;
 
 procedure TFr_planning.FrameResize(Sender: TObject);
 
-var w,h,header,hline,limite : integer;
-
 begin
-  w:=plan.Width;
-  h:=Plan.height;
+  plan_pb.Left:=0;
+  plan_pb.Top:=Ed_code.top+Ed_code.height+20;
+  if self.Width<720 then
+  begin
+       plan_pb.Width:=720;
+       plan_pb.height:=self.height - plan_pb.top;
+       Scrollbar1.Visible:=false;
+  end else
+  begin
+    Scrollbar1.Visible:=true;
+    plan_pb.Width:=self.Width - Scrollbar1.width - 5;
+    plan_pb.height:=self.height - plan_pb.top;
+    scrollbar1.Top:=plan_pb.top;
+    scrollbar1.Height:=plan_pb.height;
+  end;
+
   header:=80;
   hline:=60;
-  limite:=w div 4;
+  limite:=plan_pb.Width div 4;
 
-  ed_date.Top:=plan.Top+5;
-  ed_date.left:=plan.left+((limite - ed_date.Width) div 2);
+  ed_date.Top:=plan_pb.Top+5;
+  ed_date.left:=plan_pb.left+((limite - ed_date.Width) div 2);
   sb_previous.Top:=ed_date.top;
   sb_previous.Left:=ed_date.left - sb_previous.Width - 10;
   sb_next.top :=ed_date.top;
@@ -203,6 +218,16 @@ begin
     startdate:=start;
     remplir_planning;
   end;
+end;
+
+procedure TFr_planning.Bt_open_planningClick(Sender: TObject);
+
+var f : TF_planning_01;
+
+begin
+  f:=TF_planning_01.Create(MainForm);
+  f.w_id:=self.id;
+  f.ShowModal;
 end;
 
 procedure TFr_planning.SB_rechClick(Sender: TObject);
@@ -251,73 +276,87 @@ end;
 procedure TFr_planning.draw_week;
 
 var w,h : integer;
-  limite : integer;
-  header, hline  : integer;
   tsem : integer;
   i,l,c : integer;
   s : shortstring;
   r : trect;
   tmpdate : tdatetime;
+  tstyle : TTextStyle;
 
 
 begin
 
-     w:=plan.Width;
-     h:=Plan.height;
-     header:=60;
-     hline:=60;
-
-     limite:=w div 4;
+     w:=plan_pb.Width;
+     h:=Plan_pb.height;
 
      tsem := (w - limite) div 7;
 
      //Header
-     plan.Buffer.FillRect(1,1,w-1,header-1,color32(255,255,255));
-     plan.Buffer.FrameRectS(0,1,w,header-1,color32(255,0,0,0));
-     plan.Buffer.line(1,header,w-1,header ,color32(0,0,0,0));
-     plan.Buffer.line(1,header-1,w-1,header-1 ,color32(0,0,0,0));
+     plan_pb.Canvas.Brush.color:=TColor($FFF8DC);
+     plan_pb.Canvas.Brush.Style:=bsSolid;
+     plan_pb.Canvas.FillRect(1,1,w-1,header);
+     plan_pb.Canvas.pen.Color:=clblack;
 
-     plan.Buffer.Line(limite,1,limite,h - 1,color32(0,0,128,255),true);
+     plan_pb.canvas.Rectangle(0,1,w-1,header-1);
+
+
+     plan_pb.Canvas.pen.color:=clBlue;
+     plan_pb.canvas.Line(limite,1,limite,h - 1);
      tmpdate:=startdate;
+     tstyle.alignment:=taCenter;
+     tstyle.Opaque:=false;
+     tstyle.SingleLine:=false;
+     tstyle.Wordbreak:=true;
+     tstyle.Clipping:=true;
+     tstyle.systemFont:=true;
+     tstyle.rightToLeft:=false;
      for i:=0 to 6 do
      begin
-       if i>0 then plan.Buffer.Line(limite + i*tsem,1,limite+ i*tsem,h - 1,color32(0,0,128,255),true);
+       if i>0 then plan_pb.Canvas.Line(limite + i*tsem,1,limite+ i*tsem,h - 1);
        r.Left:=limite + i*tsem;r.right:=r.left+tsem;
        r.top:=2;r.bottom:=header;
        s:=cdays[DayOfTheWeek(tmpdate)];
-
-       {$IFDEF WINDOWS}
-       plan.Buffer.Textout(r,DT_CENTER,s);
-       {$else}
-       plan.Buffer.Textout(100, 2,s);
-       {$ENDIF}
+       plan_pb.Canvas.TextRect(r,0,0,s,tstyle);
        r.top:=20;
        s:=datetostr(tmpdate);
-       {$IFDEF WINDOWS}
-       plan.Buffer.Textout(r,DT_CENTER,s);
-       {$ENDIF}
+       plan_pb.Canvas.TextRect(r,0,0,s,tstyle);
        tmpdate:=incday(tmpdate,1);
      end;
 
 
-     plan.Buffer.Line(0,header,w,header,color32(0,0,128,255),true);
+//     plan.Buffer.Line(0,header,w,header,color32(0,0,128,255),true);
 
-     l:=1;
-     while (lines[l].sy_id>0) and (l<255) do
+     l:=0;
+     plan_pb.Canvas.Brush.Style:=bsclear;
+     if assigned(mat) then
      begin
-       plan.Buffer.Line(0,header+hline*l,w,header+hline*l,color32(0,0,128,255),true);
-       r.left:=10;r.right:=limite;
-       r.bottom:=header+hline*l;r.top:=r.bottom-hline;
-       plan.Buffer.Textout(r,DT_LEFT,lines[l].caption);
-       for c:=0 to 6 do
+       while (mat.lines[l].sy_id>0) and (l<mat.linescount) do
        begin
-         if assigned(lines[l].colums[c + 1]) then
+         if (l<mat.linescount - 1) and (mat.lines[l].sy_id<>mat.lines[l+1].sy_id) then
          begin
-               plan.Buffer.Textout(limite + c*tsem,header+hline*(l - 1)+10,lines[l].colums[c + 1].gethstart);
-               plan.Buffer.Textout(limite + c*tsem,header+hline*(l - 1)+30,lines[l].colums[c + 1].gethend);
+              plan_pb.canvas.Line(0,header+hline*(l+1),w,header+hline*(l+1));
+         end else
+         begin
+              plan_pb.canvas.Line(limite,header+hline*(l+1),w,header+hline*(l+1));
          end;
+         r.left:=10;r.right:=limite;
+         r.bottom:=header+hline*l;r.top:=r.bottom-hline;
+         tstyle.Alignment:=taLeftJustify;
+         s:='';
+         plan_pb.Canvas.TextRect(r,5,0,s,tstyle);
+
+         for c:=0 to 6 do
+         begin
+           if assigned(mat.lines[l].colums[c ]) then
+           begin
+                 s:=mat.lines[l].colums[c ].gethstart+' - '+mat.lines[l].colums[c].gethend;
+                 r.Left:=limite + c*tsem;r.Top:=header+hline*(l);
+                 r.Width:=tsem;r.height:=hline;
+                 plan_pb.Canvas.TextRect(r,r.left+5,r.top,s,tstyle);
+           end;
+         end;
+         inc(l);
        end;
-       inc(l);
      end;
 
 end;
@@ -362,65 +401,20 @@ begin
    if assigned(col) then freeAndNil(col);
    query:=nil;
    old:=-1;
-   reset_planning;
+
    ed_date.Caption:=datetostr(startdate);
+   if assigned(mat) then freeandnil(mat);
+
    if id>0 then
    begin
      enddate:=EndOfTheWeek(startdate);
      col:=Planning.loadW(id,startdate, enddate);
-     if assigned(col) then
-     begin
-       for inter in col do
-       begin
-         for l:=1 to 255 do
-         begin
-           if lines[l].sy_id<0 then
-           begin
-             lines[l].sy_id:=inter.c_id;
-             if old<>inter.c_id then
-             begin
-               sql:='SELECT SY_CODE,SY_LASTNAME,SY_FIRSTNAME FROM CUSTOMER WHERE SY_ID=%i';
-               sql:=sql.Replace('%i',inttostr(inter.c_id));
-               Maindata.readDataSet(query,sql,true);
-               if query.RecordCount>0 then
-               begin
-                    s:=query.Fields[0].AsString;
-                    s:=s+' '+query.Fields[1].AsString;
-                    s:=s+' '+query.Fields[2].AsString;
-               end;
-               query.Close;
-               old:=inter.c_id;
-             end;
-           end;
-           if (lines[l].sy_id=inter.c_id) and (lines[l].colums[inter.col_index]=nil) then
-           begin
-             lines[l].colums[inter.col_index]:=inter;
-             lines[l].caption:=s;
-             break;
-           end;
-         end;
-       end;
-     end;
+     mat:=TLPlanning.create(startdate,enddate);
+     mat.load(col);
    end;
-   //planPaintBuffer(self);
-   plan.ForceFullInvalidate;
+   plan_pb.Refresh;
 end;
 
-procedure TFr_planning.reset_planning;
-
-var i,j : integer;
-
-begin
-  for i:=1 to 255 do
-  begin
-       lines[i].sy_id:=-1;
-       lines[i].caption:='';
-       for j:=1 to 31 do
-       begin
-            lines[i].colums[j]:=nil;
-       end;
-  end;
-end;
 
 procedure Tfr_planning.setid(p_id : longint);
 
@@ -432,13 +426,15 @@ begin
   begin
     Query:=nil;
     id:=p_id;
+    Caption := rs_planning;
     sql:=Maindata.getQuery('<Q0014>','SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM WORKER WHERE SY_ID=%id');
     sql:=sql.replace('%id',inttostr(id));
     MainData.readDataSet(Query,sql,true);
     if Query.RecordCount>0 then
     begin
          Ed_code.Text:=Query.Fields[0].AsString;
-         ed_name.Caption:=Query.Fields[2].AsString+' '+Query.Fields[1].AsString;;
+         ed_name.Caption:=Query.Fields[2].AsString+' '+Query.Fields[1].AsString;
+         Caption := rs_planning+' ('+TRIM(Query.Fields[0].AsString)+') '+trim(Query.Fields[2].AsString);
     end;
     Query.close;
     Query.Free;
@@ -453,6 +449,7 @@ destructor TFr_planning.Destroy;
 
 begin
   inherited;
+  if assigned(mat) then freeAndNil(mat);
   if assigned(col) then freeAndNil(col);
 end;
 

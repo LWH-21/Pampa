@@ -74,6 +74,7 @@ inherited Search: TSearch
     Top = 419
     Width = 75
     Caption = 'Fermer'
+    ModalResult = 2
     Images = MainForm.Images
     ImageIndex = 1
     OnClick = B_CancelClick
@@ -112,10 +113,5 @@ inherited Search: TSearch
   object DataSource1: TDataSource[7]
     Left = 16
     Top = 8
-  end
-  object ZReadOnlyQuery1: TZReadOnlyQuery[8]
-    Params = <>
-    Left = 105
-    Top = 25
   end
 end

@@ -15,7 +15,6 @@
         <TextName Value="LWH.Pampa"/>
         <TextDesc Value="Planification"/>
       </XPManifest>
-      <Icon Value="0"/>
     </General>
     <LazDoc Paths="FPdoc"/>
     <i18n>
@@ -39,34 +38,40 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="9">
+    <RequiredPackages Count="11">
       <Item1>
         <PackageName Value="zcomponent"/>
       </Item1>
       <Item2>
-        <PackageName Value="DateTimeCtrls"/>
+        <PackageName Value="lr_zeosdb"/>
       </Item2>
       <Item3>
-        <PackageName Value="virtualtreeview_package"/>
+        <PackageName Value="lazreport"/>
       </Item3>
       <Item4>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="DateTimeCtrls"/>
       </Item4>
       <Item5>
-        <PackageName Value="pl_Graphics32"/>
+        <PackageName Value="virtualtreeview_package"/>
       </Item5>
       <Item6>
-        <PackageName Value="LazControls"/>
+        <PackageName Value="SynEdit"/>
       </Item6>
       <Item7>
-        <PackageName Value="MemDSLaz"/>
+        <PackageName Value="pl_Graphics32"/>
       </Item7>
       <Item8>
-        <PackageName Value="FCL"/>
+        <PackageName Value="LazControls"/>
       </Item8>
       <Item9>
-        <PackageName Value="LCL"/>
+        <PackageName Value="MemDSLaz"/>
       </Item9>
+      <Item10>
+        <PackageName Value="FCL"/>
+      </Item10>
+      <Item11>
+        <PackageName Value="LCL"/>
+      </Item11>
     </RequiredPackages>
     <Units Count="21">
       <Unit0>
@@ -215,12 +220,9 @@
         <UnitName Value="UCfg_table"/>
       </Unit19>
       <Unit20>
-        <Filename Value="ufcnx.pas"/>
+        <Filename Value="testunit.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="FCnx"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UFcnx"/>
+        <UnitName Value="TestUnit"/>
       </Unit20>
     </Units>
   </ProjectOptions>
@@ -228,7 +230,7 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value=".\win64\Pampa"/>
+      <Filename Value=".\WIN64\Pampa"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
@@ -266,9 +268,10 @@
         <ShowHintsForUnusedUnitsInMainSrc Value="True"/>
       </Verbosity>
       <CompilerMessages>
-        <IgnoredMessages idx5024="True"/>
+        <IgnoredMessages idx5026="True" idx5024="True"/>
       </CompilerMessages>
-      <CustomOptions Value="-dDEBUG"/>
+      <CustomOptions Value="-dDEBUG
+-dTESTS"/>
     </Other>
   </CompilerOptions>
   <Debugging>

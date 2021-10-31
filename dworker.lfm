@@ -1,6 +1,6 @@
 inherited Worker: TWorker
   Height = 302
-  HorizontalOffset = 1572
-  VerticalOffset = 706
+  HorizontalOffset = 1282
+  VerticalOffset = 491
   Width = 298
 end

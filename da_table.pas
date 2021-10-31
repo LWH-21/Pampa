@@ -7,12 +7,14 @@ interface
 uses
   Classes, SysUtils, strutils, DateUtils, DB, SQLDB, DataAccess, Variants, Dialogs, Forms, Controls, lwdata,
   LConvEncoding,LazUTF8,ZDataset, ZSqlUpdate,
+  Math,fpexprpars,
   UException;
 
 type
 
-  { TDA_table }
+  Tupdate_mode = (um_create, um_read, um_update, um_delete);
 
+  { TDA_table }
   TDA_table = class(TDataModule)
   private
   protected
@@ -23,21 +25,35 @@ type
     checkcrc: boolean;
 
 
-    function getcrc(R: TDataSet): longint;
-    procedure init(D: TMainData);
-    procedure Read(R: TDataSet; id: longint);
-    function codeCalc(base, firstname, lastname : shortstring) : shortstring;
 
+
+
+
+    procedure apply_style(R : TDataSet; st : TUpdateStatus); virtual;
+    function codeCalc(R : TDataSet) : shortstring;
+    function ConcurrencyControl(R : TDataSet) : boolean;
+    function Delete(R: TDataSet; var id: longint): TDbErrcode;
+    function getcrc(R: TDataSet): longint;
     function getCurrentId  : longint;
     function getNextId : integer;
-    function normalize ( s : string) : string;
-    function Write(R: TDataSet; var id: longint): TDbErrcode;
-    function Delete(R: TDataSet; var id: longint): TDbErrcode;
+    procedure init(D: TMainData);
     function Insert(R: TDataSet): TDbErrcode;
-    function Test(R: TDataset; action: char; var nbwarnings, nberr: integer; var msg: string): boolean;
-    procedure apply_style(R : TDataSet; st : TUpdateStatus); virtual;
+    function Modified(R : TDataSet) : boolean;
+    function normalize ( s : string) : string;
+    procedure Read(R: TDataSet; id: longint);
     procedure search(crit : string; R : TDataset);virtual ; abstract;
+    procedure setCrc(R : TDataSet); virtual;
     procedure setDefault(R : TDataSet); virtual;
+    procedure setID(R : TDataSet); virtual;
+    function Test(R: TDataset; action: char; var nbwarnings, nberr: integer; var msg: string): boolean;
+    function Write(R: TDataSet; var id: longint; mode : Tupdate_mode = um_read): TDbErrcode;
+
+
+
+
+
+
+
 
   end;
 
@@ -112,7 +128,7 @@ var
 begin
   if buf = nil then
     exit(0);
-
+  try
   crc := crc xor $FFFFFFFF;
   while (len >= 8) do
   begin
@@ -145,11 +161,52 @@ begin
   if r > 2147483647 then
     r := r - 2147483647;
   Result := r;
+  except
+     on E: Exception do Error(E, dber_system, 'crc32 ');
+  end;
+end;
+
+procedure TDA_table.apply_style(R : TDataSet; st : TUpdateStatus);
+
+var i : integer;
+    nom : string;
+    n,n1 : string;
+    cd: TColumnDesc;
+
+begin
+  if (st<>usmodified) and (st<>usInserted) then exit;
+  assert(assigned(R), 'Query not assigned');
+  assert(R.RecordCount <= 1, 'Just one update allowed');
+  try
+    for i := 0 to R.FieldCount - 1 do
+    begin
+      nom := (R.fields[i].FieldName).ToUpper;
+      if nom > '' then
+      begin
+        cd := Maindata.tablesdesc.Find(table, nom);
+        assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
+        assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
+        n := trimRight(VartoStr(R.fields[i].newvalue));
+        n1:=n;
+        if (cd.col_type='CHAR') then
+        begin
+              n1:=trim(n);
+              n1:=leftstr(n1,cd.col_lenght);
+              //if cd.style='NAME' then n1:=AnsiProperCase(n1,StdWordDelims+['-']);
+        end;
+        if n<>n1 then
+        begin
+             R.fields[i].Value:=n1;
+        end;
+      end;
+    end;
+  except
+     on E: Exception do Error(E, dber_sql, 'TDA_table.apply_style '+table);
+  end;
 end;
 
 
-
-function TDA_table.getcrc(R: TDataSet): longint; (* ********************** *)
+function TDA_table.getcrc(R: TDataSet): longint; (* ************************* *)
 
 var
   i: integer;
@@ -160,29 +217,36 @@ var
   n: string;
 
 begin
-  assert(assigned(R), 'Requête non assignée');
-  assert(table > '', 'Table non renseignée');
+  assert(assigned(R), 'Dataset not assigned');
+  assert(table > '', 'Table name not assigned');
   ret := '';
-  for i := 0 to R.FieldCount - 1 do
-  begin
-    nom := (R.fields[i].FieldName).ToUpper;
-    if (nom > '') and (nom <> 'SY_CRC') then
-    begin
-      cd := Maindata.tablesdesc.Find(table, nom);
-      assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
-      if (cd.col_name<>'SY_ID') and (cd.col_name<>'SY_CRC') and (cd.col_name<>'SY_ROWVERSION') and (cd.col_name<>'SY_LASTUSER') then
+  try
+    try
+      c:=random(2147483647);
+      for i := 0 to R.FieldCount - 1 do
       begin
-        //o := VartoStr(R.fields[i].OldValue);
-        n := VartoStr(R.fields[i].newvalue);
-        ret := ret + trimRight(n);
+        nom := (R.fields[i].FieldName).ToUpper;
+        if (nom > '') and (nom <> 'CRC') then
+        begin
+          cd := Maindata.tablesdesc.Find(table, nom);
+          assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
+          if (cd.col_name<>'SY_ID') and (cd.col_name<>'SY_CRC') and (cd.col_name<>'SY_ROWVERSION') and (cd.col_name<>'SY_LASTUSER') then
+          begin
+            n := VartoStr(R.fields[i].AsString);
+            ret := ret + trimRight(n);
+          end;
+        end;
       end;
+      ret := ret + '     ';
+      a := @ret[1];
+      i := length(ret) - 2;
+      c := crc32(0, a, i);
+    except
+      on E: Exception do Error(E, dber_sql, 'TDA_table.getcrc '+table);
     end;
+  finally
+     Result := c;
   end;
-  ret := ret + '     ';
-  a := @ret[1];
-  i := length(ret) - 2;
-  c := crc32(0, a, i);
-  Result := c;
 end;
 
 procedure TDA_table.init(D: TMainData);(* ************************************ *)
@@ -352,103 +416,238 @@ function TDA_table.getCurrentId  : longint;
 
 var queryid : TDataSet;
     SQueryId : String;
+    l1,l2 : longint;
 
 begin
    QueryId:=nil;
-   SqueryId:=Maindata.getQuery('QID01','SELECT ID FROM LWH_ID WHERE ENTITY =''%t'';');
-   SqueryId:=SqueryId.Replace('%t',table);
-   MainData.readDataSet(QueryId,SQueryID,true);
-   if queryid.RecordCount=1 then
-   begin
-       result:=queryid.fields[0].AsInteger;
-       inc(result);
-   end else
-   begin
-     result:=1;
+   result:=1;
+   SqueryId:=Maindata.getQuery('SP001','');
+   try
+     try
+       if SqueryId>' ' then
+       begin
+          SqueryId:=SqueryId.Replace('%t',table);
+          SqueryId:=SqueryId.Replace('%set','N');
+          MainData.readDataSet(QueryId,SQueryID,true);
+          if queryid.RecordCount=1 then
+          begin
+                result:=queryid.fields[0].AsInteger;
+          end;
+       end else
+       begin
+         SqueryId:=Maindata.getQuery('QID01','SELECT I.ID, MAX(T.SY_ID) FROM LWH_ID I CROSS JOIN %t T WHERE ENTITY =''%t''');
+         SqueryId:=SqueryId.Replace('%t',table);
+         MainData.readDataSet(QueryId,SQueryID,true);
+         if queryid.RecordCount=1 then
+         begin
+             l1:=queryid.fields[0].AsInteger;
+             l2:=queryid.fields[1].AsInteger;
+             result:=max(l1,l2);
+             inc(result);
+         end;
+       end;
+     except
+       on E: Exception do Error(e, dber_sql, 'TDA_table.GetCurrentId('+table+')');
+     end;
+   finally
+      if assigned(QueryID) then
+      begin
+           queryid.close;
+           queryid.free;
+      end;
    end;
-   queryid.close;
-   queryid.free;
 end;
 
 function TDA_table.getNextId : integer;
 
 var queryid : TDataSet;
     SQueryId : String;
+    l1,l2 : longint;
 
 begin
     QueryId:=nil;
-    SqueryId:=Maindata.getQuery('QID01','SELECT ID FROM LWH_ID WHERE ENTITY =''%t'';');
-    SqueryId:=SqueryId.Replace('%t',table);
-    MainData.readDataSet(QueryId,SQueryID,true);
-    if queryid.RecordCount=1 then
-    begin
-       result:=queryid.fields[0].AsInteger;
-       inc(result);
-       queryid.close;
-       SqueryId:=Maindata.getQuery('QID02','UPDATE LWH_ID SET ID=%r WHERE ENTITY =''%t'';');
-       SqueryId:=SqueryId.Replace('%t',table);
-       SqueryId:=SqueryId.Replace('%r',inttostr(result));
-       MainData.DoScript(SQueryId);
-    end else
-    begin
-      result:=1;
-      queryid.close;
-      SqueryId:=Maindata.getQuery('QID03','INSERT INTO LWH_ID (ENTITY, ID) VALUES (''%t'', %r);');
-      SqueryId:=SqueryId.Replace('%t',table);
-      SqueryId:=SqueryId.Replace('%r',inttostr(result));
-      MainData.DoScript(SQueryId);
+    try
+      try
+        SqueryId:=Maindata.getQuery('SP001','');
+        if SqueryId>' ' then
+        begin
+          SqueryId:=SqueryId.Replace('%t',table);
+          SqueryId:=SqueryId.Replace('%set','Y');
+          MainData.readDataSet(QueryId,SQueryID,true);
+          if queryid.RecordCount=1 then
+          begin
+               result:=queryid.fields[0].AsInteger;
+          end;
+        end else
+        begin
+          SqueryId:=Maindata.getQuery('QID01','SELECT I.ID, MAX(T.SY_ID) FROM LWH_ID I CROSS JOIN %t T WHERE ENTITY =''%t''');
+          SqueryId:=SqueryId.Replace('%t',table);
+          MainData.readDataSet(QueryId,SQueryID,true);
+          if queryid.RecordCount=1 then
+          begin
+             l1:=queryid.fields[0].AsInteger;
+             l2:=queryid.fields[1].AsInteger;
+             result:=max(l1,l2);
+             inc(result);
+             SqueryId:=Maindata.getQuery('QID02','UPDATE LWH_ID SET ID=%r WHERE ENTITY =''%t'';');
+             SqueryId:=SqueryId.Replace('%t',table);
+             SqueryId:=SqueryId.Replace('%r',inttostr(result));
+             MainData.DoScript(SQueryId);
+          end else
+          begin
+            result:=1;
+            SqueryId:=Maindata.getQuery('QID03','INSERT INTO LWH_ID (ENTITY, ID) VALUES (''%t'', %r);');
+            SqueryId:=SqueryId.Replace('%t',table);
+            SqueryId:=SqueryId.Replace('%r',inttostr(result));
+            MainData.DoScript(SQueryId);
+          end;
+        end;
+      except
+        on E: Exception do Error(e, dber_sql, 'TDA_table.GetNextId('+table+')');
+      end;
+    finally
+      if assigned(queryid) then
+      begin
+        queryid.close;
+        queryid.free;
+      end;
     end;
-    queryid.free;
 end;
 
-function TDA_table.codeCalc(base,firstname, lastname : shortstring) : shortstring;
+function TDA_table.Modified(R : TDataSet) : boolean;
+
+var F : Tfield;
+    c_old, c_new : variant;
+
+begin
+  result:=true;
+  c_old:=-1;c_new:=1;
+  if R.RecordCount<1 then exit;
+  try
+    F:=R.Fields.FindField('SY_CRC');
+    IF assigned(F) then
+    begin
+        try
+           c_old:=F.OldValue;
+        except
+          exit;
+        end;
+        try
+           c_new:=F.AsInteger;
+        except
+          exit;
+        end;
+        if c_old=c_new then result:=false;
+    end;
+  except
+    on E: Exception do Error(e, dber_sql, 'TDA_table.Modified');
+  end;
+end;
+
+function TDA_table.codeCalc(R : TDataSet) : shortstring;
 
 var QueryCode: TDataset;
     sql : string;
+    base, fname,lname : shortstring;
     n : longint;
+    F : Tfield;
 
 begin
      QueryCode:=nil;
-     base:=trim(base);
-     if base<=' ' then
+     result:='0000000';
+    // if R.RecordCount<1 then exit;
+     F:=R.Fields.FindField('SY_CODE');
+     IF assigned(F) then
      begin
-       base:=trim(lastname)+trim(firstname);
-     end;
-     base:=AnsiUpperCase(base);
-     base:=normalize(base);
-     base:=ReplaceStr(base,' ','');
-     base:=leftstr(base,4);
+       base:=F.AsString;
+       result:=normalize(base);
+       result:=uppercase(result);
+       result:=ReplaceStr(result,' ','');
+       if R.RecordCount>0 then  // RecordCount=0 => Insert
+       begin
+         if (F.OldValue=F.NewValue) then
+         begin
+              if (result=base) and (length(result)=7) then
+              begin
+                exit;
+              end;
+         end;
+       end;
+       lname:='';fname:='';
+       F:=R.Fields.FindField('SY_FIRSTNAME');
+       if assigned(F) then
+       begin
+         fname:=F.AsString;
+       end;
+       F:=R.Fields.FindField('SY_LASTNAME');
+       if assigned(F) then
+       begin
+         lname:=F.AsString;
+       end;
+       base:=trim(lname)+trim(fname);
+       base:=AnsiUpperCase(base);
+       base:=normalize(base);
+       base:=ReplaceStr(base,' ','');
+       base:=leftstr(base,4);
+       while length(base)<6 do base:=base+'0';
+       base:=leftstr(base,6)+'1';
 
-     while length(base)<6 do base:=base+'0';
-     base:=leftstr(base,6)+'1';
-
-
-     sql:=Maindata.getQuery('QID04','SELECT SY_CODE from %t where SY_CODE=''%code'' ');
-     sql:=sql.Replace('%t',table);
-     sql:=sql.Replace('%code',base);
-     MainData.readDataSet(QueryCode,sql,true);
-     if querycode.RecordCount=0 then
-     begin
-       result:=base;
+       sql:=Maindata.getQuery('QID04','SELECT SY_CODE from %t where SY_CODE=''%code'' ');
+       sql:=sql.Replace('%t',table);
+       sql:=sql.Replace('%code',base);
+       MainData.readDataSet(QueryCode,sql,true);
+       if querycode.RecordCount=0 then
+       begin
+         result:=base;
+         querycode.close;
+         querycode.free;
+         exit;
+       end;
        querycode.close;
-       querycode.free;
-       exit;
+       sql:=MainData.getQuery('QID05','SELECT MAX(SY_CODE) from %t where SY_CODE LIKE ''%code%'' ');
+       sql:=sql.Replace('%t',table);
+       sql:=sql.Replace('%code',leftstr(base,4));
+       MainData.readDataSet(QueryCode,sql,true);
+       sql := querycode.fields[0].asString;
+       sql:=sql.substring(4,10);
+       if trystrtoint(sql,n) then
+       begin
+         inc(n);
+         result:=leftstr(base,4);
+         base:=inttostr(n);
+         while length(base)<4 do base:='0'+base;
+         result:=result+base;
+       end;
      end;
-     querycode.close;
-     sql:=MainData.getQuery('QID05','SELECT MAX(SY_CODE) from %t where SY_CODE LIKE ''%code%'' ');
-     sql:=sql.Replace('%t',table);
-     sql:=sql.Replace('%code',leftstr(base,4));
-     MainData.readDataSet(QueryCode,sql,true);
-     sql := querycode.fields[0].asString;
-     sql:=sql.substring(4,10);
-     if trystrtoint(sql,n) then
-     begin
-       inc(n);
-       result:=leftstr(base,4);
-       base:=inttostr(n);
-       while length(base)<4 do base:='0'+base;
-       result:=result+base;
-     end;
+end;
+
+function TDA_table.ConcurrencyControl(R : TDataSet) : boolean;
+
+var squerycrc : string;
+    datacrc : Tdataset;
+    F : TField;
+    s_id : longint;
+    old_crc, new_crc : longint;
+
+begin
+  result:=true;
+  F:=R.Fields.FindField('SY_ID');
+  IF assigned(F) then
+  begin
+       s_id:=F.AsLongint;
+       squerycrc := 'SELECT SY_CRC, SY_ROWVERSION, SY_LASTUSER FROM %t WHERE SY_ID=%id';
+       squerycrc:=squerycrc.Replace('%t',table);
+       squerycrc:=squerycrc.Replace('%id',inttostr(s_id));
+       MainData.readDataSet(datacrc,squerycrc,true);
+       if datacrc.RecordCount>0 then
+       begin
+            new_crc:=datacrc.FieldByName('SY_CRC').AsInteger;
+            old_crc:=R.FieldByName('SY_CRC').OldValue;
+            if new_crc<>old_crc then result:=false;
+       end;
+       datacrc.Close;
+       datacrc.Free;
+  end;
 end;
 
 function TDA_table.Insert(R: TDataSet): TDbErrcode;
@@ -481,14 +680,31 @@ begin
     for i := 0 to R.FieldCount - 1 do
     begin
       fname := R.fields[i].FieldName;
+      fname := fname.ToUpper;
       if fname > '' then
       begin
         cd := Maindata.tablesdesc.Find(table, fname);
-        assert(assigned(cd), 'Description du champ ' + fname + ' non trouvée');
-        assert(cd.col_name = fname, 'Description du champ ' + fname + ' non trouvée');
+        assert(assigned(cd), 'Field description ' + fname + ' not found');
+        assert(cd.col_name = fname, 'Field description ' + fname + ' not found');
         if fname='SY_ID' then
         begin
                 R.fields[i].asInteger := getCurrentId;
+        end;
+        if fname='SY_CODE' then
+        begin
+             R.fields[i].asString := '';
+        end;
+        if fname='SY_CRC' then
+        begin
+             R.fields[i].asInteger:=random(2147483647);
+        end;
+        if fname='SY_LASTUSER' then
+        begin
+             R.fields[i].asString := Mainform.username;
+        end;
+        if fname='SY_ROWVERSION'  then
+        begin
+             R.fields[i].asDatetime:=now;
         end;
         if fname <> cle then
         begin
@@ -518,11 +734,45 @@ begin
   Screen.Cursor := crDefault;
 end;
 
+procedure TDA_table.setCrc(R : TDataSet);
+
+var c : longint;
+    F : tfield;
+
+begin
+     if R.RecordCount>0 then
+     begin
+         try
+           try
+             F:=R.Fields.FindField('SY_CRC');
+             if assigned(F) then
+             begin
+               c:=getCrc(R);
+               F.AsInteger:=c;
+             end;
+             F:=R.Fields.FindField('SY_LASTUSER');
+             if assigned(F) then
+             begin
+               F.AsString:=MainForm.username;
+             end;
+             F:=R.Fields.FindField('SY_ROWVERSION');
+             if assigned(F) then
+             begin
+               F.AsDateTime:=now;
+             end;
+           except
+             on E: Exception do Error(e, dber_sql, 'TDA_table.setCrc');
+           end;
+         finally
+
+         end;
+     end;
+end;
+
 procedure TDA_table.setDefault(R : TDataset);
 
 var i : integer;
-     fname : shortstring;
-     firstname, lastname : shortstring;
+     s,fname : shortstring;
      cd: TColumnDesc;
 
 begin
@@ -530,7 +780,7 @@ begin
    assert(R.RecordCount <= 1, 'Just one update allowed');
    for i := 0 to R.FieldCount - 1 do
    begin
-     fname := R.fields[i].FieldName;
+     fname := R.fields[i].FieldName.ToUpper;
      if fname > '' then
      begin
        cd := Maindata.tablesdesc.Find(table, fname);
@@ -538,50 +788,28 @@ begin
        assert(cd.col_name = fname, 'Description du champ ' + fname + ' non trouvée');
        if cd.col_name='SY_CODE' then
        begin
-              R.Edit;
-              firstname:=R.FieldByname('SY_FIRSTNAME').AsString;
-              lastname:=R.FieldByname('SY_LASTNAME').AsString;
-              R.fields[i].asString:=codeCalc(R.fields[i].asString,firstname, lastname);
+              s:=codeCalc(R);
+              if R.Fields[i].AsString <> s then
+              begin
+                if not R.canModify then R.Edit;
+                R.fields[i].asString:=s;
+              end;
        end;
-
      end;
    end;
 end;
 
-procedure TDA_table.apply_style(R : TDataSet; st : TUpdateStatus);
+procedure TDA_table.setID(R : TDataSet);
 
-var i : integer;
-    nom : string;
-    n,n1 : string;
-    cd: TColumnDesc;
+var l_id : longint;
+    F : Tfield;
 
 begin
-  if (st<>usmodified) and (st<>usInserted) then exit;
-  assert(assigned(R), 'Query not assigned');
-  assert(R.RecordCount <= 1, 'Just one update allowed');
-  for i := 0 to R.FieldCount - 1 do
+  F:=R.Fields.FindField('SY_ID');
+  if assigned(F) then
   begin
-    nom := (R.fields[i].FieldName).ToUpper;
-    if nom > '' then
-    begin
-      cd := Maindata.tablesdesc.Find(table, nom);
-      assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
-      assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
-      n := trimRight(VartoStr(R.fields[i].newvalue));
-      n1:=n;
-      if (cd.col_type='CHAR') then
-      begin
-            n1:=trim(n);
-            n1:=leftstr(n1,cd.col_lenght);
-            //if cd.style='NAME' then n1:=AnsiProperCase(n1,StdWordDelims+['-']);
-      end;
-      if n<>n1 then
-      begin
-           R.Edit;
-           R.fields[i].Value:=n1;
-           R.post;
-      end;
-    end;
+       l_id:=getNextId();
+       F.AsLongint:=l_id;
   end;
 end;
 
@@ -618,12 +846,13 @@ begin
        if (c='ý') or (c='ÿ') then c:='y' else
        c:=' ';
      end;
+     if c<'A' then c:=' ';
      result:=result+c;
   end;
 end;
 
 // https://wiki.freepascal.org/Databases
-function TDA_table.Write(R: TDataSet; var id: longint): TDbErrcode;
+function TDA_table.Write(R: TDataSet; var id: longint; mode : Tupdate_mode = um_read): TDbErrcode;
 
 var
   ncrc: longint;
@@ -649,195 +878,39 @@ begin
   MainForm.setMicroHelp(rs_write+' ['+table+'] : '+inttostr(id));
   Result := cber_nothing;
   if not MainData.isConnected then exit;
+  if not R.Active then  exit;
+  if R.FieldCount = 0 then exit;
   Screen.Cursor := crHourGlass;
 
-
-  if checkcrc then
-  begin
-    try
-      ncrc := getcrc(R);
-    except
-      ncrc := random(2147483647);
-    end;
-    R.FieldByName('SY_CRC').newvalue := ncrc;
-  end;
-
-  if R.Modified then
-    R.post;
-
-  st := R.UpdateStatus;
-  case st of
-    usUnmodified :
-    begin
-        Screen.Cursor := crDefault;
-        MainForm.setMicroHelp(rs_ready,0);
-        exit;
-    end;
-    usInserted   : setDefault(R);
-  end;
-
+  id:=R.FieldByName('SY_ID').AsInteger;
+  R.Edit;
+  setDefault(R);
   apply_style(R, st);
-
-  if not R.Active then
-    exit;
-  if R.FieldCount = 0 then
-    exit;
-
-  reselect := 'SELECT ' + cle + ' FROM ' + table + ' WHERE ';
-
-
-
-  nbwherecrc := 0;
-  testcrc := 0;
-  nbreselect := 0;
-
-
-  squerycrc := 'SELECT SY_CRC, SY_ROWVERSION, SY_LASTUSER FROM ' + table + ' WHERE ';
-  for i := 0 to R.FieldCount - 1 do
+  setCrc(R);
+  ncrc := getcrc(R);
+  if not Modified(R) then
   begin
-    nom := (R.fields[i].FieldName).ToUpper;
-    if nom > '' then
-    begin
-      cd := Maindata.tablesdesc.Find(table, nom);
-      assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
-      assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
-      o := trimRight(VartoStr(R.fields[i].OldValue));
-      n := trimRight(VartoStr(R.fields[i].newvalue));
-      if nom = cle then
-      begin
-        if not TryStrToInt(o, id) then
-          id := -1;
-      end;
-      if nom = 'SY_CRC' then
-      begin
-        oldcrc:=0;
-        try
-           if not MainData.IsNullOrEmpty(o) then trystrtoint(o,oldcrc);
-        except
-        end;
-
-        if not (st in [usDeleted]) then
-        begin
-          if nbreselect > 0 then
-            reselect := reselect + ' AND ';
-          reselect := reselect + ' SY_CRC=' + IntToStr(ncrc);
-          Inc(nbreselect);
-        end;
-      end
-      else
-      if cd.col_name='SY_ID' then
-      begin
-        if (nom='SY_ID') and (st=usInserted) then
-        begin
-          R.Edit;
-          id :=  getnextid;
-          R.Fields[i].AsInteger:=id;
-        end;
-        //R.fields[i].ReadOnly := True;
-        if nbwherecrc > 0 then
-          squerycrc := squerycrc + ' AND ';
-        squerycrc := squerycrc + nom + ' = ' + o;
-        Inc(nbwherecrc);
-      end
-      else
-      IF nom='SY_ROWVERSION' then
-      begin
-        oldrowversion:=EncodeDate(1963,08,03);
-        try
-           if not MainData.IsNullOrEmpty(o) then
-           trystrtodatetime(o,oldrowversion);
-        except
-        end;
-      end else
-      if nom='SY_LASTUSER' then
-      begin
-           try
-              olduser:='';
-              if not MainData.IsNullOrEmpty(o) then olduser:=o;
-           except
-           end;
-      end else
-      if o <> n then
-      begin
-        if (o = '') and (n > ' ') then
-        begin
-          if nbreselect > 0 then
-            reselect := reselect + ' AND ';
-          if (cd.col_type = 'CHAR') then
-            reselect := reselect + nom + ' =''' + n + ''' ';
-          if (cd.col_type = 'NUM') then
-            reselect := reselect + nom + ' =' + n + ' ';
-          //if (cd.type_col='DATE')
-          Inc(nbreselect);
-        end;
-      end;
-    end;
+       Screen.Cursor := crDefault;
+       R.Refresh;
+       exit;
   end;
-  //  test(R,action,nbwar,nberr,msg);
-
-  if (st in [usModified, usDeleted]) and (checkcrc) then
+  if (mode<>um_create) and (not ConcurrencyControl(R)) then
   begin
-    try
-       if MainData.cmode='ZEO' then
-      begin
-        Querycrc:=TZReadOnlyQuery.create(self);
-        TZReadOnlyQuery(Querycrc).connection:=Maindata.ZConnection;
-        TZReadOnlyQuery(Querycrc).SQL.Add(squerycrc);
-      end else
-      begin
-        Querycrc:=TSQLQuery.create(self);
-        TSQLQuery(Querycrc).DataBase:=MainData.Database;
-        TSQLQuery(Querycrc).transaction:=MainData.tran;
-        TSQLQuery(Querycrc).SQL.Add(squerycrc);
-      end;
-      querycrc.Open;
-      if querycrc.RecordCount = 1 then
-      begin
-        try
-          testcrc:=0;
-          try
-             if not querycrc.FieldByName('SY_CRC').IsNull then testcrc := querycrc.FieldByName('SY_CRC').AsLongint;
-          except
-          end;
-
-          testolduser:='';
-          try
-             if  not querycrc.FieldByName('SY_LASTUSER').IsNull then testolduser:=querycrc.FieldByName('SY_LASTUSER').AsString;
-          except
-          end;
-
-          testrowversion:=EncodeDate(1963,08,03);
-          try
-             if  not querycrc.FieldByName('SY_ROWVERSION').IsNull then testrowversion:=querycrc.FieldByName('SY_ROWVERSION').AsDateTime;
-          except
-          end;
-        except
-          testcrc := 0;
-          testolduser:='';
-          testrowversion:=EncodeDate(1963,08,03);
-        end;
-      end;
-    finally
-      if MainData.cmode='BDE' then MainData.tran.Commit;
-      Querycrc.Close;
-      Querycrc.Free;
-    end;
-    // Todo : lwh-Tester une différence plus faible
-    if (oldcrc <> testcrc) or (testolduser<>olduser) or (not sameDate(oldrowversion,testrowversion)) then
-    begin
-      Result := dber_crc;
-      R.Close;
-      R.Open;
-      raise TCrcException.Create(table + ' ' + IntToStr(id)+' User : '+testolduser+' Date :'+dateTostr(testrowversion));
-      exit;
-    end;
+    R.Close;
+    R.open;
+    raise TCrcException.Create(table + ' ' + IntToStr(id)+' User : '+testolduser+' Date :'+dateTostr(testrowversion));
+    exit;
   end;
+  IF mode=um_create then
+  begin
+    setID(R);
+  end;
+
   try
     Result := dber_none;
+    R.Post;
     if R is TSqlQuery then TSqlquery(R).ApplyUpdates(0) else
     if R is TZquery then TZquery(R).ApplyUpdates;
-
-
   except
     on E: Exception do
     begin
@@ -848,34 +921,7 @@ begin
   end;
   if MainData.cmode='DBE' then TSqlTransaction(TSqlQuery(R).Transaction).CommitRetaining ;
 
-{  if st in [usInserted] then
-  begin
-    try
-      Querycrc := TSqlQuery.Create(self);
-      Querycrc.database := R.database;
-      Querycrc.transaction := R.transaction;
-      Querycrc.sql.Text := reselect;
-      Querycrc.Open;
-      if Querycrc.RecordCount = 1 then
-      begin
-        id := StrToInt(Querycrc.FieldByName(cle).OldValue);
-      end
-      else
-      begin
-        Querycrc.Close;
-        reselect := 'SELECT MAX(' + cle + ') as IDM  FROM ' + table;
-        Querycrc.sql.Text := reselect;
-        Querycrc.Open;
-        if Querycrc.RecordCount = 1 then
-        begin
-          id := StrToInt(Querycrc.FieldByName('IDM').OldValue);
-        end;
-      end;
-      Querycrc.Close;
-    finally
-      Querycrc.Free;
-    end;
-  end; }
+  // todo : en cas d'insertion, récupérer la clé SY_ID
 
   if not (st in [usDeleted]) then Read(R,id);
 

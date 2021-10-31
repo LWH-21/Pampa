@@ -4,12 +4,12 @@
     <PathDelim Value="\"/>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="93">
+    <Units Count="104">
       <Unit0>
         <Filename Value="Pampa.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="13"/>
-        <CursorPos X="30" Y="30"/>
+        <TopLine Value="22"/>
+        <CursorPos X="43" Y="41"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -20,10 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Main"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="809"/>
-        <CursorPos X="30" Y="814"/>
+        <TopLine Value="501"/>
+        <CursorPos X="33" Y="518"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -35,9 +34,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DataAccess"/>
-        <EditorIndex Value="16"/>
-        <TopLine Value="559"/>
-        <CursorPos Y="577"/>
+        <EditorIndex Value="22"/>
+        <TopLine Value="547"/>
+        <CursorPos Y="572"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -84,9 +83,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DA_table"/>
-        <EditorIndex Value="12"/>
-        <TopLine Value="287"/>
-        <CursorPos X="101" Y="292"/>
+        <EditorIndex Value="15"/>
+        <TopLine Value="451"/>
+        <CursorPos X="31" Y="466"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -121,16 +120,17 @@
         <Filename Value="uhistomanager.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UHistoManager"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="368"/>
-        <CursorPos X="41" Y="383"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="483"/>
+        <CursorPos X="8" Y="513"/>
         <UsageCount Value="201"/>
+        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="ressourcesstrings.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="RessourcesStrings"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="19"/>
         <TopLine Value="3"/>
         <CursorPos X="10" Y="35"/>
         <UsageCount Value="200"/>
@@ -143,9 +143,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="Fru_planning"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="54"/>
-        <CursorPos X="3" Y="78"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="313"/>
+        <CursorPos X="41" Y="340"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -169,7 +170,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UTW_Tab"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="19"/>
         <CursorPos X="62" Y="48"/>
         <UsageCount Value="200"/>
@@ -182,7 +183,7 @@
         <ComponentName Value="FHistoSup"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="19"/>
         <CursorPos X="101" Y="35"/>
         <UsageCount Value="200"/>
@@ -196,7 +197,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFbookmark"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="14"/>
         <TopLine Value="527"/>
         <CursorPos X="10" Y="552"/>
         <UsageCount Value="202"/>
@@ -210,7 +211,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="UFr_histo"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="117"/>
         <CursorPos X="38" Y="129"/>
         <UsageCount Value="200"/>
@@ -221,7 +222,7 @@
         <Filename Value="datapanel.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DataPanel"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="20"/>
         <TopLine Value="1522"/>
         <CursorPos Y="1545"/>
         <UsageCount Value="200"/>
@@ -234,7 +235,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFCustomDp"/>
-        <EditorIndex Value="19"/>
+        <EditorIndex Value="26"/>
         <TopLine Value="263"/>
         <CursorPos X="3" Y="266"/>
         <UsageCount Value="201"/>
@@ -248,16 +249,23 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UCfg_table"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="59"/>
+        <EditorIndex Value="5"/>
         <CursorPos X="15" Y="81"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="136"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit19>
       <Unit20>
-        <Filename Value="ufcnx.pas"/>
+        <Filename Value="testunit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="TestUnit"/>
+        <EditorIndex Value="7"/>
+        <CursorPos X="20" Y="29"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="ufcnx.pas"/>
         <ComponentName Value="FCnx"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
@@ -265,11 +273,11 @@
         <EditorIndex Value="1"/>
         <TopLine Value="27"/>
         <CursorPos X="24" Y="230"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit20>
-      <Unit21>
+      </Unit21>
+      <Unit22>
         <Filename Value="s_intervenant.pas"/>
         <ComponentName Value="FS_INTERVENANT"/>
         <HasResources Value="True"/>
@@ -279,52 +287,52 @@
         <TopLine Value="33"/>
         <CursorPos X="66" Y="23"/>
         <UsageCount Value="136"/>
-      </Unit21>
-      <Unit22>
+      </Unit22>
+      <Unit23>
         <Filename Value="C:\lazarus\lcl\include\wincontrol.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="6159"/>
         <CursorPos Y="6183"/>
         <UsageCount Value="16"/>
-      </Unit22>
-      <Unit23>
+      </Unit23>
+      <Unit24>
         <Filename Value="C:\lazarus\lcl\include\customform.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="630"/>
         <CursorPos Y="653"/>
         <UsageCount Value="34"/>
-      </Unit23>
-      <Unit24>
+      </Unit24>
+      <Unit25>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3787"/>
         <CursorPos X="33" Y="3931"/>
         <UsageCount Value="4"/>
-      </Unit24>
-      <Unit25>
+      </Unit25>
+      <Unit26>
         <Filename Value="LW\lwdbgrid.pas"/>
         <UnitName Value="LWDBGrid"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="10"/>
         <CursorPos X="62" Y="239"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
-      </Unit25>
-      <Unit26>
+      </Unit26>
+      <Unit27>
         <Filename Value="LW\lwpopmenu.pas"/>
         <UnitName Value="LWPopMenu"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="47" Y="51"/>
         <UsageCount Value="17"/>
-      </Unit26>
-      <Unit27>
+      </Unit27>
+      <Unit28>
         <Filename Value="LW\lwdatapanel.pas"/>
         <UnitName Value="LWDataPanel"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1104"/>
         <CursorPos X="22" Y="1115"/>
         <UsageCount Value="91"/>
-      </Unit27>
-      <Unit28>
+      </Unit28>
+      <Unit29>
         <Filename Value="LW\ucustomize.pas"/>
         <ComponentName Value="FCustomize"/>
         <HasResources Value="True"/>
@@ -334,16 +342,16 @@
         <TopLine Value="157"/>
         <CursorPos Y="163"/>
         <UsageCount Value="87"/>
-      </Unit28>
-      <Unit29>
+      </Unit29>
+      <Unit30>
         <Filename Value="LW\lwdata.pas"/>
         <UnitName Value="LWData"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="7" Y="27"/>
         <UsageCount Value="97"/>
-      </Unit29>
-      <Unit30>
+      </Unit30>
+      <Unit31>
         <Filename Value="LW\uexception.pas"/>
         <ComponentName Value="FException"/>
         <HasResources Value="True"/>
@@ -352,583 +360,681 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="16"/>
         <UsageCount Value="95"/>
-      </Unit30>
-      <Unit31>
+      </Unit31>
+      <Unit32>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\packages\rtl-generics\src\generics.collections.pas"/>
         <UnitName Value="Generics.Collections"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1149"/>
         <CursorPos Y="1173"/>
         <UsageCount Value="38"/>
-      </Unit31>
-      <Unit32>
+      </Unit32>
+      <Unit33>
         <Filename Value="C:\lazarus\lcl\controls.pp"/>
         <UnitName Value="Controls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1382"/>
         <CursorPos X="15" Y="1402"/>
         <UsageCount Value="7"/>
-      </Unit32>
-      <Unit33>
+      </Unit33>
+      <Unit34>
         <Filename Value="w_a.pas"/>
         <ComponentName Value="W_A"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="W_A"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="12"/>
         <CursorPos X="17" Y="22"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit33>
-      <Unit34>
+      </Unit34>
+      <Unit35>
         <Filename Value="D:\Programmes\lazarus\components\lazreport\source\addons\lrspreadsheetexport\le_e_spreadsheet.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="89"/>
         <CursorPos X="60" Y="106"/>
         <UsageCount Value="7"/>
-      </Unit34>
-      <Unit35>
+      </Unit35>
+      <Unit36>
         <Filename Value="D:\Programmes\lazarus\fpc\3.2.0\source\packages\fcl-db\src\base\db.pas"/>
         <UnitName Value="DB"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="41"/>
         <CursorPos X="67" Y="58"/>
         <UsageCount Value="7"/>
-      </Unit35>
-      <Unit36>
+      </Unit36>
+      <Unit37>
         <Filename Value="D:\Programmes\lazarus\fpc\3.2.0\source\packages\fcl-db\src\sqldb\sqldb.pp"/>
         <UnitName Value="SQLDB"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="444"/>
         <CursorPos X="27" Y="458"/>
         <UsageCount Value="7"/>
-      </Unit36>
-      <Unit37>
+      </Unit37>
+      <Unit38>
         <Filename Value="D:\Programmes\lazarus\fpc\3.2.0\source\packages\fcl-db\src\base\bufdataset.pas"/>
         <UnitName Value="BufDataset"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="612"/>
         <CursorPos X="26" Y="639"/>
         <UsageCount Value="1"/>
-      </Unit37>
-      <Unit38>
+      </Unit38>
+      <Unit39>
         <Filename Value="D:\Programmes\lazarus\lcl\include\wincontrol.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="4244"/>
         <CursorPos Y="4262"/>
         <UsageCount Value="7"/>
-      </Unit38>
-      <Unit39>
+      </Unit39>
+      <Unit40>
         <Filename Value="C:\lazarus\lcl\include\treeview.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3426"/>
         <CursorPos Y="3449"/>
         <UsageCount Value="38"/>
-      </Unit39>
-      <Unit40>
+      </Unit40>
+      <Unit41>
         <Filename Value="C:\lazarus\lcl\dialogs.pp"/>
         <UnitName Value="Dialogs"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="13" Y="17"/>
         <UsageCount Value="91"/>
-      </Unit40>
-      <Unit41>
+      </Unit41>
+      <Unit42>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\objpas\sysutils\dati.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="837"/>
         <CursorPos X="10" Y="858"/>
         <UsageCount Value="5"/>
-      </Unit41>
-      <Unit42>
+      </Unit42>
+      <Unit43>
         <Filename Value="C:\Desktop\Cassis.HTML"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="7"/>
         <DefaultSyntaxHighlighter Value="HTML"/>
-      </Unit42>
-      <Unit43>
+      </Unit43>
+      <Unit44>
         <Filename Value="C:\lazarus\components\lazutils\laz2_dom.pas"/>
         <UnitName Value="Laz2_DOM"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1615"/>
         <CursorPos Y="1639"/>
         <UsageCount Value="14"/>
-      </Unit43>
-      <Unit44>
+      </Unit44>
+      <Unit45>
         <Filename Value="C:\lazarus\lcl\include\scrollingwincontrol.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="296"/>
         <CursorPos X="42" Y="325"/>
         <UsageCount Value="10"/>
-      </Unit44>
-      <Unit45>
+      </Unit45>
+      <Unit46>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\objpas\types.pp"/>
         <UnitName Value="Types"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="10" Y="340"/>
         <UsageCount Value="10"/>
-      </Unit45>
-      <Unit46>
+      </Unit46>
+      <Unit47>
         <Filename Value="C:\lazarus\lcl\include\font.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="901"/>
         <CursorPos Y="926"/>
         <UsageCount Value="25"/>
-      </Unit46>
-      <Unit47>
+      </Unit47>
+      <Unit48>
         <Filename Value="C:\lazarus\components\lazutils\laztracer.pas"/>
         <UnitName Value="LazTracer"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="28"/>
         <CursorPos Y="50"/>
         <UsageCount Value="4"/>
-      </Unit47>
-      <Unit48>
+      </Unit48>
+      <Unit49>
         <Filename Value="C:\lazarus\lcl\interfaces\win32\win32listsl.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="113"/>
         <CursorPos Y="135"/>
         <UsageCount Value="9"/>
-      </Unit48>
-      <Unit49>
+      </Unit49>
+      <Unit50>
         <Filename Value="C:\lazarus\lcl\include\customcombobox.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="827"/>
         <CursorPos X="27" Y="849"/>
         <UsageCount Value="9"/>
-      </Unit49>
-      <Unit50>
+      </Unit50>
+      <Unit51>
         <Filename Value="C:\lazarus\lcl\include\brush.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2"/>
         <CursorPos Y="38"/>
         <UsageCount Value="8"/>
-      </Unit50>
-      <Unit51>
+      </Unit51>
+      <Unit52>
         <Filename Value="C:\lazarus\lcl\include\customedit.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="507"/>
         <CursorPos Y="529"/>
         <UsageCount Value="7"/>
-      </Unit51>
-      <Unit52>
+      </Unit52>
+      <Unit53>
         <Filename Value="C:\lazarus\lcl\include\dbedit.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="246"/>
         <CursorPos Y="267"/>
         <UsageCount Value="7"/>
-      </Unit52>
-      <Unit53>
+      </Unit53>
+      <Unit54>
         <Filename Value="C:\lazarus\lcl\lclmessageglue.pas"/>
         <UnitName Value="LCLMessageGlue"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="87"/>
         <CursorPos Y="123"/>
         <UsageCount Value="7"/>
-      </Unit53>
-      <Unit54>
+      </Unit54>
+      <Unit55>
         <Filename Value="C:\lazarus\lcl\interfaces\win32\win32callback.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2538"/>
         <CursorPos X="37" Y="2543"/>
         <UsageCount Value="7"/>
-      </Unit54>
-      <Unit55>
+      </Unit55>
+      <Unit56>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\packages\rtl-generics\src\inc\generics.dictionariesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="550"/>
         <CursorPos X="22" Y="557"/>
         <UsageCount Value="8"/>
-      </Unit55>
-      <Unit56>
+      </Unit56>
+      <Unit57>
         <Filename Value="C:\lazarus\lcl\include\speedbutton.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="93"/>
         <CursorPos X="39" Y="118"/>
         <UsageCount Value="10"/>
-      </Unit56>
-      <Unit57>
+      </Unit57>
+      <Unit58>
         <Filename Value="C:\lazarus\lcl\include\colorbutton.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="141"/>
         <CursorPos Y="180"/>
         <UsageCount Value="7"/>
-      </Unit57>
-      <Unit58>
+      </Unit58>
+      <Unit59>
         <Filename Value="C:\lazarus\lcl\buttons.pp"/>
         <UnitName Value="Buttons"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="13" Y="23"/>
         <UsageCount Value="1"/>
-      </Unit58>
-      <Unit59>
+      </Unit59>
+      <Unit60>
         <Filename Value="ufcustomdp.lfm"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="7"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
-      </Unit59>
-      <Unit60>
+      </Unit60>
+      <Unit61>
         <Filename Value="C:\usr\lib\lazarus\2.0.6\lcl\include\treeview.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="371"/>
         <CursorPos Y="392"/>
         <UsageCount Value="9"/>
-      </Unit60>
-      <Unit61>
+      </Unit61>
+      <Unit62>
         <Filename Value="C:\lazarus\lcl\comctrls.pp"/>
         <UnitName Value="ComCtrls"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="169"/>
         <CursorPos X="14" Y="191"/>
         <UsageCount Value="53"/>
-      </Unit61>
-      <Unit62>
+      </Unit62>
+      <Unit63>
         <Filename Value="fru_planning.lfm"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="1"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
-      </Unit62>
-      <Unit63>
+      </Unit63>
+      <Unit64>
         <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
         <UnitName Value="LCLType"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="398"/>
         <CursorPos X="12" Y="435"/>
         <UsageCount Value="43"/>
-      </Unit63>
-      <Unit64>
+      </Unit64>
+      <Unit65>
         <Filename Value="C:\lazarus\components\lazutils\lconvencoding.pas"/>
         <UnitName Value="LConvEncoding"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="779"/>
         <CursorPos Y="310"/>
         <UsageCount Value="15"/>
-      </Unit64>
-      <Unit65>
+      </Unit65>
+      <Unit66>
         <Filename Value="ucfg_table.lfm"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="9"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
-      </Unit65>
-      <Unit66>
+      </Unit66>
+      <Unit67>
         <Filename Value="C:\lazarus\components\lazutils\laz2_xmlread.pas"/>
         <UnitName Value="laz2_XMLRead"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1505"/>
         <CursorPos X="46" Y="1519"/>
         <UsageCount Value="12"/>
-      </Unit66>
-      <Unit67>
+      </Unit67>
+      <Unit68>
         <Filename Value="C:\lazarus\lcl\forms.pp"/>
         <UnitName Value="Forms"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1188"/>
         <CursorPos X="3" Y="1212"/>
         <UsageCount Value="16"/>
-      </Unit67>
-      <Unit68>
+      </Unit68>
+      <Unit69>
         <Filename Value="C:\lazarus\lcl\grids.pas"/>
         <UnitName Value="Grids"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="6345"/>
         <CursorPos Y="6367"/>
         <UsageCount Value="5"/>
-      </Unit68>
-      <Unit69>
+      </Unit69>
+      <Unit70>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\packages\fcl-db\src\base\fields.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="361"/>
         <CursorPos X="51" Y="384"/>
         <UsageCount Value="12"/>
-      </Unit69>
-      <Unit70>
+      </Unit70>
+      <Unit71>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\inc\objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="395"/>
         <CursorPos X="7" Y="418"/>
         <UsageCount Value="5"/>
-      </Unit70>
-      <Unit71>
+      </Unit71>
+      <Unit72>
         <Filename Value="uexception.lfm"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="191" Y="2"/>
         <UsageCount Value="15"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
-      </Unit71>
-      <Unit72>
+      </Unit72>
+      <Unit73>
         <Filename Value="C:\lazarus\components\lazutils\lazmethodlist.pas"/>
         <UnitName Value="LazMethodList"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="166"/>
         <CursorPos Y="189"/>
         <UsageCount Value="13"/>
-      </Unit72>
-      <Unit73>
-        <Filename Value="lwdata.pas"/>
-        <UnitName Value="LWData"/>
-        <EditorIndex Value="15"/>
-        <TopLine Value="4"/>
-        <CursorPos X="40" Y="24"/>
-        <UsageCount Value="37"/>
-        <Loaded Value="True"/>
       </Unit73>
       <Unit74>
+        <Filename Value="lwdata.pas"/>
+        <UnitName Value="LWData"/>
+        <EditorIndex Value="21"/>
+        <TopLine Value="4"/>
+        <CursorPos X="40" Y="24"/>
+        <UsageCount Value="41"/>
+        <Loaded Value="True"/>
+      </Unit74>
+      <Unit75>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\packages\fcl-db\src\base\db.pas"/>
         <UnitName Value="DB"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="403"/>
         <CursorPos X="34" Y="424"/>
         <UsageCount Value="7"/>
-      </Unit74>
-      <Unit75>
+      </Unit75>
+      <Unit76>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\objpas\sysutils\syshelph.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="57"/>
         <CursorPos X="33" Y="83"/>
         <UsageCount Value="17"/>
-      </Unit75>
-      <Unit76>
+      </Unit76>
+      <Unit77>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\objpas\sysutils\syshelp.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="307"/>
         <CursorPos X="50" Y="315"/>
         <UsageCount Value="17"/>
-      </Unit76>
-      <Unit77>
+      </Unit77>
+      <Unit78>
         <Filename Value="uflogin.pas"/>
         <ComponentName Value="FLogin"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFlogin"/>
-        <EditorIndex Value="17"/>
+        <EditorIndex Value="23"/>
         <TopLine Value="67"/>
         <CursorPos X="119" Y="74"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="31"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit77>
-      <Unit78>
+      </Unit78>
+      <Unit79>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZConnection.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
         <CursorPos X="44" Y="71"/>
         <UsageCount Value="9"/>
-      </Unit78>
-      <Unit79>
+      </Unit79>
+      <Unit80>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZAbstractConnection.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="14"/>
         <CursorPos X="8" Y="102"/>
         <UsageCount Value="9"/>
-      </Unit79>
-      <Unit80>
+      </Unit80>
+      <Unit81>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZDataset.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="40"/>
         <CursorPos X="47" Y="63"/>
         <UsageCount Value="9"/>
-      </Unit80>
-      <Unit81>
+      </Unit81>
+      <Unit82>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZAbstractRODataset.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2534"/>
         <CursorPos Y="2556"/>
         <UsageCount Value="11"/>
-      </Unit81>
-      <Unit82>
+      </Unit82>
+      <Unit83>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="190"/>
         <CursorPos X="23" Y="429"/>
         <UsageCount Value="9"/>
-      </Unit82>
-      <Unit83>
+      </Unit83>
+      <Unit84>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\plain\ZPlainLoader.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="229"/>
         <CursorPos Y="252"/>
         <UsageCount Value="11"/>
-      </Unit83>
-      <Unit84>
+      </Unit84>
+      <Unit85>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcAdo.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="289"/>
         <CursorPos Y="320"/>
         <UsageCount Value="10"/>
-      </Unit84>
-      <Unit85>
+      </Unit85>
+      <Unit86>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\core\ZSysUtils.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2080"/>
         <CursorPos Y="2102"/>
         <UsageCount Value="10"/>
-      </Unit85>
-      <Unit86>
+      </Unit86>
+      <Unit87>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcAdoStatement.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="269"/>
         <CursorPos Y="292"/>
         <UsageCount Value="10"/>
-      </Unit86>
-      <Unit87>
+      </Unit87>
+      <Unit88>
         <Filename Value="D:\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZSqlProcessor.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="61"/>
         <CursorPos X="3" Y="84"/>
         <UsageCount Value="11"/>
-      </Unit87>
-      <Unit88>
+      </Unit88>
+      <Unit89>
         <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcAdo.pas"/>
-        <EditorIndex Value="20"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="304"/>
         <CursorPos Y="320"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
-      </Unit88>
-      <Unit89>
+      </Unit89>
+      <Unit90>
         <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcIntfs.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1785"/>
         <CursorPos X="36" Y="1789"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
-      </Unit89>
-      <Unit90>
+      </Unit90>
+      <Unit91>
         <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcMySqlUtils.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="293"/>
-        <CursorPos X="95" Y="316"/>
-        <UsageCount Value="10"/>
+        <CursorPos Y="310"/>
+        <UsageCount Value="11"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
-      </Unit90>
-      <Unit91>
+      </Unit91>
+      <Unit92>
         <Filename Value="dw_f.pas"/>
         <ComponentName Value="W_F"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="18"/>
-        <CursorPos X="97" Y="4"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="24"/>
+        <CursorPos X="31" Y="16"/>
+        <UsageCount Value="14"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit91>
-      <Unit92>
+      </Unit92>
+      <Unit93>
         <Filename Value="dw_f.lfm"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
-      </Unit92>
+      </Unit93>
+      <Unit94>
+        <Filename Value="fru_person.pas"/>
+        <EditorIndex Value="25"/>
+        <TopLine Value="109"/>
+        <CursorPos Y="109"/>
+        <UsageCount Value="14"/>
+        <Loaded Value="True"/>
+      </Unit94>
+      <Unit95>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\plain\ZPlainLoader.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="235"/>
+        <CursorPos X="78" Y="259"/>
+        <UsageCount Value="12"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit95>
+      <Unit96>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZAbstractRODataset.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2909"/>
+        <CursorPos Y="2924"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit96>
+      <Unit97>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcSqLiteUtils.pas"/>
+        <EditorIndex Value="17"/>
+        <TopLine Value="224"/>
+        <CursorPos Y="241"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit97>
+      <Unit98>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcSqLiteStatement.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="377"/>
+        <CursorPos Y="394"/>
+        <UsageCount Value="11"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit98>
+      <Unit99>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\dbc\ZDbcUtils.pas"/>
+        <EditorIndex Value="16"/>
+        <TopLine Value="396"/>
+        <CursorPos Y="413"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit99>
+      <Unit100>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\component\ZAbstractDataset.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="439"/>
+        <CursorPos Y="454"/>
+        <UsageCount Value="11"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit100>
+      <Unit101>
+        <Filename Value="C:\Users\LWH\AppData\Local\lazarus\onlinepackagemanager\packages\zeosdbo\src\plain\ZPlainSqLiteDriver.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="944"/>
+        <CursorPos Y="964"/>
+        <UsageCount Value="11"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit101>
+      <Unit102>
+        <Filename Value="uf_planning_01.pas"/>
+        <UnitName Value="UF_planning_01"/>
+        <EditorIndex Value="18"/>
+        <CursorPos X="38" Y="9"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+      </Unit102>
+      <Unit103>
+        <Filename Value="dplanning.pas"/>
+        <ComponentName Value="Planning"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <UnitName Value="DPlanning"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="393"/>
+        <CursorPos Y="422"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit103>
     </Units>
-    <JumpHistory Count="27" HistoryIndex="26">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="75" TopLine="55"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="136" TopLine="119"/>
       </Position1>
       <Position2>
-        <Filename Value="main.pas"/>
-        <Caret Line="827" TopLine="812"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="346" TopLine="328"/>
       </Position2>
       <Position3>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="93" TopLine="76"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="347" TopLine="328"/>
       </Position3>
       <Position4>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="131" TopLine="115"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="346" TopLine="328"/>
       </Position4>
       <Position5>
-        <Filename Value="main.pas"/>
-        <Caret Line="827" TopLine="818"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="347" TopLine="328"/>
       </Position5>
       <Position6>
-        <Filename Value="main.pas"/>
-        <Caret Line="837" Column="21" TopLine="818"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="349" TopLine="328"/>
       </Position6>
       <Position7>
-        <Filename Value="main.pas"/>
-        <Caret Line="1119" Column="12" TopLine="1091"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="346" TopLine="328"/>
       </Position7>
       <Position8>
-        <Filename Value="main.pas"/>
-        <Caret Line="30" Column="90" TopLine="21"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="347" TopLine="328"/>
       </Position8>
       <Position9>
-        <Filename Value="main.pas"/>
-        <Caret Line="192" Column="24" TopLine="164"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="349" TopLine="328"/>
       </Position9>
       <Position10>
-        <Filename Value="main.pas"/>
-        <Caret Line="527" Column="29" TopLine="500"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="353" TopLine="328"/>
       </Position10>
       <Position11>
-        <Filename Value="main.pas"/>
-        <Caret Line="730" Column="12" TopLine="702"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="355" TopLine="328"/>
       </Position11>
       <Position12>
-        <Filename Value="main.pas"/>
-        <Caret Line="784" Column="12" TopLine="756"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="361" TopLine="334"/>
       </Position12>
       <Position13>
-        <Filename Value="main.pas"/>
-        <Caret Line="837" Column="26" TopLine="809"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="363" TopLine="335"/>
       </Position13>
       <Position14>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="73" TopLine="55"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="364" TopLine="336"/>
       </Position14>
       <Position15>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="60" Column="29" TopLine="33"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="369" TopLine="341"/>
       </Position15>
       <Position16>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="27" Column="40" TopLine="8"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="346" TopLine="344"/>
       </Position16>
       <Position17>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="47" Column="42" TopLine="19"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="188" Column="32" TopLine="181"/>
       </Position17>
       <Position18>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="75" Column="10" TopLine="47"/>
+        <Filename Value="Pampa.lpr"/>
+        <Caret Line="30" Column="30" TopLine="13"/>
       </Position18>
       <Position19>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="71" Column="25" TopLine="54"/>
+        <Filename Value="uhistomanager.pas"/>
+        <Caret Line="35" Column="62" TopLine="18"/>
       </Position19>
       <Position20>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="75" Column="10" TopLine="54"/>
+        <Filename Value="Pampa.lpr"/>
+        <Caret Line="31" Column="12" TopLine="22"/>
       </Position20>
       <Position21>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="82" Column="43" TopLine="54"/>
+        <Filename Value="testunit.pas"/>
+        <Caret Line="11" Column="29"/>
       </Position21>
       <Position22>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="95" Column="10" TopLine="67"/>
+        <Filename Value="uhistomanager.pas"/>
+        <Caret Line="35" Column="57" TopLine="18"/>
       </Position22>
       <Position23>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="440" Column="5" TopLine="415"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="418" Column="27" TopLine="383"/>
       </Position23>
       <Position24>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="391" Column="46" TopLine="385"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="19" Column="27" TopLine="13"/>
       </Position24>
       <Position25>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="104" Column="38" TopLine="77"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="88" Column="23" TopLine="66"/>
       </Position25>
       <Position26>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="106" Column="38" TopLine="77"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="107" Column="60" TopLine="67"/>
       </Position26>
       <Position27>
-        <Filename Value="fru_planning.pas"/>
-        <Caret Line="452" Column="52" TopLine="402"/>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="424" Column="38" TopLine="385"/>
       </Position27>
+      <Position28>
+        <Filename Value="dplanning.pas"/>
+        <Caret Line="432" TopLine="392"/>
+      </Position28>
+      <Position29>
+        <Filename Value="uhistomanager.pas"/>
+        <Caret Line="513" Column="8" TopLine="483"/>
+      </Position29>
+      <Position30>
+        <Filename Value="fru_planning.pas"/>
+        <Caret Line="337" Column="78" TopLine="315"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
