@@ -12,8 +12,12 @@ tagline: Pampa|Open-source Planning Software
 email: lwh@free.fr
 description: > # this means to ignore newlines until "baseurl:"
   Planning software
-#baseurl: "/cards" # the subpath of your site, e.g. /blog
-url: "https://lwh-21.github.io/Pampa" # the base hostname & protocol for your site
+domain : "lwh-21.github.io"
+url: "https://lwh-21.github.io" # Site url, also used in jekyll-seo-tag
+baseurl: "/Pampa"
+repo: "https://github.com/LWH-21/Pampa/"
+github_username:  LWH-21
+
 author: LWH
 logo: /assets/logos\logo.svg
 locale: fr
