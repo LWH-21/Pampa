@@ -14,12 +14,12 @@ description: > # this means to ignore newlines until "baseurl:"
   Planning software
 domain : "lwh-21.github.io"
 url: "https://lwh-21.github.io" # Site url, also used in jekyll-seo-tag
-baseurl: "/Pampa/docs"
+baseurl: "/Pampa"
 repo: "https://github.com/LWH-21/Pampa/"
 github_username:  LWH-21
 
 author: LWH
-logo: /assets/logos\logo.svg
+logo: /assets/logos/logo.svg
 locale: fr
 language: french
 format: web
