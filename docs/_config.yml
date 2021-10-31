@@ -73,10 +73,10 @@ disqus: no
 disqus-shortname: 
 
 #social
-facebook: http://facebook.com/
-quora: http://quora.com/
-twitter: http://twitter.com/
-github: http://github.com/
+facebook: https://www.facebook.com/profile.php?id=100009215959255
+quora: # http://quora.com/
+twitter: # http://twitter.com/
+github: https://github.com/LWH-21
 email: lwh@free.fr
 
 #facebook like box
