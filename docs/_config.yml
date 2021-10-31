@@ -17,7 +17,7 @@ url: "https://lwh-21.github.io" # Site url, also used in jekyll-seo-tag
 baseurl: "/Pampa"
 repo: "https://github.com/LWH-21/Pampa/"
 github_username:  LWH-21
-
+encoding: UTF-8
 author: LWH
 logo: /assets/logos/logo.svg
 locale: fr
@@ -85,9 +85,7 @@ fb-app-id:
 fb-page-url: 
 fb-page-title: 
 
-# Sass style
-sass:
-  style: compressed
+
 
 # Ruby Gems
 plugins: 
