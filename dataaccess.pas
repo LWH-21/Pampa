@@ -11,7 +11,7 @@ uses
   {$IFDEF WINDOWS}
   win32proc,
   {$ENDIF}
-  dos, Generics.Collections, Clipbrd, Controls, Forms, Zconnection, ZDataset,
+  dos, Generics.Collections, Clipbrd, Controls, Forms, Zconnection, ZDataset,ZSqlUpdate,
   ZSqlProcessor, ZPgEventAlerter, ZSqlMonitor, ZSqlMetadata, ZConnectionGroup,
   ZGroupedConnection, ZIBEventAlerter, fpjson, jsonparser;
 
@@ -66,8 +66,8 @@ type
     function isConnected : boolean;
     function getSyntax(topic : string; def : string) : string;
     function getTimestamp : shortstring;
-    function getQuery(topic : string; def : string) : string;
-    function readDataSet(var R: Tdataset; sql : string ; readonly : boolean) : boolean;
+    function getQuery(topic : string; def : string = '') : string;
+    function readDataSet(var R: Tdataset; sql : string ; readonly : boolean; sinsert : string = ''; sdelete : string = ''; supdate : string='') : boolean;
     procedure SaveIhm(code,json : string);
     procedure Logon;
     procedure Logoff;
@@ -557,7 +557,7 @@ begin
   end;
 end;
 
-function TMainData.getQuery(topic : string; def : string) : string;
+function TMainData.getQuery(topic : string; def : string = '') : string;
 
 var Node : TDomNode;
 
@@ -1004,7 +1004,10 @@ begin
   {$ENDIF}
 end;
 
-function TmainData.ReadDataSet(var R: Tdataset; sql : string; readonly : boolean) : boolean;
+// todo : procedure WriteDataSet;
+function TmainData.ReadDataSet(var R: Tdataset; sql : string; readonly : boolean ;  sinsert : string = ''; sdelete : string = ''; supdate : string='') : boolean;
+
+var upd : TZUpdateSQL;
 
 begin
   if isnullorempty(sql) then MainForm.setMicroHelp(rs_read,0) else MainForm.setMicroHelp(sql,0);
@@ -1043,6 +1046,22 @@ begin
           if R is TZQuery then
           begin
             TZQuery(R).SQL.text:=sql;
+            if (not readonly) then
+            begin
+                 //TZQuery(R).UpdateMode:=umUpdateChanged;
+                 IF (sinsert>' ') or (supdate>' ') or (sdelete>' ') then
+                 begin
+                   upd:=TZquery(R).UpdateObject;
+                   if not assigned(upd) then
+                   begin
+                       upd:=TZUpdateSQL.Create(R);
+                   end;
+                   if sinsert>' ' then upd.InsertSQL.Text:=sinsert;
+                   if supdate>' ' then upd.ModifySQL.Text:=supdate;
+                   if sdelete>' ' then upd.DeleteSQL.Text:=sdelete;
+                   TZquery(R).UpdateObject:=upd;
+                 end;
+            end;
             TZQuery(R).prepare;
           end else
           if R is TZReadOnlyQuery then
@@ -1053,6 +1072,13 @@ begin
           if R is TSQLQuery then
           begin
             TSQLQuery(R).SQL.text:=sql;
+            if (not readonly) then
+            begin
+                 TSQLQuery(R).UpdateMode:=upWhereKeyOnly;
+                 if sinsert>' ' then TSQLQuery(R).InsertSQL.Text:=sinsert;
+                 if supdate>' ' then TSQLQuery(R).UpdateSQL.Text:=supdate;
+                 if sdelete>' ' then TSQLQuery(R).DeleteSQL.Text:=sdelete;
+            end;
             TSQLQuery(R).prepare;
           end else
           begin

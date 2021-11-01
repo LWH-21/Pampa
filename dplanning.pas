@@ -37,15 +37,21 @@ Type TLPlanning = class
           start_date : tdatetime;
           end_date   : tdatetime;
           linescount : integer;
-          colscount : integer;
-
+          colscount  : integer;
+          libs       : array of record
+                             id : longint;
+                             code : shortstring;
+                             caption : string;
+                       end;
           lines : array of record
                                   sy_id : longint;
+                                  index : integer;
                                   colums : array of TIntervention;
                             end;
 
           constructor create(s,e : tdatetime);
           procedure load(l : TInterventions);
+          function loadID(s_id : longint) : integer;
           procedure normalize;
           procedure reset;
      end;
@@ -60,7 +66,6 @@ type
   public
        procedure init (D : TMainData);
        function loadW(sy_worker : longint; start, endDate : tdatetime) : TInterventions;
-
        function IsoStrToDate(s : shortstring) : TdateTime;
        function ToIsoDate (dt : TDateTime) : shortstring;
 
@@ -326,6 +331,7 @@ begin
   begin
        setLength(lines[i].colums,colscount);
   end;
+  setLength(libs,10);
 end;
 
 procedure TLPlanning.load(l : TInterventions);
@@ -334,6 +340,7 @@ var  inter : Tintervention;
      nline,col,ncol : integer;
      i,j : integer;
      found : boolean;
+     num_index : integer;
 
 begin
      reset;
@@ -347,7 +354,9 @@ begin
                begin
                  if lines[nline].SY_ID<=0 then
                  begin
+                      num_index:=loadID(inter.c_id);
                       lines[nline].sy_id:=inter.c_id;
+                      lines[nline].index:=num_index;
                  end;
                  if lines[nline].SY_ID=inter.c_id then
                  begin
@@ -381,6 +390,53 @@ begin
      end;
 end;
 
+function TLPlanning.loadID(s_id : longint) : integer;
+
+var i, j : integer;
+    found : boolean;
+    query : Tdataset;
+    sql : string;
+
+begin
+     j:=length(libs);
+     found:=false;
+     for i:=0 to j-1 do
+     begin
+       if libs[i].ID=s_id then
+       begin
+           found:=true;
+           result:=i;
+           break;
+       end else
+       if libs[i].id<0 then break;
+     end;
+     if not found then
+     begin
+         if i=j-1 then
+         begin
+             setlength(libs,j + 10);
+             for i:=j to j+9 do
+             begin
+               libs[i].ID:=-1;
+             end;
+             i:=j + 1;
+         end;
+         query:=nil;
+         sql:=MainData.getQuery('Q0014','SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM WORKER WHERE SY_ID=%id');
+         sql:=sql.Replace('%id',inttostr(s_id));
+         Maindata.readDataSet(query,sql,true);
+         if query.RecordCount>0 then
+         begin
+              libs[i].id:=s_id;
+              libs[i].code:=query.fields[0].asString;
+              libs[i].caption:=query.fields[1].asString+' '+query.fields[2].asString;
+         end;
+         query.close;
+         query.free;
+         result:=i;
+     end;
+end;
+
 procedure TLPlanning.reset;
 
 var i,j : integer;
@@ -394,6 +450,13 @@ begin
          lines[i].colums[j]:=nil;
        end;
      end;
+     j:=length(libs);
+     for i:=0 to j - 1 do
+     begin
+       libs[i].id:=-1;
+       libs[i].code:='';
+       libs[i].caption:='';
+     end;
 end;
 
 procedure TLPlanning.normalize;
@@ -401,6 +464,7 @@ procedure TLPlanning.normalize;
 var swap : boolean;
     l,c : integer;
     temp : TIntervention;
+    minl,minl1 : integer;
 
 begin
      swap:=true;
@@ -430,7 +494,32 @@ begin
          inc(l);
        end;
      end;
+     //
+     for l:=0 to linescount - 2 do
+     begin
+          if (lines[l].sy_id>0) and (lines[l+1].sy_id=lines[l].sy_id) then
+          begin
+              minl:=2400;
+              minl1:=2400;
+              for c:=0 to colscount -1 do
+              begin
+                   if assigned(lines[l].colums[c]) then if lines[l].colums[c].h_start<minl then minl:=lines[l].colums[c].h_start;
+                   if assigned(lines[l+1].colums[c]) then if lines[l+1].colums[c].h_start<minl1 then minl1:=lines[l+1].colums[c].h_start;
+              end;
+              for c:=0 to colscount -1 do
+              begin
+                   if assigned(lines[l].colums[c]) and (not assigned(lines[l+1].colums[c])) then
+                   begin
+                        if abs(lines[l].colums[c].h_start-minl)>abs(lines[l].colums[c].h_start-minl1) then
+                        begin
+                            lines[l+1].colums[c]:=lines[l].colums[c];
+                            lines[l].colums[c]:=nil;
+                        end;
+                   end;
+              end;
 
+          end;
+     end;
 end;
 
 end.

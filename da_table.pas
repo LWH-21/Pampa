@@ -562,10 +562,10 @@ begin
        base:=F.AsString;
        result:=normalize(base);
        result:=uppercase(result);
-       result:=ReplaceStr(result,' ','');
+       result:=trim(ReplaceStr(result,' ',''));
        if R.RecordCount>0 then  // RecordCount=0 => Insert
        begin
-         if (F.OldValue=F.NewValue) then
+         if (F.OldValue=F.AsString) then
          begin
               if (result=base) and (length(result)=7) then
               begin
@@ -598,7 +598,7 @@ begin
        MainData.readDataSet(QueryCode,sql,true);
        if querycode.RecordCount=0 then
        begin
-         result:=base;
+         result:=trim(base);
          querycode.close;
          querycode.free;
          exit;
@@ -616,7 +616,7 @@ begin
          result:=leftstr(base,4);
          base:=inttostr(n);
          while length(base)<4 do base:='0'+base;
-         result:=result+base;
+         result:=trim(result+base);
        end;
      end;
 end;
@@ -846,7 +846,7 @@ begin
        if (c='ý') or (c='ÿ') then c:='y' else
        c:=' ';
      end;
-     if c<'A' then c:=' ';
+     if c<'0' then c:=' ';
      result:=result+c;
   end;
 end;

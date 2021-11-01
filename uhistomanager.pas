@@ -95,7 +95,8 @@ begin
   assert(MainData.isConnected,'Not connected');
   try
     try
-      MainData.readDataSet(query,'',false);
+      // Initialize Query
+      query:=nil;
       LoadHisto;
     except
        on e : exception do error(e, dber_system,'THistoManager.create '+sql);
@@ -107,7 +108,7 @@ end;
 
 procedure THistoManager.LoadHisto;
 
-var sql : string;
+var sql, sinsert,supdate : string;
     i, num : integer;
     code : shortstring;
     exists : boolean;
@@ -127,11 +128,14 @@ begin
              hmenu[num].caption:='';
              hmenu[num].json:='';
          end;
-         query.close;
+         if assigned(query) then query.close;
 
          sql:=Maindata.getQuery('Q0006','SELECT DT, USERNAME, CODE, TIM, JSON, LASTUSER, ROWVERSION FROM LWH_HISTO WHERE USERNAME=''%u'' ORDER BY DT DESC, TIM DESC, CODE ASC');
+         sinsert:=Maindata.getQuery('IN001_C');
+         supdate:=Maindata.getQuery('IN001_U');
+
          sql:=sql.Replace('%u',Mainform.username);
-         MainData.readDataSet(Query,sql,true);
+         MainData.readDataSet(Query,sql,false,sinsert,'',supdate);
 
          i:=Query.RecordCount;
          num:=0;
@@ -384,7 +388,7 @@ begin
               if assigned(f) then f.AsString:=Mainform.username;
               f:=query.FindField('ROWVERSION');
               if assigned(f) then f.AsDateTime:=now;
-              query.post;
+              //query.post;
          end
          else
          begin
@@ -395,7 +399,7 @@ begin
              if assigned(f) then f.AsString:=Mainform.username;
              f:=query.FindField('ROWVERSION');
              if assigned(f) then f.AsDateTime:=now;
-             query.post;
+             //query.post;
          end;
          for i:=1 to 10 do if hmenu[i].code=key then
          begin
@@ -445,11 +449,13 @@ begin
     try
     if MainData.cmode='ZEO' then
     begin
+         query.Post;
          TZquery(query).ApplyUpdates;
     end else
     begin
       if TSQLQuery(query).Changecount>0 then
       begin
+           query.Post;
            TSQLQuery(query).ApplyUpdates;
            TSqlTransaction(TSQlQuery(Query).Transaction).CommitRetaining;
       end;

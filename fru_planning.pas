@@ -339,11 +339,15 @@ begin
          begin
               plan_pb.canvas.Line(limite,header+hline*(l+1),w,header+hline*(l+1));
          end;
-         r.left:=10;r.right:=limite;
-         r.bottom:=header+hline*l;r.top:=r.bottom-hline;
-         tstyle.Alignment:=taLeftJustify;
-         s:='';
-         plan_pb.Canvas.TextRect(r,5,0,s,tstyle);
+         if (l=0) or (mat.lines[l].sy_id<>mat.lines[l-1].sy_id) then
+         begin
+              r.left:=10;r.right:=limite;
+              r.bottom:=header+hline*(l+1);r.top:=r.bottom-hline;
+              tstyle.Alignment:=taLeftJustify;
+              c:=mat.lines[l].index;
+              s:=mat.libs[c].code+' '+mat.libs[c].caption;
+              plan_pb.Canvas.TextRect(r,15,5,s,tstyle);
+         end;
 
          for c:=0 to 6 do
          begin

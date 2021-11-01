@@ -2,8 +2,8 @@ object MainData: TMainData
   OnCreate = DataModuleCreate
   OldCreateOrder = False
   Height = 663
-  HorizontalOffset = 232
-  VerticalOffset = 224
+  HorizontalOffset = -1581
+  VerticalOffset = 199
   Width = 1550
   object SQLConnector: TSQLConnector
     Connected = False
