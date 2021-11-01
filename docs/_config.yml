@@ -66,7 +66,7 @@ paginate_path: /page:num/
 
 ############### SEO  ##################
 # Tracker
-analytics: G-KD84JYW6MX
+analytics: UA-62028023-2
 
 # Comments
 disqus: no
