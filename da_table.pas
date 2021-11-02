@@ -355,7 +355,9 @@ begin
     sinsert:=sinsert+') VALUES ('+svalues+')';
   end;
 
-  try
+  MainData.readDataSet(R,sselect,false,sinsert,sdelete,supdate);
+
+  (*try
     if R is TSqlQuery then
     begin
       TSqlQuery(R).sql.text:=sselect;
@@ -381,7 +383,7 @@ begin
     end;
   except
     on E: Exception do Error(E, dber_sql, sselect);
-  end;
+  end;    *)
 
   try
     R.Open;
@@ -907,10 +909,14 @@ begin
   end;
 
   try
-    Result := dber_none;
-    R.Post;
-    if R is TSqlQuery then TSqlquery(R).ApplyUpdates(0) else
-    if R is TZquery then TZquery(R).ApplyUpdates;
+    Result := dber_sql;
+    if MainData.WriteDataSet(R) then
+    begin
+         Result := dber_none;
+    end else
+    begin
+      exit;
+    end;
   except
     on E: Exception do
     begin
@@ -919,7 +925,6 @@ begin
       exit;
     end;
   end;
-  if MainData.cmode='DBE' then TSqlTransaction(TSqlQuery(R).Transaction).CommitRetaining ;
 
   // todo : en cas d'insertion, récupérer la clé SY_ID
 

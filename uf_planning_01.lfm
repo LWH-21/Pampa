@@ -1,55 +1,95 @@
 inherited F_planning_01: TF_planning_01
   Left = 449
-  Height = 460
+  Height = 613
   Top = 250
-  Width = 792
+  Width = 1019
   Caption = 'F_planning_01'
-  ClientHeight = 460
-  ClientWidth = 792
+  ClientHeight = 613
+  ClientWidth = 1019
   OnClose = FormClose
   OnShow = FormShow
   object BitBtn1: TBitBtn[0]
-    Left = 8
+    Left = 16
     Height = 30
-    Top = 416
+    Top = 576
     Width = 75
     Caption = 'BitBtn1'
     TabOrder = 0
   end
   object Ed_code: TEdit[1]
-    Left = 56
+    Left = 16
     Height = 23
     Top = 7
     Width = 80
     TabOrder = 1
   end
   object Ed_lib: TEdit[2]
-    Left = 144
+    Left = 104
     Height = 23
-    Top = 9
-    Width = 560
+    Top = 7
+    Width = 880
     TabOrder = 2
   end
-  object Cb_customer: TComboBox[3]
-    Left = 59
-    Height = 23
+  object DBGrid1: TDBGrid[3]
+    Left = 16
+    Height = 128
     Top = 40
-    Width = 644
-    ItemHeight = 15
+    Width = 976
+    Color = clWindow
+    Columns = <    
+      item
+        Title.Caption = 'SY_ID'
+        Width = 44
+        FieldName = 'SY_ID'
+      end    
+      item
+        MinSize = 100
+        ReadOnly = True
+        Title.Caption = 'START_DATE'
+        Width = 81
+        FieldName = 'START_DATE'
+      end    
+      item
+        ReadOnly = True
+        Title.Caption = 'END_DATE'
+        Width = 71
+        FieldName = 'END_DATE'
+      end    
+      item
+        ReadOnly = True
+        Title.Caption = 'DESCRIPTION'
+        Width = 87
+        FieldName = 'DESCRIPTION'
+      end>
+    DataSource = DataSource1
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgAutoSizeColumns]
     TabOrder = 3
   end
-  object DBGrid1: TDBGrid[4]
-    Left = 16
-    Height = 100
-    Top = 104
-    Width = 680
-    Color = clWindow
-    Columns = <>
-    DataSource = DataSource1
-    TabOrder = 4
+  object DataSource1: TDataSource[4]
+    DataSet = MemDataset1
+    Left = 864
+    Top = 552
   end
-  object DataSource1: TDataSource[5]
-    Left = 720
-    Top = 112
+  object MemDataset1: TMemDataset[5]
+    FieldDefs = <    
+      item
+        Name = 'SY_ID'
+        DataType = ftInteger
+      end    
+      item
+        Name = 'START_DATE'
+        DataType = ftDateTime
+      end    
+      item
+        Name = 'END_DATE'
+        DataType = ftDateTime
+      end    
+      item
+        Name = 'DESCRIPTION'
+        DataType = ftString
+        Size = 1024
+      end>
+    Left = 928
+    Top = 552
   end
 end

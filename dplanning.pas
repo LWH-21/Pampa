@@ -66,12 +66,12 @@ type
   public
        procedure init (D : TMainData);
        function loadW(sy_worker : longint; start, endDate : tdatetime) : TInterventions;
-       function IsoStrToDate(s : shortstring) : TdateTime;
+
        function ToIsoDate (dt : TDateTime) : shortstring;
 
   end;
 
-
+function IsoStrToDate(s : shortstring) : TdateTime;
 
 var
   Planning: TPlanning;
@@ -85,6 +85,21 @@ implementation
 uses UException;
 
 {$R *.lfm}
+
+function IsoStrToDate(s : shortstring) : TdateTime;
+
+var y,m,d : integer;
+
+begin
+  {$IFDEF WINDOWS}
+  if not TryIsostrtodate(s,result) then
+  {$ENDIF}
+  begin
+       if TryStrToInt(copy(s,1,4),y) and tryStrToInt(copy(s,5,2),m) and TryStrToInt(copy(s,7,2),d) then
+         result:=EncodeDate(y,m,d);
+  end;
+end;
+
 
 constructor TIntervention.create (d : tdatetime;  hs,he : integer; p,w,c : longint);
 
@@ -297,19 +312,6 @@ begin
   END;
 end;
 
-function TPlanning.IsoStrToDate(s : shortstring) : TdateTime;
-
-var y,m,d : integer;
-
-begin
-  {$IFDEF WINDOWS}
-  if not TryIsostrtodate(s,result) then
-  {$ENDIF}
-  begin
-       if TryStrToInt(copy(s,1,4),y) and tryStrToInt(copy(s,5,2),m) and TryStrToInt(copy(s,7,2),d) then
-         result:=EncodeDate(y,m,d);
-  end;
-end;
 
 function TPlanning.ToIsoDate (dt : TDateTime) : shortstring;
 

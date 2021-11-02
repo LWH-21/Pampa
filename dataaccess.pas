@@ -74,6 +74,7 @@ type
     procedure Export_script(s : tstream; modele : shortstring);
     procedure export_data_toStream(s : tstream; table : string; xml : TDOMNode);
     procedure Exporter;
+    function WriteDataSet(var R: Tdataset) : boolean;
     destructor Destroy; override;
 
   end;
@@ -1174,6 +1175,45 @@ begin
   continue:=true;
 end;
 
+function TMainData.WriteDataSet(var R: Tdataset) : boolean;
+
+var s : string;
+
+begin
+  assert(assigned(R),'Dataset not assigned');
+  result:=false;
+  Screen.Cursor:=crSQLWait;
+  s:=MainForm.StatusBar1.Panels[0].Text;
+  MainForm.StatusBar1.Panels[0].Text := rs_write;
+  try
+    try
+      if R is TZQuery then
+      begin
+        R.Post;
+        TZquery(R).ApplyUpdates;
+        result:=true;
+      end else
+      if R is TSQLQuery then
+      begin
+        R.Post;
+        TSQLQuery(R).ApplyUpdates;
+        TSqlTransaction(TSQlQuery(R).Transaction).CommitRetaining;
+        result:=true;
+      end;
+    except
+          on e : Exception do
+          begin
+               Error (e, dber_sql,'TMainData.WriteDataSet');
+               result:=false;
+          end;
+    end;
+  finally
+    Screen.Cursor := crDefault;
+    MainForm.StatusBar1.Panels[0].Text := s;
+  end;
+end;
+
+end.
 
 
 end.

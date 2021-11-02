@@ -51,8 +51,8 @@ Type
         destructor destroy;override;
 
         {$IFDEF TESTS}
-        procedure TestBDD;
-        procedure TestProcedures;
+        procedure TestBDD( s : TStringStream);
+        procedure TestProcedures( s : TStringStream);
         {$ENDIF}
 
   end;
@@ -117,7 +117,7 @@ begin
      if not MainData.isConnected then exit;
      try
        try
-         save;
+
          Screen.Cursor := crHourGlass;
          for num:=1 to 10 do
          begin
@@ -128,7 +128,11 @@ begin
              hmenu[num].caption:='';
              hmenu[num].json:='';
          end;
-         if assigned(query) then query.close;
+         if assigned(query) then
+         begin
+            save;
+            query.close;
+         end;
 
          sql:=Maindata.getQuery('Q0006','SELECT DT, USERNAME, CODE, TIM, JSON, LASTUSER, ROWVERSION FROM LWH_HISTO WHERE USERNAME=''%u'' ORDER BY DT DESC, TIM DESC, CODE ASC');
          sinsert:=Maindata.getQuery('IN001_C');
@@ -388,7 +392,6 @@ begin
               if assigned(f) then f.AsString:=Mainform.username;
               f:=query.FindField('ROWVERSION');
               if assigned(f) then f.AsDateTime:=now;
-              //query.post;
          end
          else
          begin
@@ -399,7 +402,6 @@ begin
              if assigned(f) then f.AsString:=Mainform.username;
              f:=query.FindField('ROWVERSION');
              if assigned(f) then f.AsDateTime:=now;
-             //query.post;
          end;
          for i:=1 to 10 do if hmenu[i].code=key then
          begin
@@ -440,30 +442,14 @@ In the event of an error (several users connected with the same login), do nothi
 procedure THistoManager.save;
 
 begin
-  // todo utiliser ordre replace s'il existe
+  assert(assigned(Query),'Query not assigned');
   if not MainData.isConnected then exit;
   if not changed then exit;
   Screen.Cursor := crHourGlass;
   MainForm.StatusBar1.Panels[0].Text := rs_savehisto;
   try
-    try
-    if MainData.cmode='ZEO' then
-    begin
-         query.Post;
-         TZquery(query).ApplyUpdates;
-    end else
-    begin
-      if TSQLQuery(query).Changecount>0 then
-      begin
-           query.Post;
-           TSQLQuery(query).ApplyUpdates;
-           TSqlTransaction(TSQlQuery(Query).Transaction).CommitRetaining;
-      end;
-    end;
-    except
-    end;
+    if MainData.WriteDataSet(Query) then changed:=false;
   finally
-    changed:=false;
     Screen.Cursor := crDefault;
     MainForm.StatusBar1.Panels[0].Text := rs_ready;
   end;
@@ -514,21 +500,29 @@ begin
 end;
 
 {$IFDEF TESTS}
-procedure THistoManager.TestBDD;
+procedure THistoManager.TestBDD( s : TStringStream);
 
-var sql : string;
+var sql,temp : string;
+    sl : TStringList;
 
 begin
+  s.WriteString('Test BDD THistoManager'+LineEnding);
   // Test if queries exists
-  sql:=Maindata.getQuery('Q0006','');
-  if sql<=' ' then
+  sl:=TStringList.Create;
+  sl.Add('IN001_C');
+  sl.Add('IN001_U');
+  sl.Add('Q0006');
+  for temp in sl do
   begin
-
+       sql:=Maindata.getQuery(temp,'');
+       if sql<=' ' then  s.WriteString(temp+' missing'+LineEnding);
   end;
+  sl.Free;
 end;
 
-procedure THistoManager.TestProcedures;
+procedure THistoManager.TestProcedures( s : TStringStream);
 begin
+  s.WriteString('Test procedures THistoManager'#10);
 end;
 {$ENDIF}
 

@@ -45,12 +45,7 @@ end;
 procedure TFcfg_table_det.BitBtn1Click(Sender: TObject);
 begin
   src.DataSet.UpdateRecord;
-  if src.DataSet is TSqlQuery then TSqlquery(src.DataSet).ApplyUpdates(0) else
-  if src.DataSet is TZquery then TZquery(src.DataSet).ApplyUpdates;
-  if MainData.cmode='DBE' then
-  begin
-    TSqlTransaction(TSqlQuery(src.DataSet).Transaction).CommitRetaining ;
-  end;
+  //MainData.WriteDataSet(src.DataSet);
 end;
 
 procedure TFcfg_table_det.FormShow(Sender: TObject);
