@@ -453,8 +453,8 @@ destructor TFr_planning.Destroy;
 
 begin
   inherited;
-  if assigned(mat) then freeAndNil(mat);
   if assigned(col) then freeAndNil(col);
+  if assigned(mat) then freeAndNil(mat);
 end;
 
 end.

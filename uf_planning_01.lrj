@@ -4,5 +4,6 @@
 {"hash":5829588,"name":"tf_planning_01.dbgrid1.columns[0].title.caption","sourcebytes":[83,89,95,73,68],"value":"SY_ID"},
 {"hash":128323301,"name":"tf_planning_01.dbgrid1.columns[1].title.caption","sourcebytes":[83,84,65,82,84,95,68,65,84,69],"value":"START_DATE"},
 {"hash":44270117,"name":"tf_planning_01.dbgrid1.columns[2].title.caption","sourcebytes":[69,78,68,95,68,65,84,69],"value":"END_DATE"},
-{"hash":112012222,"name":"tf_planning_01.dbgrid1.columns[3].title.caption","sourcebytes":[68,69,83,67,82,73,80,84,73,79,78],"value":"DESCRIPTION"}
+{"hash":112012222,"name":"tf_planning_01.dbgrid1.columns[3].title.caption","sourcebytes":[68,69,83,67,82,73,80,84,73,79,78],"value":"DESCRIPTION"},
+{"hash":88817569,"name":"tf_planning_01.planning_1.caption","sourcebytes":[80,108,97,110,110,105,110,103,95,49],"value":"Planning_1"}
 ]}

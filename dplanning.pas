@@ -23,6 +23,7 @@ type TIntervention = Class
           col_index : integer;
 
           constructor create (d : tdatetime; hs,he : integer; p,w,c : longint);
+          constructor create (i_day,hs,he : integer; p,w,c : longint);
           function gethstart : shortstring;
           function gethend : shortstring;
      end;
@@ -49,11 +50,15 @@ Type TLPlanning = class
                                   colums : array of TIntervention;
                             end;
 
+          constructor create;
           constructor create(s,e : tdatetime);
+          procedure add_inter(inter : TIntervention);
           procedure load(l : TInterventions);
+          procedure load(s : string);
           function loadID(s_id : longint) : integer;
           procedure normalize;
           procedure reset;
+          destructor destroy();override;
      end;
 
 
@@ -113,6 +118,16 @@ begin
   week_day:=DayOfTheWeek(dt);
 end;
 
+constructor TIntervention.create (i_day,hs,he : integer; p,w,c : longint);
+
+begin
+     h_start:=hs;
+     h_end:=he;
+     planning:=p;
+     w_id:=w;
+     c_id:=c;
+     week_day:=i_day;
+end;
 
 function TIntervention.gethstart : shortstring;
 begin
@@ -319,6 +334,21 @@ begin
    result:=FormatDateTime('YYYYMMDD',dt);
 end;
 
+constructor TLPlanning.create();
+
+var i : integer;
+
+begin
+  colscount:=7;
+  linescount:=20;
+  setlength(lines,linescount);
+  for i:=0 to linescount-1 do
+  begin
+       setLength(lines[i].colums,colscount);
+  end;
+  setLength(libs,10);
+end;
+
 constructor TLPlanning.create(s,e : tdatetime);
 
 var i : integer;
@@ -336,6 +366,54 @@ begin
   setLength(libs,10);
 end;
 
+procedure TLPlanning.add_inter(inter : TIntervention);
+var
+     nline,col,ncol : integer;
+     i,j : integer;
+     found : boolean;
+     num_index : integer;
+
+begin
+     nline:=0; found:=false;
+     ncol:=inter.week_day - 1;
+     while not found do
+     begin
+       if lines[nline].SY_ID<=0 then
+       begin
+            num_index:=loadID(inter.c_id);
+            lines[nline].sy_id:=inter.c_id;
+            lines[nline].index:=num_index;
+       end;
+       if lines[nline].SY_ID=inter.c_id then
+       begin
+            if not assigned(lines[nline].colums[ncol]) then
+            begin
+                 lines[nline].colums[ncol]:=inter;
+                 found:=true;
+            end;
+       end;
+       if not found then
+       begin
+            inc(nline);
+            if nline>=(linescount-1) then
+            begin
+                linescount:=linescount+20;
+                setlength(lines,linescount);
+                for i:=nline to linescount-1 do
+                begin
+                     lines[i].SY_ID:=-1;
+                     setLength(lines[i].colums,colscount);
+                     for j:=0 to colscount - 1 do
+                     begin
+                          lines[i].colums[j]:=nil;
+                     end;
+                end;
+            end;
+       end;
+     end;
+     assert(found=true,'not found');
+end;
+
 procedure TLPlanning.load(l : TInterventions);
 
 var  inter : Tintervention;
@@ -350,7 +428,8 @@ begin
      begin
           for inter in l do
           begin
-               nline:=0; found:=false;
+               add_inter(inter);
+               {nline:=0; found:=false;
                ncol:=DaysBetween(start_date,inter.dt);
                while not found do
                begin
@@ -386,10 +465,70 @@ begin
                           end;
                       end;
                  end;
-               end;
+               end; }
           end;
           normalize;
      end;
+end;
+
+procedure TLPlanning.load(s : String);
+
+var json : TJSONData;
+    Data, Data1,Data2: TJSONData;
+    jo1 : TJSONData;
+    i,j : integer;
+    c_id : int64;
+    i_day,i_start,i_end,i_freq : integer;
+
+    procedure add_planning;
+
+    var dtemp : tdatetime;
+        dw : integer;
+        inter : Tintervention;
+
+    begin
+       inter:=Tintervention.create(i_day,i_start,i_end,0,0,c_id);
+       inter.col_index:=i_day;
+       add_inter(inter);
+    end;
+
+begin
+     reset();
+     json:=GetJson(s);
+     IF assigned(json) then
+     begin
+       data:=Json.findPath('PLANNING');
+       if assigned(data) and (data.JSONType=jtarray) then
+       begin
+            for I:=0 to Data.Count-1 do
+            begin
+                 c_id:=-1;
+                 jo1:=TJSONArray(Data).Objects[i];
+                 Data1:=jo1.FindPath('CID');
+                 if assigned(data) then c_id:=Data1.AsInt64;
+                 Data1:=jo1.FindPath('INTERV');
+                 if (assigned(Data1)) and (data1.JSONType=jtarray) then
+                 begin
+                      for j:=0 to Data1.Count-1 do
+                      begin
+                           i_day:=-1;i_start:=0;i_end:=0;i_freq:=0;
+                           jo1:=TJSONArray(Data1).Objects[j];
+                           Data2:=jo1.FindPath('DAY');
+                           if assigned(data2) then i_day:=Data2.AsInteger;
+                           Data2:=jo1.FindPath('START');
+                           if assigned(data2) then i_start:=Data2.AsInteger;
+                           Data2:=jo1.FindPath('END');
+                           if assigned(data2) then i_end:=Data2.AsInteger;
+                           Data2:=jo1.FindPath('FREQ');
+                           if assigned(data2) then i_freq:=Data2.AsInteger;
+                           add_planning;
+                      end;
+                 end;
+            end;
+       end;
+       freeAndNil(json);
+     end;
+     normalize;
 end;
 
 function TLPlanning.loadID(s_id : longint) : integer;
@@ -449,7 +588,7 @@ begin
        lines[i].SY_ID:=-1;
        for j:=0 to colscount - 1 do
        begin
-         lines[i].colums[j]:=nil;
+         freeAndNil(lines[i].colums[j]);
        end;
      end;
      j:=length(libs);
@@ -522,6 +661,14 @@ begin
 
           end;
      end;
+end;
+
+destructor TLPlanning.destroy();
+
+var i,j : integer;
+
+begin
+    // reset;
 end;
 
 end.
