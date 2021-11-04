@@ -44,6 +44,8 @@
 {"hash":338489,"name":"tmainform.mw09.caption","sourcebytes":[77,87,48,57],"value":"MW09"},
 {"hash":338496,"name":"tmainform.mw10.caption","sourcebytes":[77,87,49,48],"value":"MW10"},
 {"hash":4716229,"name":"tmainform.mhelp.caption","sourcebytes":[65,105,100,38,101],"value":"Aid&e"},
+{"hash":85637559,"name":"tmainform.mdebug.caption","sourcebytes":[77,68,101,98,117,103],"value":"MDebug"},
+{"hash":5950131,"name":"tmainform.mtests.caption","sourcebytes":[84,101,115,116,115],"value":"Tests"},
 {"hash":146848402,"name":"tmainform.act_exit.caption","sourcebytes":[81,117,105,116,116,101,114],"value":"Quitter"},
 {"hash":223050654,"name":"tmainform.act_exit.hint","sourcebytes":[81,117,105,116,116,101,32,108,39,97,112,112,108,105,99,97,116,105,111,110],"value":"Quitte l'application"},
 {"hash":161226388,"name":"tmainform.act_worker.caption","sourcebytes":[73,110,116,101,114,118,101,110,97,110,116],"value":"Intervenant"},

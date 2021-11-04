@@ -416,6 +416,14 @@ inherited MainForm: TMainForm
     end
     object MHelp: TMenuItem
       Caption = 'Aid&e'
+      object MDebug: TMenuItem
+        Caption = 'MDebug'
+        OnClick = MDebugClick
+        object Mtests: TMenuItem
+          Caption = 'Tests'
+          OnClick = MtestsClick
+        end
+      end
     end
   end
   object ActionList1: TActionList[6]
@@ -1236,8 +1244,8 @@ inherited MainForm: TMainForm
     Enabled = False
     Interval = 60000
     OnTimer = IdleTimerTimer
-    Left = 79
-    Top = 440
+    Left = 232
+    Top = 488
   end
   object Timer1: TTimer[9]
     Enabled = False

@@ -74,7 +74,7 @@ type
     procedure Export_script(s : tstream; modele : shortstring);
     procedure export_data_toStream(s : tstream; table : string; xml : TDOMNode);
     procedure Exporter;
-    function WriteDataSet(var R: Tdataset) : boolean;
+    function WriteDataSet(var R: Tdataset; origin : shortstring='') : boolean;
     destructor Destroy; override;
 
   end;
@@ -239,6 +239,8 @@ var insert : string;
                   // Numerics Data Type
                   IF (type_col='NUM') and (precis=0) then type_col:='INT';
                   if (type_col='NUM') and (precis>0) and (longueur>0) then type_col:='DECI';
+                  // String Data Type
+                  if (type_col='CHAR') and (longueur>5) then type_col:='VARCHAR';
                   n:=xml.FindNode('TYPE'+type_col);
                   if assigned(n) and (n.GetChildCount>0) then s2:=n.FirstChild.NodeValue else s2:=type_col;
                   s2:=StringReplace(s2,'%l',inttostr(longueur),[rfReplaceAll, rfIgnoreCase]);
@@ -1005,7 +1007,7 @@ begin
   {$ENDIF}
 end;
 
-// todo : procedure WriteDataSet;
+
 function TmainData.ReadDataSet(var R: Tdataset; sql : string; readonly : boolean ;  sinsert : string = ''; sdelete : string = ''; supdate : string='') : boolean;
 
 var upd : TZUpdateSQL;
@@ -1175,12 +1177,13 @@ begin
   continue:=true;
 end;
 
-function TMainData.WriteDataSet(var R: Tdataset) : boolean;
+function TMainData.WriteDataSet(var R: Tdataset; origin : shortstring='') : boolean;
 
 var s : string;
 
 begin
   assert(assigned(R),'Dataset not assigned');
+  assert(R.FieldCount>0,'Dataset has no fields');
   result:=false;
   Screen.Cursor:=crSQLWait;
   s:=MainForm.StatusBar1.Panels[0].Text;
@@ -1203,7 +1206,7 @@ begin
     except
           on e : Exception do
           begin
-               Error (e, dber_sql,'TMainData.WriteDataSet');
+               Error (e, dber_sql,'TMainData.WriteDataSet '+origin);
                result:=false;
           end;
     end;

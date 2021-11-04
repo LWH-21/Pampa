@@ -448,7 +448,7 @@ begin
   Screen.Cursor := crHourGlass;
   MainForm.StatusBar1.Panels[0].Text := rs_savehisto;
   try
-    if MainData.WriteDataSet(Query) then changed:=false;
+    if MainData.WriteDataSet(Query,'THistoManager.save') then changed:=false;
   finally
     Screen.Cursor := crDefault;
     MainForm.StatusBar1.Panels[0].Text := rs_ready;

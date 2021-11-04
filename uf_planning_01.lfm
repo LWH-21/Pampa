@@ -33,50 +33,14 @@ inherited F_planning_01: TF_planning_01
     Width = 880
     TabOrder = 2
   end
-  object DBGrid1: TDBGrid[3]
-    Left = 8
-    Height = 128
-    Top = 40
-    Width = 1000
-    Color = clWindow
-    Columns = <    
-      item
-        Title.Caption = 'SY_ID'
-        Width = 44
-        FieldName = 'SY_ID'
-      end    
-      item
-        MinSize = 100
-        ReadOnly = True
-        Title.Caption = 'START_DATE'
-        Width = 81
-        FieldName = 'START_DATE'
-      end    
-      item
-        ReadOnly = True
-        Title.Caption = 'END_DATE'
-        Width = 71
-        FieldName = 'END_DATE'
-      end    
-      item
-        ReadOnly = True
-        Title.Caption = 'DESCRIPTION'
-        Width = 87
-        FieldName = 'DESCRIPTION'
-      end>
-    DataSource = DataSource1
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgAutoSizeColumns]
-    TabOrder = 3
-    OnCellClick = DBGrid1CellClick
-  end
-  object Plannings: TPageControl[4]
+  object Plannings: TPageControl[3]
     Left = 8
     Height = 384
     Top = 176
     Width = 1000
     ActivePage = Planning_1
     TabIndex = 0
-    TabOrder = 4
+    TabOrder = 3
     object Planning_1: TTabSheet
       Caption = 'Planning_1'
       ClientHeight = 356
@@ -99,31 +63,41 @@ inherited F_planning_01: TF_planning_01
       end
     end
   end
-  object DataSource1: TDataSource[5]
-    DataSet = MemDataset1
-    Left = 832
-    Top = 568
-  end
-  object MemDataset1: TMemDataset[6]
-    FieldDefs = <    
+  object List: TStringGrid[4]
+    Left = 16
+    Height = 100
+    Top = 48
+    Width = 976
+    ColCount = 4
+    Columns = <    
       item
-        Name = 'SY_ID'
-        DataType = ftInteger
+        MinSize = 100
+        ReadOnly = True
+        Title.Caption = 'id'
+        Width = 100
       end    
       item
-        Name = 'START_DATE'
-        DataType = ftDateTime
+        MinSize = 100
+        ReadOnly = True
+        Title.Caption = 'Début'
+        Width = 100
       end    
       item
-        Name = 'END_DATE'
-        DataType = ftDateTime
+        MinSize = 100
+        ReadOnly = True
+        Title.Caption = 'Fin'
+        Width = 100
       end    
       item
-        Name = 'DESCRIPTION'
-        DataType = ftString
-        Size = 1024
+        MinSize = 100
+        MaxSize = 500
+        ReadOnly = True
+        Title.Caption = 'Detail'
+        Width = 550
       end>
-    Left = 888
-    Top = 568
+    FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goRowSelect, goSmoothScroll]
+    TabOrder = 4
+    OnSelection = ListSelection
   end
 end

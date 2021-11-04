@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,
-  DBGrids, StdCtrls, ComCtrls, ExtCtrls, ListFilterEdit, W_A, DB, memds,
+  DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, ListFilterEdit, W_A, DB, memds,
   DataAccess, DPlanning;
 
 type
@@ -15,26 +15,26 @@ type
 
   TF_planning_01 = class(TW_A)
     BitBtn1: TBitBtn;
-    DataSource1: TDataSource;
-    DBGrid1: TDBGrid;
     Ed_lib: TEdit;
     Ed_code: TEdit;
-    MemDataset1: TMemDataset;
     pb_plan1: TPaintBox;
     Plannings: TPageControl;
     Planning_1: TTabSheet;
     Scroll_planning_1: TScrollBar;
+    List: TStringGrid;
     procedure DBGrid1CellClick(Column: TColumn);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ListSelection(Sender: TObject; aCol, aRow: Integer);
     procedure pb_plan1Paint(Sender: TObject);
   private
    query : TDataset;
    header,hline,limite : integer;
    mat :   TLPlanning;
+   currentrow : integer;
   public
     w_id : longint;
     procedure draw_planning_1;
@@ -54,7 +54,7 @@ end;
 
 procedure TF_planning_01.DBGrid1CellClick(Column: TColumn);
 begin
-  showmessage('ok');
+
 end;
 
 procedure TF_planning_01.FormCreate(Sender: TObject);
@@ -64,6 +64,7 @@ begin
      query:=nil;
      header:=40;
      hline:=30;
+     currentrow:= -1;
      limite:=pb_plan1.Width div 6;
 end;
 
@@ -90,6 +91,31 @@ procedure TF_planning_01.FormShow(Sender: TObject);
 
 begin
      load;
+end;
+
+procedure TF_planning_01.ListSelection(Sender: TObject; aCol, aRow: Integer);
+
+var s : shortstring;
+    s1 : string;
+    l : longint;
+
+begin
+  if aRow>0 then
+  begin
+       s:=List.Cells[0,aRow];
+       if trystrtoint(s,l) then
+       begin
+           if currentrow<>l then
+           begin
+               currentrow:=l;
+               s1:=List.Cells[3,aRow];
+               mat.reset;
+               mat.load(s1);
+               pb_plan1.Invalidate;
+               pb_plan1.Refresh;
+           end;
+       end;
+  end;
 end;
 
 procedure TF_planning_01.pb_plan1Paint(Sender: TObject);
@@ -199,7 +225,7 @@ procedure TF_planning_01.load;
 var R : TDataSet;
     sql,s : string;
     l : longint;
-    start_date,end_date : tdatetime;
+    start_date,end_date : shortstring;
 
 begin
   Ed_code.Clear;
@@ -222,21 +248,21 @@ begin
   sql:=MainData.getQuery('QPL02','SELECT SY_ID, SY_WID, SY_FORMAT, SY_START, SY_END, SY_DETAIL FROM PLANNING WHERE SY_WID=%w');
   sql:=sql.Replace('%w',inttostr(w_id));
   Maindata.readDataSet(query,sql,true);
-  MemDataset1.Close;
-  Memdataset1.Active:=true;
+  List.Clean;
+  List.RowCount:=1;
   while not query.EOF do
   begin
     l:=Query.Fields[0].AsInteger;
-    s:=query.Fields[3].AsString;
-    start_date:=IsoStrToDate(s);
-    s:=query.Fields[4].AsString;
-    end_date:=IsoStrToDate(s);
+    start_date:=query.Fields[3].AsString;
+    end_date:=query.Fields[4].AsString;
+
     s:=query.Fields[5].AsString;
     mat.load(s);
-    s:=copy(s,1,500);
-    MemDataSet1.InsertRecord([l,start_date,end_date,s]);
+//    s:=copy(s,1,500);
+    List.InsertRowWithValues(1,[inttostr(l),start_date,end_date,s]);
     query.Next;
   end;
+  List.Row:=1;
   draw_planning_1;
 end;
 

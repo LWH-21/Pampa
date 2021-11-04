@@ -16,6 +16,7 @@ uses
   {$IFDEF WINDOWS}Windows,{$ENDIF}
   Types,
   {$IFDEF DEBUG}LazLogger,{$ENDIF}
+  {$IFDEF TESTS}TestUnit,{$ENDIF}
   RessourcesStrings, Fru_planning, UFr_histo;
 
 type
@@ -56,6 +57,8 @@ type
     MBDD: TMenuItem;
     MCascade: TMenuItem;
     MenuItem3: TMenuItem;
+    MDebug: TMenuItem;
+    Mtests: TMenuItem;
     MI_table: TMenuItem;
     MMark: TMenuItem;
     MLHisto: TMenuItem;
@@ -146,8 +149,10 @@ type
     procedure MDelHistoClick(Sender: TObject);
     procedure MDisplayClick(Sender: TObject);
     procedure MCascadeClick(Sender: TObject);
+    procedure MDebugClick(Sender: TObject);
     procedure MhistoClick(Sender: TObject);
     procedure MI_tableClick(Sender: TObject);
+    procedure MtestsClick(Sender: TObject);
     procedure MWindowClick(Sender: TObject);
     procedure MwindowsClick(Sender: TObject);
     procedure OngletChange(Sender: TObject);
@@ -567,6 +572,7 @@ end;
 
 procedure TMainForm.IdleTimerTimer(Sender: TObject);
 begin
+   setMicrohelp(rs_idle);
    if assigned(histoManager) then
    begin
      try
@@ -576,7 +582,6 @@ begin
      end;
    end;
    StatusBar1.Panels[1].Text := MainData.getInfoConnect;
-   setMicrohelp(rs_idle);
 end;
 
 procedure TMainForm.MBDDClick(Sender: TObject);
@@ -794,6 +799,11 @@ begin
 
 end;
 
+procedure TMainForm.MDebugClick(Sender: TObject);
+begin
+
+end;
+
 
 procedure TMainForm.OpenWindow(code : shortstring;json : string='');
 
@@ -877,6 +887,20 @@ var FCfg_Table: TFCfg_Table;
 begin
      FCfg_Table:= TFCfg_Table.Create(self);
      FCfg_Table.ShowModal;
+end;
+
+procedure TMainForm.MtestsClick(Sender: TObject);
+
+{$IFDEF TESTS}
+var  FTest: TFTest;
+{$ENDIF}
+
+begin
+  {$IFDEF TESTS}
+          Ftest:=TFTest.Create(self);
+          FTest.ShowModal;
+          FTest.Free;
+  {$ENDIF}
 end;
 
 procedure TMainForm.MWindowClick(Sender: TObject);

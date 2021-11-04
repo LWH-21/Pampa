@@ -174,7 +174,7 @@ var i : integer;
     cd: TColumnDesc;
 
 begin
-  if (st<>usmodified) and (st<>usInserted) then exit;
+  //if (st<>usmodified) and (st<>usInserted) then exit;
   assert(assigned(R), 'Query not assigned');
   assert(R.RecordCount <= 1, 'Just one update allowed');
   try
@@ -910,7 +910,7 @@ begin
 
   try
     Result := dber_sql;
-    if MainData.WriteDataSet(R) then
+    if MainData.WriteDataSet(R,'TDA_table.Write '+table) then
     begin
          Result := dber_none;
     end else
