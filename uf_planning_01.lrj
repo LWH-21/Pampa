@@ -1,6 +1,6 @@
 {"version":1,"strings":[
 {"hash":144964129,"name":"tf_planning_01.caption","sourcebytes":[70,95,112,108,97,110,110,105,110,103,95,48,49],"value":"F_planning_01"},
-{"hash":151558993,"name":"tf_planning_01.bitbtn1.caption","sourcebytes":[66,105,116,66,116,110,49],"value":"BitBtn1"},
+{"hash":301841,"name":"tf_planning_01.btn_ok.caption","sourcebytes":[66,116,110,49],"value":"Btn1"},
 {"hash":88817569,"name":"tf_planning_01.planning_1.caption","sourcebytes":[80,108,97,110,110,105,110,103,95,49],"value":"Planning_1"},
 {"hash":1780,"name":"tf_planning_01.list.columns[0].title.caption","sourcebytes":[105,100],"value":"id"},
 {"hash":84801988,"name":"tf_planning_01.list.columns[1].title.caption","sourcebytes":[68,195,169,98,117,116],"value":"D\u00E9but"},

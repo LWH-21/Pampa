@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, strutils, DateUtils, DB, SQLDB, DataAccess, Variants, Dialogs, Forms, Controls, lwdata,
   LConvEncoding,LazUTF8,ZDataset, ZSqlUpdate,
-  Math,fpexprpars,
+  Math,fpexprpars,RegExpr,
   UException;
 
 type
@@ -43,8 +43,8 @@ type
     procedure Read(R: TDataSet; id: longint);
     procedure search(crit : string; R : TDataset);virtual ; abstract;
     procedure setCrc(R : TDataSet); virtual;
-    procedure setDefault(R : TDataSet); virtual;
-    procedure setID(R : TDataSet); virtual;
+    function setDefault(R : TDataSet) : boolean; virtual;
+    function setID(R : TDataSet) : boolean; virtual;
     function Test(R: TDataset; action: char; var nbwarnings, nberr: integer; var msg: string): boolean;
     function Write(R: TDataSet; var id: longint; mode : Tupdate_mode = um_read): TDbErrcode;
 
@@ -186,7 +186,7 @@ begin
         cd := Maindata.tablesdesc.Find(table, nom);
         assert(assigned(cd), 'Description du champ ' + nom + ' non trouvée');
         assert(cd.col_name = nom, 'Description du champ ' + nom + ' non trouvée');
-        n := trimRight(VartoStr(R.fields[i].newvalue));
+        n := R.fields[i].asString;
         n1:=n;
         if (cd.col_type='CHAR') then
         begin
@@ -555,9 +555,11 @@ var QueryCode: TDataset;
     F : Tfield;
 
 begin
+     assert(assigned(R),'Dataset not assigned');
+     assert(assigned(R.Fields.FindField('SY_CODE')),'No SY_CODE field in dataset');
      QueryCode:=nil;
      result:='0000000';
-    // if R.RecordCount<1 then exit;
+
      F:=R.Fields.FindField('SY_CODE');
      IF assigned(F) then
      begin
@@ -569,9 +571,9 @@ begin
        begin
          if (F.OldValue=F.AsString) then
          begin
-              if (result=base) and (length(result)=7) then
+              if (result=base) and (length(result)=7) and (copy(result,1,4)<>'????') then
               begin
-                exit;
+                   exit;
               end;
          end;
        end;
@@ -591,6 +593,8 @@ begin
        base:=normalize(base);
        base:=ReplaceStr(base,' ','');
        base:=leftstr(base,4);
+       base:=trim(base);
+       if base<=' ' then base:='????';
        while length(base)<6 do base:=base+'0';
        base:=leftstr(base,6)+'1';
 
@@ -771,7 +775,7 @@ begin
      end;
 end;
 
-procedure TDA_table.setDefault(R : TDataset);
+function TDA_table.setDefault(R : TDataset) : boolean;
 
 var i : integer;
      s,fname : shortstring;
@@ -780,38 +784,58 @@ var i : integer;
 begin
    assert(assigned(R), 'Query not assigned');
    assert(R.RecordCount <= 1, 'Just one update allowed');
-   for i := 0 to R.FieldCount - 1 do
-   begin
-     fname := R.fields[i].FieldName.ToUpper;
-     if fname > '' then
+   result:=true;
+   try
+     for i := 0 to R.FieldCount - 1 do
      begin
-       cd := Maindata.tablesdesc.Find(table, fname);
-       assert(assigned(cd), 'Description du champ ' + fname + ' non trouvée');
-       assert(cd.col_name = fname, 'Description du champ ' + fname + ' non trouvée');
-       if cd.col_name='SY_CODE' then
+       fname := R.fields[i].FieldName.ToUpper;
+       if fname > '' then
        begin
-              s:=codeCalc(R);
-              if R.Fields[i].AsString <> s then
-              begin
-                if not R.canModify then R.Edit;
-                R.fields[i].asString:=s;
-              end;
+         cd:=nil;
+         cd := Maindata.tablesdesc.Find(table, fname);
+         assert(assigned(cd), 'Field description ' + fname + ' not found. cd not assigned.');
+         assert(cd.col_name = fname, 'Field description ' + fname + ' not found.');
+         if cd.col_name='SY_CODE' then
+         begin
+                s:=codeCalc(R);
+                if R.Fields[i].AsString <> s then
+                begin
+                  if not R.canModify then R.Edit;
+                  R.fields[i].asString:=s;
+                end;
+         end;
        end;
+     end;
+   except
+     on E: Exception do
+     begin
+       Error(e, dber_sql, 'TDA_table.setDefault '+table);
      end;
    end;
 end;
 
-procedure TDA_table.setID(R : TDataSet);
+function TDA_table.setID(R : TDataSet) : boolean;
 
 var l_id : longint;
     F : Tfield;
 
 begin
-  F:=R.Fields.FindField('SY_ID');
-  if assigned(F) then
-  begin
-       l_id:=getNextId();
-       F.AsLongint:=l_id;
+  assert(assigned(R),'Dataset not assigned');
+  assert(assigned(R.Fields.FindField('SY_ID')),'No SY_ID field');
+  result:=false;
+  try
+    F:=R.Fields.FindField('SY_ID');
+    if assigned(F) then
+    begin
+         l_id:=getNextId();
+         if l_id>0 then
+         begin
+              F.AsLongint:=l_id;
+              result:=true;
+         end;
+    end;
+  except
+    on E: Exception do Error(e, dber_sql, 'TDA_table.setID '+table);
   end;
 end;
 
@@ -886,7 +910,11 @@ begin
 
   id:=R.FieldByName('SY_ID').AsInteger;
   R.Edit;
-  setDefault(R);
+  if not setDefault(R) then
+  begin
+       Screen.Cursor := crDefault;
+       exit;
+  end;
   apply_style(R, st);
   setCrc(R);
   ncrc := getcrc(R);
@@ -905,7 +933,11 @@ begin
   end;
   IF mode=um_create then
   begin
-    setID(R);
+    if not setID(R) then
+    begin
+      Screen.Cursor := crDefault;
+      exit;
+    end;
   end;
 
   try

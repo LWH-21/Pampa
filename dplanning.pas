@@ -7,7 +7,7 @@ interface
 uses
   Classes, Objects, SysUtils, DateUtils,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
   Generics.Collections,Generics.Defaults,
-  fpjson,jsonparser,
+  fpjson,jsonparser,Graphics,
   RessourcesStrings;
 
 

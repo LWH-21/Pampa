@@ -6,17 +6,19 @@ inherited F_planning_01: TF_planning_01
   Caption = 'F_planning_01'
   ClientHeight = 613
   ClientWidth = 1019
+  Constraints.MinHeight = 338
+  Constraints.MinWidth = 500
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
   OnShow = FormShow
-  object BitBtn1: TBitBtn[0]
+  object Btn_ok: TBitBtn[0]
     Left = 16
     Height = 30
     Top = 576
     Width = 75
-    Caption = 'BitBtn1'
+    Caption = 'Btn1'
     TabOrder = 0
   end
   object Ed_code: TEdit[1]
@@ -48,8 +50,11 @@ inherited F_planning_01: TF_planning_01
       object pb_plan1: TPaintBox
         Left = 0
         Height = 336
-        Top = 8
+        Top = 0
         Width = 960
+        Anchors = [akTop, akLeft, akBottom]
+        OnClick = pb_plan1Click
+        OnMouseDown = pb_plan1MouseDown
         OnPaint = pb_plan1Paint
       end
       object Scroll_planning_1: TScrollBar
@@ -57,9 +62,11 @@ inherited F_planning_01: TF_planning_01
         Height = 336
         Top = 8
         Width = 17
+        Anchors = []
         Kind = sbVertical
         PageSize = 0
         TabOrder = 0
+        OnChange = Scroll_planning_1Change
       end
     end
   end

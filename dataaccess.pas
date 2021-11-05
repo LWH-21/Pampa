@@ -1182,9 +1182,10 @@ function TMainData.WriteDataSet(var R: Tdataset; origin : shortstring='') : bool
 var s : string;
 
 begin
-  assert(assigned(R),'Dataset not assigned');
-  assert(R.FieldCount>0,'Dataset has no fields');
+  assert(assigned(R),'Dataset not assigned '+origin);
+  assert(R.FieldCount>0,'Dataset has no fields '+origin);
   result:=false;
+  if R.fieldCount=0 then exit;
   Screen.Cursor:=crSQLWait;
   s:=MainForm.StatusBar1.Panels[0].Text;
   MainForm.StatusBar1.Panels[0].Text := rs_write;
