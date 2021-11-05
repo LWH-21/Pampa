@@ -10,10 +10,9 @@ locale: fr
 categories: [social]
 ref: aggir 
 ---
+Vous trouverez [ici](https://github.com/LWH-21/Aggir "Dépôt Github pour les formulaires PDF") un formulaire PDF permettant de calculer le GIR d'une personne. Cette  [grille AGGIR](https://github.com/LWH-21/Aggir/blob/db4d2a2c16464154e4be0310f5d0639d5c2832c3/Formulaire_aggir.pdf "Formulaire Aggir) calcule le Gir en fonction des dix variables relatives à la perte d'autonomie dites *discriminantes* (en fait seules les 8 premières influent réellement sur le Gir).
 
-
-La grille AGGIR (Autonomie Gérontologique et Groupe Iso Ressources) est  utilisée pour évaluer le niveau de perte d’autonomie d’une personne :  son GIR (Groupe iso ressources).
-Il s'agit d'un nombre entre 1 et 6 indiquant le degré d'autonomie de la personne évaluée.
+Le Gir est un nombre entre 1 et 6 indiquant le degré d'autonomie de la personne évaluée.
 Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de dépendance suivants :
 
 - **GIR 1**: Perte d'autonomie mentale, corporelle, locomotrice et sociale
@@ -23,18 +22,7 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 - **GIR 5**: Autonomie mentale totale et aucun problème pour ses déplacements dans son logement
 - **GIR 6**: Aucun problème dans la réalisation des actes de la vie courante
 
-La grille AGGIR est composée de 17 rubriques, appelées variables :
-
-- **10 variables relatives à la perte d’autonomie physique et psychique**, dites **discriminantes**, car seules ces 10 variables sont utilisées pour le calcul du GIR.
-- **7 autres variables**, dites **illustratives,** car elles n’entrent pas dans le calcul du GIR. Elles apportent des  informations utiles à l’élaboration du plan d’aide dans le cadre de 
-
-Chacune de ces 17 rubriques est cotée A, B ou C :
-
-- A correspond à des actes accomplis seul spontanément, totalement, habituellement et correctement ;
-- B correspond à des actes accomplis seul qui ne sont pas  spontanément effectués, et/ou qui sont partiellement effectués et/ou qui ne sont pas habituellement effectués et/ou qui ne sont pas correctement effectués ;
-- C correspond à des actes qui ne sont pas accomplis seul.
-
-En voici l'algorithme en Python :
+Voici l'algorithme utilisé pour ce calcul, codé en Python :
 
 ```python
 # aggir=(COHERENCE, ORIENTATION, TOILETTE, HABILLAGE, ALIMENTATION, ELIMINATION, TRANSFERTS, DEPL. INT, DEPL EXT., COMMUNICATION )
