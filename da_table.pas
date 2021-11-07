@@ -636,11 +636,18 @@ var squerycrc : string;
     old_crc, new_crc : longint;
 
 begin
+  assert(assigned(R),'Dataset not assigned');
+  assert(assigned(R.Fields.FindField('SY_ID')),'No key field');
+  assert(assigned(R.Fields.FindField('SY_CRC')),'No CRC field');
+  assert(assigned(R.Fields.FindField('SY_ROWVERSION')),'No RowVersion field');
+  assert(assigned(R.Fields.FindField('SY_LASTUSER')),'No Last User field');
+  assert(table>' ','Not table specified');
   result:=true;
   F:=R.Fields.FindField('SY_ID');
   IF assigned(F) then
   begin
        s_id:=F.AsLongint;
+       // Todo MainData.getquery
        squerycrc := 'SELECT SY_CRC, SY_ROWVERSION, SY_LASTUSER FROM %t WHERE SY_ID=%id';
        squerycrc:=squerycrc.Replace('%t',table);
        squerycrc:=squerycrc.Replace('%id',inttostr(s_id));
@@ -650,6 +657,9 @@ begin
             new_crc:=datacrc.FieldByName('SY_CRC').AsInteger;
             old_crc:=R.FieldByName('SY_CRC').OldValue;
             if new_crc<>old_crc then result:=false;
+       end else
+       begin
+         result:=false;
        end;
        datacrc.Close;
        datacrc.Free;

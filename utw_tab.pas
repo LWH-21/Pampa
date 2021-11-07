@@ -18,6 +18,7 @@ type
     TB_return: TToolButton;
     TB_Close: TToolButton;
     TB_stayontop: TToolButton;
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure TB_CloseClick(Sender: TObject);
     procedure TB_returnClick(Sender: TObject);
@@ -44,7 +45,11 @@ procedure TW_Tab.TB_returnClick(Sender: TObject);
 begin
    if origine = 'O' then
    begin
-     if Assigned(Frame) then MainForm.OpenFrame(Frame,'R');
+     if Assigned(Frame) then
+     begin
+       Frame.align:=alclient;
+       MainForm.OpenFrame(Frame,'R');
+     end;
    end;
    close;
 end;
@@ -73,8 +78,13 @@ begin
   if Assigned(Frame) then CanClose:=frame.CanClose;
   if CanClose then
   begin
-      MainForm.notify(Frame,[Main.no_close]);
+      //MainForm.notify(Frame,[Main.no_close]);
   end;
+end;
+
+procedure TW_Tab.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  CloseAction:=caFree;
 end;
 
 procedure TW_tab.addFrame(f : TW_F);
@@ -82,6 +92,7 @@ procedure TW_tab.addFrame(f : TW_F);
 begin
      f.SetParent(self);
      f.align:=alclient;
+     f.visible:=true;
      self.caption:=f.caption;
      if (f is TW_F) then
      begin

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs,ExtCtrls,StdCtrls, ComCtrls,
-  Da_table;
+  Da_table,LWTabPage;
 
 type
   TW_F = class(TFrame)
@@ -28,6 +28,7 @@ type
     procedure save(Data: PtrInt);virtual;
     procedure delete(Data: PtrInt);virtual;
     procedure SetParent(aparent : TWinControl); override;
+    destructor destroy; override;
   end;
 
 implementation
@@ -55,14 +56,14 @@ begin
      if assigned(parent) then
      begin
           MainForm.notify(self,[no_close]);
-          if parent is TForm then
+        {  if parent is TForm then
           begin
                TForm(parent).Close;
-          end;
-          if parent is TTabSheet then
+          end;  }
+          {if parent is TTabSheet then
           begin
              parent.Visible:=false;
-          end;
+          end;  }
      end;
 end;
 
@@ -103,10 +104,16 @@ begin
      end else
      begin
           if aparent is Tform then notifs:=notifs+[no_inwindow];
-          if aparent is TTabSheet then notifs:=notifs+[no_intab];
+          if aparent is TLWPageControl then notifs:=notifs+[no_intab];
      end;
      inherited SetParent(aparent);
      MainForm.notify(self,notifs);
+end;
+
+destructor TW_F.destroy;
+
+begin
+     inherited;
 end;
 
 end.

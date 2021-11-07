@@ -7,6 +7,7 @@ inherited W_Tab: TW_Tab
   ClientHeight = 691
   ClientWidth = 1566
   DefaultMonitor = dmMainForm
+  OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   object StatusBar1: TStatusBar[0]
     Left = 0

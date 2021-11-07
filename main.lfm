@@ -162,23 +162,11 @@ inherited MainForm: TMainForm
     OnMoved = SplitterMoved
     Visible = False
   end
-  object Onglet: TPageControl[3]
-    Left = 328
-    Height = 736
-    Top = 32
-    Width = 954
-    Anchors = []
-    DragMode = dmAutomatic
-    TabOrder = 3
-    OnChange = OngletChange
-    OnDragDrop = OngletDragDrop
-    OnDragOver = OngletDragOver
-  end
-  inline Fr_Histo1: TFr_Histo[4]
+  inline Fr_Histo1: TFr_Histo[3]
     Height = 726
     Top = 32
     ClientHeight = 726
-    TabOrder = 4
+    TabOrder = 3
     Visible = True
     inherited TV_ind: TTreeView
       Images = nil
@@ -187,7 +175,7 @@ inherited MainForm: TMainForm
       Images = nil
     end
   end
-  object MainMenu1: TMainMenu[5]
+  object MainMenu1: TMainMenu[4]
     Images = Images
     ImagesWidth = 16
     Left = 24
@@ -426,7 +414,7 @@ inherited MainForm: TMainForm
       end
     end
   end
-  object ActionList1: TActionList[6]
+  object ActionList1: TActionList[5]
     Images = Images
     Left = 128
     Top = 440
@@ -529,7 +517,7 @@ inherited MainForm: TMainForm
       OnExecute = Act_customerExecute
     end
   end
-  object Images: TImageList[7]
+  object Images: TImageList[6]
     Left = 192
     Top = 440
     Bitmap = {
@@ -1240,14 +1228,14 @@ inherited MainForm: TMainForm
       0000000000000000000000000000
     }
   end
-  object IdleTimer: TIdleTimer[8]
+  object IdleTimer: TIdleTimer[7]
     Enabled = False
     Interval = 60000
     OnTimer = IdleTimerTimer
     Left = 232
     Top = 488
   end
-  object Timer1: TTimer[9]
+  object Timer1: TTimer[8]
     Enabled = False
     OnTimer = Timer1Timer
     Left = 240

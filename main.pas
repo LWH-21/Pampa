@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ExtCtrls,StrUtils,
-  ComCtrls, Buttons, ActnList,
+  ComCtrls, Buttons, ActnList,LWTabPage,
   Generics.Collections,
   W_A, dw_f, Dataaccess,
   DWorker, DCustomer,DPlanning,
@@ -111,7 +111,6 @@ type
     MEdit: TMenuItem;
     MNew: TMenuItem;
     MOpen: TMenuItem;
-    Onglet: TPageControl;
     SB_save: TSpeedButton;
     SB_quit: TSpeedButton;
     SB_planning: TSpeedButton;
@@ -156,9 +155,7 @@ type
     procedure MWindowClick(Sender: TObject);
     procedure MwindowsClick(Sender: TObject);
     procedure OngletChange(Sender: TObject);
-    procedure OngletDragDrop(Sender, Source: TObject; X, Y: Integer);
-    procedure OngletDragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);
+
     procedure Page0ContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: boolean);
     procedure SplitterMoved(Sender: TObject);
@@ -184,6 +181,7 @@ type
     LateralPanel : shortstring;
     tmicrohelp : integer;
     activated : boolean;
+    tabcontrol : TLWPageControl;
     {$IFDEF DEBUG}logstream : TfileStream;{$ENDIF}
 
     procedure updateWindowMenu;
@@ -214,25 +212,6 @@ uses UException;
 {$R *.lfm}
 
 
-function GetTabIndex(APageControl:TPageControl;X, Y: Integer): Integer;
-var TabRect: TRect;
-begin
-  {Le résultat de cette fonction
-  nous donne l'index de l'onglet qui se trouve aux coordonnées X,Y
-  (le repère de référence étant la fenêtre du TPageControl)}
-  Result := APageControl.IndexOfTabAt(X,Y);
-  // Si la souris se trouve au dessus d'un onglet
-  if Result>-1 then
-  begin
-    // On récupère le rectangle de l'onglet visé
-    TabRect:=APageControl.TabRect(Result);
-    // Si on est dans la partie droite de ce rectangle
-    if x>((TabRect.Left+TabRect.Right) div 2)
-    // Alors l'index d'insertion est (Index de l'onglet visé)+1
-    then Inc(Result);
-  end;
-end;
-
 { TMainForm }
 
 
@@ -243,7 +222,13 @@ var
 
 
 begin
-  onglet.visible:=false;
+  tabcontrol:=TLWPageControl.create(self);
+  tabcontrol.Parent:=self;
+  tabcontrol.left:=328; tabcontrol.TOP:=32;
+  tabcontrol.Width:=954;tabcontrol.Height:=736;
+  tabcontrol.TabOrder:=1;
+
+  tabcontrol.visible:=false;
   activated:=false;
   StatusBar1.Panels[0].Text := DateTimeToStr(Now);
   StatusBar1.Panels[1].Text := '?';
@@ -265,35 +250,32 @@ begin
 
   // Menu popup de l'onglet
 
-  Onglet.PopupMenu := TPopupMenu.Create(self);
-  Onglet.PopupMenu.Parent := Onglet;
+  tabcontrol.PopupMenu := TPopupMenu.Create(self);
+  tabcontrol.PopupMenu.Parent := tabcontrol;
   MyItem := TMenuItem.Create(Self);
   MyItem.Action := ActionList1.ActionByName('Act_closetab');
   MyItem.Name := 'Mclose';
-  Onglet.PopupMenu.Items.Add(MyItem);
+  tabcontrol.PopupMenu.Items.Add(MyItem);
   MyItem := TMenuItem.Create(Self);
   MyItem.Action := ActionList1.ActionByName('Act_towindow');
   MyItem.Name := 'MFenetre';
-  Onglet.PopupMenu.Items.Add(MyItem);
+  tabcontrol.PopupMenu.Items.Add(MyItem);
 
 
 end;
 
 procedure TMainForm.closeAll;
 
-var tab: TTabSheet;
+var tab: TFrame;
     i : integer;
     f : Tframe;
     fo : Tform;
 
 begin
   try
-    i:=onglet.PageCount;
-    while (i>0) do
+    while (tabcontrol.PageCount>0) do
     begin
-      tab:=onglet.ActivePage;
-      if assigned(tab) then tab.Free;
-      i:=onglet.PageCount;
+      tabcontrol.CloseTab(1);
     end;
   Except
     on e : exception do log(e.ToString);
@@ -306,7 +288,7 @@ begin
            if f.parent is TForm then
            begin
                 fo:=f.parent as Tform;
-                fo.Close;
+                fo.free;
            end;
          end;
     end;
@@ -353,7 +335,7 @@ end;
 procedure TMainForm.updatePanel(sender : Tform);
 
 var s : string;
-    tab: TTabSheet;
+    tab: TFrame;
     i : integer;
 
 begin
@@ -361,27 +343,21 @@ begin
   if sender=self then
   begin
     s:=self.name;
-    tab := onglet.ActivePage;
-    if assigned(tab) then
+    if tabcontrol.PageCount>0 then
     begin
-      i := 0;
-      while (i < tab.ControlCount) do
+      tab := tabcontrol.ActivePage;
+      if tab is TW_F then
       begin
-        if tab.Controls[i] is TW_F then
-        begin
-          s:=s+':'+tab.Controls[i].classname;
-          if tab.caption>' ' then s:=s+' ['+tab.Caption+']';
-          break;
-        end;
-        Inc(i);
+           s:=s+':'+tab.ClassName;
+           if tab.caption>' ' then s:=s+' ['+tab.Caption+']';
       end;
     end;
   end else
   begin
     s:=sender.ClassName;
     i := 0;
-     while (i < sender.ControlCount) do
-     begin
+    while (i < sender.ControlCount) do
+    begin
        if sender.Controls[i] is TW_F then
        begin
          s:=s+':'+sender.Controls[i].classname;
@@ -457,7 +433,7 @@ end;
 function TMainForm.TabClose(Sender: TObject) : boolean;
 
 var
-  tab: TTabSheet;
+  tab: TFrame;
   Frame: TW_F;
   i: integer;
   canclose: boolean;
@@ -465,30 +441,21 @@ var
 begin
   result:=false;
   canclose := True;
-  tab := onglet.ActivePage;
-  if assigned(tab) then
+  if (tabcontrol.PageCount>0) then
   begin
-    i := 0;
-    frame := nil;
-    while (not assigned(frame)) and (i < tab.ControlCount) do
+    tab := tabcontrol.ActivePage;
+    if (assigned(tab)) and (tab is TW_F) then
     begin
-      if tab.Controls[i] is TW_F then
-      begin
-        frame := TW_F(tab.Controls[i]);
-      end
-      else
-        Inc(i);
-    end;
-    if assigned(frame) and (frame.Visible) then
-    begin
+      i := 0;
+      frame := TW_F(tab);
       canclose := frame.CanClose;
+      if canclose then
+      begin
+        tabcontrol.CloseTab(frame);
+        frame.close;
+        result:=true;
+      end else result:=false;
     end;
-    if canclose then
-    begin
-      if assigned(frame) then frame.close;
-      tab.Free;
-      result:=true;
-    end else result:=false;
   end;
 end;
 
@@ -527,8 +494,9 @@ begin
     // Fenetre planning par défaut
     if MainData.isConnected then
     begin
-      onglet.Visible:=true;
+      tabcontrol.Visible:=true;
       Fplanning := TFr_planning.Create(self);
+      FPlanning.Caption:=rs_planning;
       OpenFrame(Fplanning,'N');
     end;
 
@@ -544,21 +512,24 @@ end;
 
 procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 
-var tab: TTabSheet;
+var tab: TFrame;
+    i : integer;
 
 
 begin
-    tab := onglet.ActivePage;
-    while assigned(tab) do
+    Canclose:=true;
+    assert(assigned(tabcontrol),'tab not assigned');
+    for i:=1 to tabcontrol.Pagecount do
     begin
-         if not tabClose(self) then
-         begin
-           CanClose:=false;
-           exit;
-         end;
-         tab := onglet.ActivePage;
+      tab:=tabcontrol.GetPage(i);
+      if assigned(tab) then
+      begin
+        if tab is TW_F then
+        begin
+            canclose:=canclose and TW_F(tab).CanClose;
+        end;
+      end;
     end;
-    CanClose:=true;
 end;
 
 procedure TMainForm.FormShow(Sender: TObject);
@@ -615,7 +586,8 @@ var
   i: integer;
 
 begin
-  tab := onglet.ActivePage;
+ { todo a revoir
+ tab := tabcontrol.ActivePage;
   if assigned(tab) then
   begin
     i := 0;
@@ -634,7 +606,7 @@ begin
       Application.QueueAsyncCall(@frame.delete, 0);
     end;
   end;
-
+  }
 end;
 
 procedure TMainForm.Act_affhistoExecute(Sender: TObject);
@@ -813,14 +785,15 @@ var  find : boolean;
 
 begin
    find:=false;
-   for f in FenList do
+   // todo a revoir
+ {  for f in FenList do
    begin
      if f.getcode=code then
      begin
          find:=true;
          if f.Parent is TTabSheet then
          begin
-            onglet.ActivePage:=TTabSheet(f.parent);
+            tabcontrol.ActivePage:=TTabSheet(f.parent);
          end else
          if f.Parent is TForm then
          begin
@@ -830,7 +803,7 @@ begin
            F.parent.Top:=self.top+50;
          end;
      end;
-   end;
+   end;}
 
    if not find then
    begin
@@ -944,72 +917,7 @@ begin
   UpdatePanel(self);
 end;
 
-procedure TMainForm.OngletDragDrop(Sender, Source: TObject; X, Y: Integer);
 
-
-var TargetIndex, SourceIndex : integer;
-    ATabSheet:TTabSheet;
-
-
-begin
-  if (source = onglet) and (sender is TPageControl) and (onglet.PageCount>1) then ;
-  begin
-     TargetIndex:=GetTabIndex(onglet,x,y);
-     if TargetIndex<>-1 then
-     begin
-          SourceIndex:=Onglet.ActivePage.PageIndex;
-          ATabSheet:=onglet.Pages[SourceIndex];
-          if (TargetIndex>Onglet.ActivePage.PageIndex) then dec(TargetIndex);
-          ATabSheet.PageIndex:=TargetIndex;
-       end;
-    {
-    const TCM_GETITEMRECT = $130A;
-    var i: Integer;
-        SourceIndex,TargetIndex:Integer;
-        ATabSheet:TTabSheet;
-    begin
-       if Sender=Source
-       // Si le glissé-déposé concerne un TPageControl sur lui même
-       then begin
-               {On détermine la nouvelle valeur d'index de l'onglet que l'on dépose}
-               TargetIndex:=GetTabIndex(Sender,x,y);
-               {Si on ne le dépose pas "dans le vide"}
-               if (TargetIndex>-1)
-               {L'onglet déposé, celui qui est actif (ActivePage), prend sa nouvelle
-                valeur d'index (PageIndex)}
-               then begin
-                      // Si le nouvel index est supérieur à l'ancien index,
-                      // on le décrémente, sinon l'onglet est "mal déplacé"
-                      if (TargetIndex>Sender.ActivePage.PageIndex) then dec(TargetIndex);
-                      Sender.ActivePage.PageIndex:=TargetIndex;
-                    end;
-            end
-       // Si le glissé-déposé s'effectue entre deux TPageControl différents...
-       else begin
-               {On détermine l'index de l'onglet que l'on dépose}
-               SourceIndex:=Source.ActivePage.PageIndex;
-               {On détermine la nouvelle valeur d'index de l'onglet que l'on dépose}
-               TargetIndex:=GetTabIndex(Sender,x,y);
-               {Si on ne le dépose pas "dans le vide"}
-               if TargetIndex>-1 then
-               begin
-                  // On récupère la référence de notre onglet
-                  ATabSheet:=Source.Pages[SourceIndex];
-                  // On l'affecte à son nouveau TPageControl
-                  ATabSheet.PageControl:=Sender;
-                  // Et on lui assigne son nouvel index
-                  ATabSheet.PageIndex:=TargetIndex;
-               end;
-            end;
-    }
-  end;
-end;
-
-procedure TMainForm.OngletDragOver(Sender, Source: TObject; X, Y: Integer;
-  State: TDragState; var Accept: Boolean);
-begin
-  if source = onglet then  accept:=true;
-end;
 
 procedure TMainForm.Page0ContextPopup(Sender: TObject; MousePos: TPoint;
   var Handled: boolean);
@@ -1033,31 +941,20 @@ end;
 procedure TMainForm.TabToWindow(Sender: TObject);
 
 var
-  tab: TTabSheet;
+  tab: TFrame;
   Frame: TW_F;
   i: integer;
   w: TW_Tab;
 
 begin
   try
-    tab := onglet.ActivePage;
-    if assigned(tab) then
+    if tabcontrol.PageCount>0 then
     begin
-      //tab.Hide;
-      i := 0;
-      frame := nil;
-      {TODO : LWH. Possible memory leak }
-      while (not assigned(frame)) and (i < tab.ControlCount) do
+      tab := tabcontrol.ActivePage;
+      if (assigned(tab)) and (tab is TW_F) then
       begin
-        if tab.Controls[i] is TW_F then
-        begin
-          frame := TW_F(tab.Controls[i]);
-        end
-        else
-          Inc(i);
-      end;
-      if assigned(frame) then
-      begin
+        i := 0;
+        frame := TW_F(tab);
         w := TW_Tab.Create(self);
         w.addFrame(frame);
         w.Width := tab.Width;
@@ -1069,9 +966,9 @@ begin
         w.Left:=self.left+50;
         w.top:=self.top+50;
         w.Show;
+        tabcontrol.CloseTab(frame);
+        frame.visible:=true;
       end;
-      i:=tab.ControlCount;
-      freeAndNil(tab);
     end;
   except
     on E: Exception do
@@ -1093,10 +990,10 @@ begin
     StatusBar1.Panels[0].Width := round(self.Width / 2);
     StatusBar1.Panels[1].Width := round(self.Width / 4);
     StatusBar1.Panels[2].Width := round(self.Width / 4);
-    onglet.Top:=Toolbar1.height;
-    onglet.height:=self.ClientHeight - Toolbar1.height - StatusBar1.height;
+    tabcontrol.Top:=Toolbar1.height;
+    tabcontrol.height:=self.ClientHeight - Toolbar1.height - StatusBar1.height;
     Splitter.top:=Toolbar1.height;
-    Splitter.height := Onglet.height;
+    Splitter.height := tabcontrol.height;
     if splitter.left<150 then splitter.left:=150;
     Fr_histo1.top:=Toolbar1.height;
     if Fr_histo1.visible then
@@ -1109,13 +1006,13 @@ begin
        end;
        Fr_histo1.Left:=0;
        Fr_histo1.Width:=Splitter.left-2;
-       onglet.Left:=Splitter.left+6;
-       onglet.width:=width - onglet.Left;
+       tabcontrol.Left:=Splitter.left+6;
+       tabcontrol.width:=width - tabcontrol.Left;
     end else
     begin
       Splitter.visible:=false;
-      onglet.Left:=0;
-      onglet.Width:=Width;
+      tabcontrol.Left:=0;
+      tabcontrol.Width:=Width;
     end;
   except
     on E: Exception do
@@ -1146,29 +1043,22 @@ end;
 procedure TMainForm.Act_SaveExecute(Sender: TObject);
 
 var
-  tab: TTabSheet;
+  tab: TFrame;
   Frame: TW_F;
   i: integer;
 
 begin
   try
-     tab := onglet.ActivePage;
-     if assigned(tab) then
+     if tabcontrol.PageCount>0 then
      begin
-        i := 0;
-        frame := nil;
-        while (not assigned(frame)) and (i < tab.ControlCount) do
-        begin
-          if tab.Controls[i] is TW_F then
-          begin
-            frame := TW_F(tab.Controls[i]);
-          end
-          else Inc(i);
-        end;
-        if assigned(frame) then
-        begin
-          Application.QueueAsyncCall(@frame.save, 0);
-        end;
+       tab := tabcontrol.ActivePage;
+       if (assigned(tab)) and (tab is TW_F) then
+       begin
+          i := 0;
+          frame := TW_F(tab);
+          frame.save(0);
+          //Application.QueueAsyncCall(@frame.save, 0);
+       end;
      end;
   except
     on E: Exception do
@@ -1179,25 +1069,18 @@ end;
 {Ouvre une nouvelle fenêtre dans l'onglet principal}
 procedure TMainForm.OpenFrame(F: TW_F; mode : char);
 
-var
-  tab: TTabSheet;
-
 begin
+  // todo : a compléter    attention au retour dans la liste des fenêtres
+  assert(assigned(f),'Frame is not assigned');
   try
-    tab := onglet.AddTabSheet;
-    if assigned(tab) then
+    if assigned(F) then
     begin
-      tab.Caption := 'New';
-      if assigned(F) then
-      begin
-        inc(Fencount);
-        F.Name := F.Name + IntToHex(Fencount, 4);
-        F.setParent(tab);
-        F.Align := alClient;
-        tab.Caption := F.Caption;
-        if mode='N' then Application.QueueAsyncCall(@F.init, 0);
-      end;
-      onglet.ActivePage := tab;
+      tabcontrol.AddTabSheet(f);
+      //f.setParent(tabcontrol);
+      inc(Fencount);
+      F.Name := F.Name + IntToHex(Fencount, 4);
+      if mode='N' then Application.QueueAsyncCall(@F.init, 0);
+      tabcontrol.ActivePage := f;
     end;
   except
     on E: Exception do
@@ -1208,13 +1091,22 @@ end;
 
 procedure TMainForm.notify(Sender : Tcomponent; ev : TNotifySet);
 
+var f : TFrame;
+
 begin
+  assert(sender is TW_F,'Not a frame');
   if assigned(Sender) and (Sender is TW_F) and assigned(FenList) then
   begin
     if no_open in ev then FenList.Add(TW_F(Sender));
     if no_close in ev then
     begin
-      FenList.Extract(TW_F(Sender));
+      if (sender is TW_F) then
+      begin
+           f:=FenList.Extract(TW_F(Sender));
+           // Todo : pourquoi la suppression ne marche pas ?
+           //f.Parent:=nil;
+           freeAndNil(f);
+      end;
     end;
     updateWindowMenu;
   end;
@@ -1243,6 +1135,7 @@ procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var f: TFCustomDP;
 
 begin
+  closeAll;
   MainForm.setMicroHelp(rs_quit);
   if assigned(IdleTimer) then IdleTimer.Enabled:=false;
   Timer1.Enabled:=false;
@@ -1250,7 +1143,7 @@ begin
   // Save and Free HistoManager
   if assigned(HistoManager) then
   begin
-    {todo : lwh. sometimes fail }
+    {todo : lwh. sometimes HistoManager.Free fail }
     HistoManager.Free;
   end;
    // Close transaction
