@@ -287,7 +287,7 @@ var
   reply: integer;
 
 begin
-  if visible then self.SetFocus else exit;
+  if visible then self.SetFocus ;//else exit;
   if isModified then
   begin
     reply := QuestionDlg(rs_demande_confirmation, rs_abandonner_modif,

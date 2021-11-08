@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = 449
+  Left = 213
   Height = 613
-  Top = 250
+  Top = 214
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613
@@ -59,8 +59,8 @@ inherited F_planning_01: TF_planning_01
       end
       object Scroll_planning_1: TScrollBar
         Left = 968
-        Height = 336
-        Top = 8
+        Height = 344
+        Top = 0
         Width = 17
         Anchors = []
         Kind = sbVertical
@@ -106,5 +106,36 @@ inherited F_planning_01: TF_planning_01
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goRowSelect, goSmoothScroll]
     TabOrder = 4
     OnSelection = ListSelection
+  end
+  inline EnterPlanning: TFPlanning_enter[5]
+    Left = 368
+    Top = 250
+    Width = 192
+    ClientWidth = 192
+    TabOrder = 5
+    inherited Panel1: TPanel
+      Width = 192
+      ClientWidth = 192
+    end
+  end
+  object Planning_menu: TPopupMenu[6]
+    Left = 136
+    Top = 568
+    object Mchange: TMenuItem
+      Caption = 'Modifier'
+      OnClick = MchangeClick
+    end
+    object MDel: TMenuItem
+      Caption = 'Supprimer'
+    end
+    object Minsert: TMenuItem
+      Caption = 'Insérer une ligne'
+    end
+    object MCopy: TMenuItem
+      Caption = 'Copier'
+    end
+    object MPaste: TMenuItem
+      Caption = 'Coller'
+    end
   end
 end

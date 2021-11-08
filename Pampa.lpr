@@ -36,7 +36,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   { you can add units after this }
   SysUtils, // une unité ajoutée pour PathDelim
   gettext, translations, datetimectrls, dworker, Ucfg_table_det, DCustomer,
-  DPlanning, LWTabPage;
+  DPlanning, LWTabPage, UPlanning_enter;
 
 {$R *.res}
 
@@ -53,15 +53,29 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
       PODirectory + 'lclstrconsts.fr.po', Lang, FallbackLang); // traduction
   end;
 
+{$IFOPT C+}
+var OldErrorProc : TAssertErrorProc;
 
+procedure AssertionHandler( const Msg: ShortString; const Fname: ShortString; Lineno: LongInt; ErrorAddr: pointer);
 
 begin
+  if assigned(MainForm) then
+  begin
+    Mainform.log('Assert failed: '+msg+', Module:'+Fname+' Line n° '+inttostr(Lineno));
+  end;
+  OldErrorProc(Msg,FName,LineNo,ErrorAddr);
+end;
+{$ENDIF}
 
+begin
+  {$IFOPT C+}
+  OldErrorProc:=AssertErrorProc;
+  AssertErrorProc:=@AssertionHandler;
+  {$ENDIF}
   {$if declared(useHeapTrace)}
   globalSkipIfNoLeaks := True; // supported as of debugger version 3.2.0
   setHeapTraceOutput('trace.log');
   {$endIf}
-
   RequireDerivedFormResource := True;
   LCLTranslate;
   Application.Scaled := True;

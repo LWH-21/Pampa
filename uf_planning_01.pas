@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,
-  DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, ListFilterEdit, W_A, DB, memds,
-  DataAccess, DPlanning;
+  DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, Menus, ListFilterEdit, W_A, DB,
+  memds, DataAccess, DPlanning, UPlanning_enter;
 
 type
 
@@ -17,9 +17,16 @@ type
     Btn_ok: TBitBtn;
     Ed_lib: TEdit;
     Ed_code: TEdit;
+    EnterPlanning: TFPlanning_enter;
+    Mchange: TMenuItem;
+    MPaste: TMenuItem;
+    MDel: TMenuItem;
+    Minsert: TMenuItem;
+    MCopy: TMenuItem;
     pb_plan1: TPaintBox;
     Plannings: TPageControl;
     Planning_1: TTabSheet;
+    Planning_menu: TPopupMenu;
     Scroll_planning_1: TScrollBar;
     List: TStringGrid;
     procedure DBGrid1CellClick(Column: TColumn);
@@ -29,6 +36,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ListSelection(Sender: TObject; aCol, aRow: Integer);
+    procedure MchangeClick(Sender: TObject);
     procedure pb_plan1Click(Sender: TObject);
     procedure pb_plan1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -99,20 +107,15 @@ begin
   Btn_ok.Top := Plannings.top + Plannings.height + 10;
   caption:='W = '+inttostr(self.width)+' H = '+inttostr(self.height);
   scrollbar_show;
-  if Scroll_planning_1.visible then
-  begin
-       Scroll_planning_1.top:=pb_plan1.top;
-       Scroll_planning_1.height:=pb_plan1.height;
-       Scroll_planning_1.left := planning_1.Width - Scroll_planning_1.width;
-       pb_plan1.width := Scroll_planning_1.left - pb_plan1.left;
-  end else
-  begin
-       pb_plan1.width:= planning_1.Width - pb_plan1.left;
-  end;
+  Scroll_planning_1.top:=pb_plan1.top;
+  Scroll_planning_1.height:=pb_plan1.height;
+  Scroll_planning_1.left := planning_1.Width - Scroll_planning_1.width;
+  pb_plan1.width := Scroll_planning_1.left - pb_plan1.left;
+
   limite:=pb_plan1.Width div 6;
   wcol:=(pb_plan1.Width - limite) div 7;
 
-
+  EnterPlanning.visible:=false;
   pb_plan1.Refresh;
 end;
 
@@ -144,6 +147,12 @@ begin
   end;
 end;
 
+procedure TF_planning_01.MchangeClick(Sender: TObject);
+begin
+    EnterPlanning.visible:=true;
+    EnterPlanning.SetFocus;
+end;
+
 procedure TF_planning_01.pb_plan1Click(Sender: TObject);
 begin
 
@@ -157,6 +166,7 @@ var l,c : integer;
 begin
      assert(wcol>0,'Col width equals to 0');
      assert(hline>0,'Line height equals to 0');
+     EnterPlanning.Visible:=false;
      if x<limite then
      begin
          c:=0;
@@ -176,6 +186,10 @@ begin
      selection.x:=c;
      selection.Y:=l;
      pb_plan1.Refresh;
+     if Button=mbRight then
+     begin
+         Planning_menu.PopUp;
+     end;
 end;
 
 procedure TF_planning_01.pb_plan1Paint(Sender: TObject);
@@ -216,14 +230,14 @@ begin
      w:=pb_plan1.Width;
      h:=pb_plan1.height;
 
-     if nblines>((h-header) div hline) then
+     {if nblines>((h-header) div hline) then
      begin
           Scroll_planning_1.Visible:=true;
           Scroll_planning_1.Max:=nblines;
      end else
      begin
        Scroll_planning_1.visible:=false;
-     end;
+     end;}
 
      //Header
      pb_plan1.Canvas.Brush.color:=TColor($FFF8DC);
@@ -385,11 +399,12 @@ begin
      h:=pb_plan1.Height;
      if nblines>((h-header) div hline) then
      begin
-          Scroll_planning_1.Visible:=true;
+          Scroll_planning_1.Enabled:=true;
           Scroll_planning_1.Max:=nblines;
      end else
      begin
-       Scroll_planning_1.visible:=false;
+          Scroll_planning_1.Max:=0;
+          Scroll_planning_1.enabled:=false;
      end;
 end;
 

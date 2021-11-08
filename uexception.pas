@@ -81,7 +81,9 @@ begin
      edit2.Text:=msg;
      edit3.Text:='';
      MainForm.setMicroHelp(e.Message,5);
-     MainForm.log(e.ToString);
+     Report:='Program exception. '+ E.ClassName + 'Message: ' + E.Message;
+     MainForm.log(Report);
+    // MainForm.log(e.ToString);
      showmodal;
 end;
 

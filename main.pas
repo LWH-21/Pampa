@@ -239,7 +239,7 @@ begin
   logstream:=nil;
   Application.OnException := @HandleException;
   {$IFDEF DEBUG}
-  logstream:=TFileStream.Create('Pampa.log',fmCreate);
+  logstream:=TFileStream.Create('Pampa.log',fmCreate or fmShareDenyNone);
   log('Open');
   {$ENDIF}
   Application.ProcessMessages;
@@ -514,6 +514,7 @@ procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 
 var tab: TFrame;
     i : integer;
+    c : boolean;
 
 
 begin
@@ -526,7 +527,13 @@ begin
       begin
         if tab is TW_F then
         begin
-            canclose:=canclose and TW_F(tab).CanClose;
+            c:=TW_F(tab).CanClose;
+            canclose:=canclose and c;
+            if not c then
+            begin
+              tabcontrol.ActivePageIndex:=i;
+              break;
+            end;
         end;
       end;
     end;

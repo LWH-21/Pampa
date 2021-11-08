@@ -5,5 +5,10 @@
 {"hash":1780,"name":"tf_planning_01.list.columns[0].title.caption","sourcebytes":[105,100],"value":"id"},
 {"hash":84801988,"name":"tf_planning_01.list.columns[1].title.caption","sourcebytes":[68,195,169,98,117,116],"value":"D\u00E9but"},
 {"hash":19710,"name":"tf_planning_01.list.columns[2].title.caption","sourcebytes":[70,105,110],"value":"Fin"},
-{"hash":78424060,"name":"tf_planning_01.list.columns[3].title.caption","sourcebytes":[68,101,116,97,105,108],"value":"Detail"}
+{"hash":78424060,"name":"tf_planning_01.list.columns[3].title.caption","sourcebytes":[68,101,116,97,105,108],"value":"Detail"},
+{"hash":95406722,"name":"tf_planning_01.mchange.caption","sourcebytes":[77,111,100,105,102,105,101,114],"value":"Modifier"},
+{"hash":125352194,"name":"tf_planning_01.mdel.caption","sourcebytes":[83,117,112,112,114,105,109,101,114],"value":"Supprimer"},
+{"hash":179534853,"name":"tf_planning_01.minsert.caption","sourcebytes":[73,110,115,195,169,114,101,114,32,117,110,101,32,108,105,103,110,101],"value":"Ins\u00E9rer une ligne"},
+{"hash":78016450,"name":"tf_planning_01.mcopy.caption","sourcebytes":[67,111,112,105,101,114],"value":"Copier"},
+{"hash":78000834,"name":"tf_planning_01.mpaste.caption","sourcebytes":[67,111,108,108,101,114],"value":"Coller"}
 ]}

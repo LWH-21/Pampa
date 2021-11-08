@@ -1,0 +1,55 @@
+object FPlanning_enter: TFPlanning_enter
+  Left = 0
+  Height = 240
+  Top = 0
+  Width = 320
+  ClientHeight = 240
+  ClientWidth = 320
+  OnExit = FrameExit
+  TabOrder = 0
+  DesignLeft = 562
+  DesignTop = 381
+  object Panel1: TPanel
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 320
+    Align = alClient
+    BevelInner = bvRaised
+    BevelWidth = 2
+    ClientHeight = 240
+    ClientWidth = 320
+    TabOrder = 0
+    object Btn_apply: TBitBtn
+      Left = 8
+      Height = 30
+      Top = 200
+      Width = 75
+      Caption = 'Appliquer'
+      OnClick = Btn_applyClick
+      TabOrder = 0
+    end
+    object TimeEdit1: TTimeEdit
+      Left = 16
+      Height = 23
+      Top = 48
+      Width = 103
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      TabOrder = 1
+      Text = 'TimeEdit1'
+    end
+    object TimeEdit2: TTimeEdit
+      Left = 16
+      Height = 23
+      Top = 77
+      Width = 103
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      TabOrder = 2
+      Text = 'TimeEdit2'
+    end
+  end
+end

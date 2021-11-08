@@ -25,6 +25,7 @@ interface
        private
             FActivePage : TFrame;
             FActivePageIndex : integer;
+            FHeadColor : Tcolor;
             FOnPageChanged : TNotifyEvent;
             pages : array of TLWPage;
             FPageCount: integer;
@@ -34,6 +35,7 @@ interface
             procedure SetActivePage(f : Tframe);
        published
        property ActivePageIndex : integer READ FActivePageIndex WRITE SetActivePageIndex;
+       property HeadColor : TColor READ FHeadColor WRITE FHeadColor;
        property OnChange : TNotifyEvent read FOnPageChanged write FOnPageChanged;
        property PageCount : integer READ FPageCount;
        property ActivePage : TFrame READ FActivePage WRITE SetActivePage ;
@@ -84,6 +86,7 @@ constructor TLWPageControl.create(Aowner : TComponent);
 
 begin
  inherited create(Aowner);
+ FHeadColor:=$dee1e6;
  FPageCount:=0;
  FActivePageIndex:=0;
  serial:=0;
@@ -108,9 +111,9 @@ begin
        f.name:=self.name+'_'+inttostr(serial);
        f.align:=alnone;
        f.parent:=self;
-       f.Left:=0;f.top:=50;
-       f.Width:=self.Width;
-       f.height:=self.Height - 50;
+       f.Left:=1;f.top:=50;
+       f.Width:=self.Width-2;
+       f.height:=self.Height - 51;
        SetActivePageIndex(FPageCount);
        refresh;
      end;
@@ -158,7 +161,7 @@ end;
 function TLWPageControl.GetPage ( index : integer) : TFrame;
 
 begin
-     assert((index<length(pages)) and (index>0),'Incorrect index');
+     assert((index<=length(pages)) and (index>0),'Incorrect index');
      if (index<=Pagecount) and (index>0) then
      begin
           result:=pages[index - 1].frame;
@@ -213,11 +216,28 @@ var c : TCanvas;
   textstyle : TTextStyle;
   i, j : integer;
   r : trect;
+  pts : array[0..6] of Tpoint;
+
+  procedure fillpts(x,y : integer);
+
+  begin
+       pts[0].x:=x;pts[0].y:=y;
+       pts[1].x:=x - 2;pts[1].y:=y-5;  // Control Point
+       pts[2].x:=x  -2;pts[2].y:=y-15 ;  // Control Point
+       pts[3].x:=x ;pts[3].y:=y - 30;
+       pts[4].x:=x -5; pts[4].y:=y - 35;  // Control Point
+       pts[5].x:=x - 5 +tabsize ;pts[5].y:=y - 35;  // Control Point
+       pts[6].x:=x + tabsize; pts[6].Y:=y - 30 ;
+       {pts[7].x:=x - 15;pts[7].y:=y-15;  // Control Point
+       pts[8].x:=x + tabsize;pts[8].Y:=y;
+       pts[9].x:=x - 15;pts[9].y:=y - 10;  // Control Point
+       pts[10].x:=x + tabsize + 2;pts[10].y:=y; }
+  end;
 
 begin
   canvas.Brush.Color:=clwhite;
   canvas.FillRect(0,0,width,height);
-  colbase:=$e5edf4;
+  colbase:=FHeadColor;
   canvas.brush.Color:=colbase;
   canvas.FillRect(0,0,width,60);
   col:=Lighter(colbase, 50);
@@ -245,17 +265,26 @@ begin
     end;
 
     //canvas.RoundRect(1+i*tabsize,2,-1+(i+1)*tabsize,35,10,10);
-    canvas.Rectangle(1+i*tabsize,2,-1+(i+1)*tabsize,35);
+
     r.Left:=2+i*tabsize;
     r.top:=3;
     r.right:=-1+(i+1)*tabsize;
     r.bottom:=32;
     if (i=FActivePageIndex - 1) then
     begin
+        canvas.Pen.color:=clblack;
+        canvas.Pen.Width:=1;
+        canvas.Rectangle(1+i*tabsize,2,-1+(i+1)*tabsize,35);
         canvas.Font.Color:=clBlack;
         canvas.Font.Bold:=true;
+        fillpts(500,32);
+        canvas.Pen.color:=clred;
+        canvas.Pen.Width:=3;
+        //canvas.Polyline(pts);
+        canvas.PolyBezier(pts,false,false);
     end else
     begin
+        canvas.Line(1+i*tabsize,5,1+i*tabsize,30);
         canvas.Font.Color:=clDkGray;
         canvas.Font.Bold:=false;
     end;
@@ -282,6 +311,7 @@ procedure TLWPageControl.SetActivePage(f : Tframe);
 var i : integer;
 
 begin
+     assert(assigned(f),'Frame not assigned');
      for i:=0 to FPageCount-1 do
      begin
           if pages[i].frame=f then
@@ -290,6 +320,7 @@ begin
               break;
           end;
      end;
+     assert((i>=0) and (i<FPageCount),'Frame not found');
 end;
 
 procedure TLWPageControl.SetActivePageIndex(p: integer);
@@ -328,9 +359,9 @@ begin
      begin
           if assigned(pages[i].frame) then
           begin
-               pages[i].frame.Left:=0;pages[i].frame.top:=50;
-               pages[i].frame.Width:=self.Width;
-               pages[i].frame.height:=self.Height - 50;
+               pages[i].frame.Left:=1;pages[i].frame.top:=50;
+               pages[i].frame.Width:=self.Width - 2;
+               pages[i].frame.height:=self.Height - 51;
           end;
      end;
 end;
