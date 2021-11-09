@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Assertions et programmation par contrat"
+title:  "Assertions"
 description: "Emploi des assertions en pascal et programmation par contrat"
 image: /images/2021-11-13-assertions.jpg
 date:   2021-11-13
@@ -76,7 +76,7 @@ end.
 ```
 Il est possible d'activer ou de désactiver les assertions à la compilation. Je sais qu'il y a tout un débat sur le fait qu'il faille livrer un programme en laissant les assertions actives ou non. Pour ma part, j'estime que les assertions sont une aide à la mise au point (de même que les commentaires, les vérifications faites par le compilateur etc.) et que les utiisateurs ne devraient pas à en avoir connaissance. Mais bon.
 
-En tous cas, il est possible de tester à l'intérieur du programme si les assertions sont actives ou non, à l'aide de la directive de compilation ```pascal {$IFOPT C+} ... {$ENDIF}```. Exemple :
+En tous cas, il est possible de tester à l'intérieur du programme si les assertions sont actives ou non, à l'aide de la directive de compilation ```{$IFOPT C+} ... {$ENDIF}```. Exemple :
 
 ```pascal
 {$IFOPT C+}
