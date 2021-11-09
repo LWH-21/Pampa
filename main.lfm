@@ -1,7 +1,7 @@
 inherited MainForm: TMainForm
   Left = 208
   Height = 811
-  Top = 296
+  Top = 197
   Width = 1282
   Anchors = [akTop, akLeft, akRight, akBottom]
   Caption = 'Pampa'

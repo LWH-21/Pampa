@@ -5,12 +5,13 @@ unit Fru_planning;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, GR32, Graphics,
+  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, Graphics,
   LCLType, EditBtn,
   DB,DataAccess,
   ressourcesStrings,
   fpjson,jsonparser,
-  GR32_Image, dw_f, DWorker, Dateutils, FSearch, DPlanning, UF_planning_01;
+  BGRABitmap, BGRABitmapTypes,
+  dw_f, DWorker, Dateutils, FSearch, DPlanning, UF_planning_01;
 
 type
 

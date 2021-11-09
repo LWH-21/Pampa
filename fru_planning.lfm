@@ -4,7 +4,7 @@ inherited Fr_planning: TFr_planning
   ClientHeight = 485
   ClientWidth = 944
   OnResize = FrameResize
-  DesignLeft = -1
+  DesignLeft = -7
   DesignTop = 287
   object ScrollBar1: TScrollBar[0]
     Left = 926

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
   Buttons, EditBtn, ActnList,
-  Grids, GR32_Dsgn_Color, VirtualTrees, DB,
+  Grids,  VirtualTrees, DB,
   SQLDB, DataAccess, Types;
 
 type

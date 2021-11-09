@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
-  Buttons, Spin, DBCtrls, ExtCtrls, ActnList, Menus, GR32_Image,
+  Buttons, Spin, DBCtrls, ExtCtrls, ActnList, Menus,
   DataPanel, LWData, ZConnection;
 
 type
@@ -36,14 +36,9 @@ type
     ActionList1: TActionList;
     Btn_supr: TBitBtn;
     Button1: TButton;
-    Bvl_flag: TBevel;
-    Bvl_column: TBevel;
     Btn_close: TBitBtn;
     Btn_tab: TBitBtn;
     Btn_save: TBitBtn;
-    Bvl_bevel: TBevel;
-    Bvl_text: TBevel;
-    Bvl_button: TBevel;
     CheckBox1: TCheckBox;
     chk_color: TCheckBox;
     ColorButton1: TColorButton;
@@ -51,11 +46,6 @@ type
     ComboBox1: TComboBox;
     ComboBox_kind: TComboBox;
     ComboBox_fields: TComboBox;
-    Ctrl_button: TImage32;
-    Ctrl_column: TImage32;
-    Ctrl_flag: TImage32;
-    Ctrl_bevel: TImage32;
-    Ctrl_text: TImage32;
     EdHint: TEdit;
     Ed_caption: TEdit;
     Gb_align: TGroupBox;
@@ -204,7 +194,7 @@ procedure TFCustomDP.FormDragOver(Sender, Source: TObject; X, Y: integer;
   State: TDragState; var Accept: boolean);
 
 begin
-  if assigned(Source) and (Source is Tcontrol) and (Source is TImage32) then
+  if assigned(Source) and (Source is Tcontrol) (*and (Source is TImage32)*) then
   begin
     if leftStr(TControl(Source).Name, 4) = 'Ctrl' then
       accept := True;
@@ -776,7 +766,7 @@ procedure TFCustomDP.setInsertObject(o : shortstring);
 
 begin
   insert_object:=o;
-  Bvl_column.shape:=bsSpacer;
+ (* Bvl_column.shape:=bsSpacer;
   Bvl_text.shape:=bsSpacer;
   Bvl_button.shape:=bsSpacer;
   Bvl_flag.shape:=bsSpacer;
@@ -786,7 +776,7 @@ begin
   if insert_object='Ctrl_button' then Bvl_button.shape:=bsFrame;
   if insert_object='Ctrl_flag' then Bvl_flag.shape:=bsFrame;
   if insert_object='Ctrl_bevel' then Bvl_bevel.shape:=bsFrame;
-  if insert_object='' then Screen.Cursor:=crDefault else Screen.cursor:=crDrag;
+  if insert_object='' then Screen.Cursor:=crDefault else Screen.cursor:=crDrag;     *)
 end;
 
 { Indicates which panel is affected by the changes

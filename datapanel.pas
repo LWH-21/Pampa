@@ -9,7 +9,7 @@ uses
   RessourcesStrings,
   DataAccess, DB,LWData,SQLDB,
   Controls, Dialogs, DBCtrls, ExtCtrls, Forms, Menus,StdCtrls, Graphics,FPImage,
-  Buttons, GR32,GR32_Image,LCLType,
+  Buttons, LCLType,
   Generics.Collections,Generics.Defaults,
   fpjson,jsonparser;
 
@@ -1025,7 +1025,7 @@ end;
 procedure TDataPanel.DragDrop(Sender, Source: TObject; X, Y: Integer);
 
 begin
-   if DesignMode and assigned(source) and (source is Tcontrol) and (source is TImage32)  then
+   if DesignMode and assigned(source) and (source is Tcontrol) (* and (source is TImage32)*)  then
    begin
      add_ctrl(TControl(Source).name,X,Y);
    end;
@@ -1037,7 +1037,7 @@ Procedure TDataPanel.DragOver(Sender, Source: TObject; X, Y: Integer; State: TDr
 
 begin
   accept:=False;
-  if DesignMode and assigned(source) and (source is Tcontrol) and (source is TImage32) then
+  if DesignMode and assigned(source) and (source is Tcontrol) (*and (source is TImage32)*) then
   begin
     if leftStr(TControl(source).Name,4)='Ctrl' then accept:=true;
   end;

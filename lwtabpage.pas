@@ -5,8 +5,9 @@ unit LWTabPage;
 interface
 
   uses
-    Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, ComCtrls,
-    StdCtrls,LCLIntf;
+    Classes, SysUtils, Forms, Controls, Dialogs, ExtCtrls, ComCtrls,
+    StdCtrls,LCLIntf,
+    Graphics,BGRABitmap, BGRABitmapTypes;
 
   type
 
@@ -210,13 +211,19 @@ end;
 
 procedure TLWPageControl.Paint;
 
-var c : TCanvas;
+var bmp: TBGRABitmap;
+    col : TBGRAPixel;
+    TS: TTextStyle;
+    r : trect;
+    i : integer;
+  {c : TCanvas;
   colbase : Tcolor;
   col : Tcolor;
   textstyle : TTextStyle;
   i, j : integer;
   r : trect;
   pts : array[0..6] of Tpoint;
+
 
   procedure fillpts(x,y : integer);
 
@@ -232,12 +239,45 @@ var c : TCanvas;
        pts[8].x:=x + tabsize;pts[8].Y:=y;
        pts[9].x:=x - 15;pts[9].y:=y - 10;  // Control Point
        pts[10].x:=x + tabsize + 2;pts[10].y:=y; }
-  end;
+  end;                        }
 
 begin
+
+  bmp := TBGRABitmap.Create(width,60, BGRAWhite);
+  bmp.FontAntialias:=true;
+  bmp.FontName:='Arial';
+  bmp.FontHeight:=11;
+  col:=bgra($de,$e1,$e6);
+
+  bmp.fillrect(0,0,width,60,col,dmset);
+  col.lightness:=60000 ;
+  bmp.FillRect(0,35,width,60,bgra($f1,$f3,$f4),dmset);
+
+  ts.RightToLeft:=false;
+
+  for i:=0 to FPageCount-1 do
+  begin
+    if (i=FActivePageIndex - 1) then
+    begin
+         bmp.RoundRectAntialias(2+i*tabsize,4,-2+(i+1)*tabsize,33,10,10,bgra(0,0,0),1,bgra($f1,$f3,$f4));
+         r.left:=5+i*tabsize;r.top:=3;
+         r.right:=r.left+tabsize-10;r.bottom:=30;
+         bmp.TextRect(r,10+i*tabsize,10,pages[i].caption,ts,bgra(0,0,0));
+    end else
+    begin
+      r.left:=5+i*tabsize;r.top:=3;
+      r.right:=r.left+tabsize-10;r.bottom:=30;
+      bmp.TextRect(r,10+i*tabsize,10,pages[i].caption,ts,bgra(128,128,128));
+    end;
+  end;
+
+
   canvas.Brush.Color:=clwhite;
   canvas.FillRect(0,0,width,height);
-  colbase:=FHeadColor;
+  bmp.Draw(Canvas, 0, 0, True);
+  bmp.free;
+
+{  colbase:=FHeadColor;
   canvas.brush.Color:=colbase;
   canvas.FillRect(0,0,width,60);
   col:=Lighter(colbase, 50);
@@ -303,7 +343,7 @@ begin
        canvas.TextRect(r,r.left,r.top,pages[i].caption);
   end;    }
   canvas.Brush.Color:=clwhite;
-  canvas.FillRect(0,32,width,35);
+  canvas.FillRect(0,32,width,35); }
 end;
 
 procedure TLWPageControl.SetActivePage(f : Tframe);

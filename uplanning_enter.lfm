@@ -29,7 +29,7 @@ object FPlanning_enter: TFPlanning_enter
       OnClick = Btn_applyClick
       TabOrder = 0
     end
-    object TimeEdit1: TTimeEdit
+    object StartTime: TTimeEdit
       Left = 16
       Height = 23
       Top = 48
@@ -37,19 +37,28 @@ object FPlanning_enter: TFPlanning_enter
       ButtonWidth = 23
       NumGlyphs = 1
       MaxLength = 0
+      OnChange = StartTimeChange
       TabOrder = 1
-      Text = 'TimeEdit1'
+      Text = '12:00'
     end
-    object TimeEdit2: TTimeEdit
-      Left = 16
+    object Edit1: TEdit
+      Left = 23
       Height = 23
-      Top = 77
-      Width = 103
-      ButtonWidth = 23
-      NumGlyphs = 1
-      MaxLength = 0
+      Top = 117
+      Width = 80
       TabOrder = 2
-      Text = 'TimeEdit2'
+      Text = 'Edit1'
     end
+  end
+  object EndTime: TTimeEdit
+    Left = 16
+    Height = 23
+    Top = 77
+    Width = 103
+    ButtonWidth = 23
+    NumGlyphs = 1
+    MaxLength = 0
+    TabOrder = 1
+    Text = 'EndTime'
   end
 end

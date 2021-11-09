@@ -81,6 +81,7 @@ begin
      header:=40;
      hline:=30;
      currentrow:= -1;
+     EnterPlanning.init(self);
      FormResize(self);
 end;
 
@@ -149,7 +150,7 @@ end;
 
 procedure TF_planning_01.MchangeClick(Sender: TObject);
 begin
-    EnterPlanning.visible:=true;
+    EnterPlanning.setInter(selection.x, Selection.y, mat.lines[selection.Y - 1].colums[selection.x - 1]);
     EnterPlanning.SetFocus;
 end;
 

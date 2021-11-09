@@ -108,15 +108,9 @@ inherited F_planning_01: TF_planning_01
     OnSelection = ListSelection
   end
   inline EnterPlanning: TFPlanning_enter[5]
-    Left = 368
-    Top = 250
-    Width = 192
-    ClientWidth = 192
+    Left = 582
+    Top = 156
     TabOrder = 5
-    inherited Panel1: TPanel
-      Width = 192
-      ClientWidth = 192
-    end
   end
   object Planning_menu: TPopupMenu[6]
     Left = 136

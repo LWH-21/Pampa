@@ -1,5 +1,6 @@
 {"version":1,"strings":[
 {"hash":120636338,"name":"tfplanning_enter.btn_apply.caption","sourcebytes":[65,112,112,108,105,113,117,101,114],"value":"Appliquer"},
-{"hash":60558193,"name":"tfplanning_enter.timeedit1.text","sourcebytes":[84,105,109,101,69,100,105,116,49],"value":"TimeEdit1"},
-{"hash":60558194,"name":"tfplanning_enter.timeedit2.text","sourcebytes":[84,105,109,101,69,100,105,116,50],"value":"TimeEdit2"}
+{"hash":3431728,"name":"tfplanning_enter.starttime.text","sourcebytes":[49,50,58,48,48],"value":"12:00"},
+{"hash":4960369,"name":"tfplanning_enter.edit1.text","sourcebytes":[69,100,105,116,49],"value":"Edit1"},
+{"hash":206155893,"name":"tfplanning_enter.endtime.text","sourcebytes":[69,110,100,84,105,109,101],"value":"EndTime"}
 ]}
