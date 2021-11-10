@@ -8,7 +8,7 @@ uses
   Classes, Objects, SysUtils, DateUtils,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
   Generics.Collections,Generics.Defaults,
   fpjson,jsonparser,Graphics,
-  RessourcesStrings;
+  RessourcesStrings,clipbrd;
 
 
 type TIntervention = Class
@@ -53,6 +53,7 @@ Type TLPlanning = class
           constructor create;
           constructor create(s,e : tdatetime);
           procedure add_inter(inter : TIntervention);
+          function CreateJson : string;
           procedure load(l : TInterventions);
           procedure load(s : string);
           function loadID(s_id : longint) : integer;
@@ -258,6 +259,8 @@ begin
   end;
 end;
 
+
+
 procedure TPlanning.init(D:TMainData);
 begin
   inherited init(D);
@@ -413,6 +416,96 @@ begin
      end;
      assert(found=true,'not found');
 end;
+
+function TLPlanning.CreateJson : string;
+
+var jsonobj,lst,objline,objcol : TJSONObject;
+    l, c : integer;
+    old : longint;
+    inter : TIntervention;
+
+begin
+     jsonobj := TJSONObject.create();
+     jsonobj.add ('PLANNING',TJSONArray.Create);
+     for l:=0 to linescount-1 do
+     begin
+          if (lines[l].SY_ID<>old) and (lines[l].SY_ID>0) then
+          begin
+            old:=lines[l].SY_ID;
+            objline:=TJSONObject.Create(['CID',inttostr(old)]);
+            objline.add ('INTERV',TJSONArray.Create);
+            jsonobj.Arrays['PLANNING'].add(objline);
+          end;
+          if (lines[l].SY_ID>0) and (assigned(objline)) then
+          begin
+            for c:=0 to colscount -1 do
+            begin
+                   inter:=lines[l].colums[c];
+                   if assigned(inter) then
+                   begin
+                     objcol:=TJSONObject.create();
+
+                     objcol.add('DAY',inttostr(inter.week_day));
+                     objcol.add('START',inttostr(inter.h_start));
+                     objcol.add('END',inttostr(inter.h_end));
+                   //  if inter.freq<>1 then objcol.add('FREQ',inttostr(inter.freq));
+                     objline.Arrays['INTERV'].add(objcol);
+                   end;
+            end;
+          end;
+     end;
+
+     result:=jsonobj.FormatJson([foSingleLineArray,foSingleLineObject,foDoNotQuoteMembers,foUseTabchar,foSkipWhiteSpace],1);
+     //Clipboard.AsText:=result;
+
+     jsonobj.Free;
+end;
+
+(*
+  {
+    "PLANNING": [
+      {
+        "CID": 10,
+        "INTERV": [
+          {
+            "DAY": 1,
+            "START": 1030,
+            "END": 1130,
+            "FREQ": 1
+          },
+          {
+            "DAY": 3,
+            "START": 1030,
+            "END": 1130,
+            "FREQ": 1
+          },
+          {
+            "DAY": 5,
+            "START": 910,
+            "END": 1020,
+            "FREQ": 1
+          }
+        ]
+      },
+      {
+        "CID": 20,
+        "INTERV": [
+          {
+            "DAY": 1,
+            "START": 1430,
+            "END": 1530,
+            "FREQ": 1
+          },
+          {
+            "DAY": 2,
+            "START": 1030,
+            "END": 1130,
+            "FREQ": 1
+          }
+        ]
+      }
+    ]
+  }          *)
 
 procedure TLPlanning.load(l : TInterventions);
 

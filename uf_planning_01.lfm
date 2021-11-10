@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = 213
+  Left = 216
   Height = 613
-  Top = 214
+  Top = 315
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613
@@ -19,6 +19,7 @@ inherited F_planning_01: TF_planning_01
     Top = 576
     Width = 75
     Caption = 'Btn1'
+    OnClick = Btn_okClick
     TabOrder = 0
   end
   object Ed_code: TEdit[1]
@@ -107,12 +108,7 @@ inherited F_planning_01: TF_planning_01
     TabOrder = 4
     OnSelection = ListSelection
   end
-  inline EnterPlanning: TFPlanning_enter[5]
-    Left = 582
-    Top = 156
-    TabOrder = 5
-  end
-  object Planning_menu: TPopupMenu[6]
+  object Planning_menu: TPopupMenu[5]
     Left = 136
     Top = 568
     object Mchange: TMenuItem

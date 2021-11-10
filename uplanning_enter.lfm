@@ -1,9 +1,10 @@
 object FPlanning_enter: TFPlanning_enter
   Left = 0
-  Height = 240
+  Height = 156
   Top = 0
   Width = 320
-  ClientHeight = 240
+  Anchors = []
+  ClientHeight = 156
   ClientWidth = 320
   OnExit = FrameExit
   TabOrder = 0
@@ -11,19 +12,19 @@ object FPlanning_enter: TFPlanning_enter
   DesignTop = 381
   object Panel1: TPanel
     Left = 0
-    Height = 240
+    Height = 156
     Top = 0
     Width = 320
     Align = alClient
     BevelInner = bvRaised
     BevelWidth = 2
-    ClientHeight = 240
+    ClientHeight = 156
     ClientWidth = 320
     TabOrder = 0
     object Btn_apply: TBitBtn
-      Left = 8
+      Left = 9
       Height = 30
-      Top = 200
+      Top = 88
       Width = 75
       Caption = 'Appliquer'
       OnClick = Btn_applyClick
@@ -41,19 +42,75 @@ object FPlanning_enter: TFPlanning_enter
       TabOrder = 1
       Text = '12:00'
     end
-    object Edit1: TEdit
-      Left = 23
-      Height = 23
-      Top = 117
-      Width = 80
+    object Ckb_monday: TCheckBox
+      Left = 16
+      Height = 19
+      Hint = 'Lundi'
+      Top = 24
+      Width = 20
       TabOrder = 2
-      Text = 'Edit1'
+    end
+    object Ckb_tuesday: TCheckBox
+      Left = 40
+      Height = 19
+      Hint = 'Mardi'
+      Top = 24
+      Width = 20
+      TabOrder = 3
+    end
+    object Ckb_wednesday: TCheckBox
+      Left = 88
+      Height = 19
+      Hint = 'Mercredi'
+      Top = 24
+      Width = 20
+      TabOrder = 4
+    end
+    object Ckb_thursday: TCheckBox
+      Left = 64
+      Height = 19
+      Hint = 'Jeudi'
+      Top = 24
+      Width = 20
+      TabOrder = 5
+    end
+    object Ckb_friday: TCheckBox
+      Left = 112
+      Height = 19
+      Hint = 'Vendredi'
+      Top = 24
+      Width = 20
+      TabOrder = 6
+    end
+    object Ckb_saturday: TCheckBox
+      Left = 136
+      Height = 19
+      Hint = 'Samedi'
+      Top = 24
+      Width = 20
+      TabOrder = 7
+    end
+    object Ckb_sunday: TCheckBox
+      Left = 160
+      Height = 19
+      Hint = 'Dimanche'
+      Top = 24
+      Width = 20
+      TabOrder = 8
+    end
+    object Label1: TLabel
+      Left = 16
+      Height = 15
+      Top = 8
+      Width = 152
+      Caption = 'L     M      M     J      V     S      D'
+      ParentColor = False
     end
   end
   object EndTime: TTimeEdit
-    Left = 16
+    Left = 128
     Height = 23
-    Top = 77
+    Top = 48
     Width = 103
     ButtonWidth = 23
     NumGlyphs = 1

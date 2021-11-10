@@ -191,7 +191,8 @@ type
     HistoManager: THistoManager;
     username: string;
     procedure HandleException(Sender: TObject; E: Exception);
-    procedure closeAll;
+    (* Closes all open tabs and windows *)
+    function closeAll : boolean;
     procedure OpenFrame(F: TW_F; mode : char);
     procedure notify(Sender : Tcomponent; ev :TNotifySet);
     procedure log (msg : string);
@@ -264,37 +265,59 @@ begin
 
 end;
 
-procedure TMainForm.closeAll;
+(* Closes all open tabs and windows *******************************************)
+{}
+function TMainForm.closeAll : boolean;
 
 var tab: TFrame;
     i : integer;
-    f : Tframe;
+    frame : TW_F;
     fo : Tform;
+    CanClose : boolean;
 
 begin
+  assert(assigned(FenList),'Window list is not created');
+  CanClose:=false;
+  result:=false;
+  FormCloseQuery(self, CanClose);
+  if not Canclose then exit;
   try
     while (tabcontrol.PageCount>0) do
     begin
+      tab := tabcontrol.ActivePage;
+      if (assigned(tab)) and (tab is TW_F) then
+      begin
+        frame := TW_F(tab);
+        tabcontrol.CloseTab(frame);
+        frame.close;
+      end;
       tabcontrol.CloseTab(1);
     end;
   Except
-    on e : exception do log(e.ToString);
+    on e : exception do UException.Error(e, dberr_interface, 'TMainForm.CloseAll 1');
   end;
   try
-    for f in FenList do
+    for tab in FenList do
     begin
-         if assigned(f.parent) then
+         if assigned(tab.parent) then
          begin
-           if f.parent is TForm then
+           if tab.parent is TForm then
            begin
-                fo:=f.parent as Tform;
+                fo:=tab.parent as Tform;
                 fo.free;
            end;
          end;
     end;
+    while FenList.Count>0 do
+    begin
+      FenList.Delete(0);
+    end;
   except
-    on e : exception do log(e.ToString);
+    on e : exception do UException.Error(e, dberr_interface, 'TMainForm.CloseAll 2');
   end;
+  result:=true;
+  i := fenlist.Count;
+  assert(FenList.Count=0,'Not all tabs / windows are closed');
 end;
 
 procedure TMainForm.HandleException(Sender: TObject; E: Exception);
@@ -520,21 +543,29 @@ var tab: TFrame;
 begin
     Canclose:=true;
     assert(assigned(tabcontrol),'tab not assigned');
-    for i:=1 to tabcontrol.Pagecount do
-    begin
-      tab:=tabcontrol.GetPage(i);
-      if assigned(tab) then
+    try
+      for i:=1 to tabcontrol.Pagecount do
       begin
-        if tab is TW_F then
+        tab:=tabcontrol.GetPage(i);
+        if assigned(tab) then
         begin
-            c:=TW_F(tab).CanClose;
-            canclose:=canclose and c;
-            if not c then
-            begin
-              tabcontrol.ActivePageIndex:=i;
-              break;
-            end;
+          if tab is TW_F then
+          begin
+              c:=TW_F(tab).CanClose;
+              canclose:=canclose and c;
+              if not c then
+              begin
+                tabcontrol.ActivePageIndex:=i;
+                break;
+              end;
+          end;
         end;
+      end;
+    except
+      on E: Exception do
+      begin
+         UException.Error(E, dberr_interface, 'TMainForm.FormCloseQuery');
+         CanClose:=false;
       end;
     end;
 end;
@@ -988,7 +1019,10 @@ procedure TMainForm.Act_exitExecute(Sender: TObject); (* ********************* *
 
 begin
   StatusBar1.Panels[0].Text := rs_fermeture;
-  Close;
+  if CloseAll then
+  begin
+       Close;
+  end;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject); (* ************************* *)
@@ -1142,7 +1176,7 @@ procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var f: TFCustomDP;
 
 begin
-  closeAll;
+  if not closeAll then exit;
   MainForm.setMicroHelp(rs_quit);
   if assigned(IdleTimer) then IdleTimer.Enabled:=false;
   Timer1.Enabled:=false;

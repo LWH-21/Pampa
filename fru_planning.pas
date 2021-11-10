@@ -56,6 +56,7 @@ type
     function getinfos : shortstring;override;
     procedure init(Data: PtrInt); override;
     procedure init(p_id : longint;j : string);override;
+
     procedure remplir_planning;
 
     procedure setid(p_id : longint);

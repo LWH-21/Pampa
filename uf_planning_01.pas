@@ -5,7 +5,7 @@ unit UF_planning_01;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,DateUtils,
   DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, Menus, ListFilterEdit, W_A, DB,
   memds, DataAccess, DPlanning, UPlanning_enter;
 
@@ -17,7 +17,6 @@ type
     Btn_ok: TBitBtn;
     Ed_lib: TEdit;
     Ed_code: TEdit;
-    EnterPlanning: TFPlanning_enter;
     Mchange: TMenuItem;
     MPaste: TMenuItem;
     MDel: TMenuItem;
@@ -29,6 +28,7 @@ type
     Planning_menu: TPopupMenu;
     Scroll_planning_1: TScrollBar;
     List: TStringGrid;
+    procedure Btn_okClick(Sender: TObject);
     procedure DBGrid1CellClick(Column: TColumn);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -49,11 +49,13 @@ type
    mat :   TLPlanning;
    currentrow : integer;
    selection : Tpoint;
+   EnterPlanning: TFPlanning_enter;
   public
     w_id : longint;
     procedure draw_planning_1;
     procedure load;
     procedure load_planning(pl_id : longint);
+    procedure modify;
     procedure scrollbar_show;
   end;
 
@@ -73,8 +75,23 @@ begin
 
 end;
 
+procedure TF_planning_01.Btn_okClick(Sender: TObject);
+
+var s : string;
+
+begin
+     s:=mat.CreateJson;
+     query.Edit;
+     query.fieldbyname('SY_DETAIL').AsString:=s;
+     MainData.WriteDataSet(query,'TF_planning_01');
+end;
+
 procedure TF_planning_01.FormCreate(Sender: TObject);
 begin
+     EnterPlanning:= TFPlanning_enter.Create(self);
+     EnterPlanning.parent:=self;
+     EnterPlanning.left:=0;
+     EnterPlanning.top:=0;
      mat:=TLPlanning.create;
      w_id:=-1;
      query:=nil;
@@ -87,6 +104,7 @@ end;
 
 procedure TF_planning_01.FormDestroy(Sender: TObject);
 begin
+  if assigned(EnterPlanning) then FreeAndNil(EnterPlanning);
   if assigned(mat) then
   begin
     mat.reset;
@@ -149,9 +167,42 @@ begin
 end;
 
 procedure TF_planning_01.MchangeClick(Sender: TObject);
+
 begin
+    EnterPlanning.Left:=pb_plan1.left + limite + selection.x*wcol;
+    if EnterPlanning.Left+EnterPlanning.Width > self.width then
+    begin
+        EnterPlanning.Left:=pb_plan1.left + limite + (selection.x - 1)*wcol - EnterPlanning.width;
+    end;
+    if EnterPlanning.Left<pb_plan1.left  then EnterPlanning.Left:=pb_plan1.left;
+
+    EnterPlanning.Top:=pb_plan1.top + header + selection.Y * hline;
+    if EnterPlanning.Top + EnterPlanning.Height > self.Height then
+    begin
+         EnterPlanning.Top:=pb_plan1.top + header + (selection.Y - 1) * hline - EnterPlanning.Height;
+         if EnterPlanning.top<(pb_plan1.top - EnterPlanning.height div 2)  then EnterPlanning.top:=(pb_plan1.top - EnterPlanning.height div 2);
+    end;
     EnterPlanning.setInter(selection.x, Selection.y, mat.lines[selection.Y - 1].colums[selection.x - 1]);
     EnterPlanning.SetFocus;
+end;
+
+procedure TF_planning_01.modify;
+
+var inter : TIntervention;
+
+begin
+    inter:=mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1];
+    if not assigned(inter) then
+    begin
+         inter:=TIntervention.create(EnterPlanning.col,0,0,0,w_id,mat.lines[EnterPlanning.line - 1].sy_id);
+         mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1]:=inter;
+    end;
+    if assigned(inter) then
+    begin
+         inter.h_start:=HourOf(EnterPlanning.StartTime.Time)*100 + MinuteOf(EnterPlanning.StartTime.Time);
+         inter.h_end:=HourOf(EnterPlanning.EndTime.Time)*100 + MinuteOf(EnterPlanning.EndTime.Time);
+    end;
+    pb_plan1.Refresh;
 end;
 
 procedure TF_planning_01.pb_plan1Click(Sender: TObject);

@@ -1,6 +1,13 @@
 {"version":1,"strings":[
 {"hash":120636338,"name":"tfplanning_enter.btn_apply.caption","sourcebytes":[65,112,112,108,105,113,117,101,114],"value":"Appliquer"},
 {"hash":3431728,"name":"tfplanning_enter.starttime.text","sourcebytes":[49,50,58,48,48],"value":"12:00"},
-{"hash":4960369,"name":"tfplanning_enter.edit1.text","sourcebytes":[69,100,105,116,49],"value":"Edit1"},
+{"hash":5489833,"name":"tfplanning_enter.ckb_monday.hint","sourcebytes":[76,117,110,100,105],"value":"Lundi"},
+{"hash":5474473,"name":"tfplanning_enter.ckb_tuesday.hint","sourcebytes":[77,97,114,100,105],"value":"Mardi"},
+{"hash":210407065,"name":"tfplanning_enter.ckb_wednesday.hint","sourcebytes":[77,101,114,99,114,101,100,105],"value":"Mercredi"},
+{"hash":5295017,"name":"tfplanning_enter.ckb_thursday.hint","sourcebytes":[74,101,117,100,105],"value":"Jeudi"},
+{"hash":206278249,"name":"tfplanning_enter.ckb_friday.hint","sourcebytes":[86,101,110,100,114,101,100,105],"value":"Vendredi"},
+{"hash":93862825,"name":"tfplanning_enter.ckb_saturday.hint","sourcebytes":[83,97,109,101,100,105],"value":"Samedi"},
+{"hash":3689813,"name":"tfplanning_enter.ckb_sunday.hint","sourcebytes":[68,105,109,97,110,99,104,101],"value":"Dimanche"},
+{"hash":143764,"name":"tfplanning_enter.label1.caption","sourcebytes":[76,32,32,32,32,32,77,32,32,32,32,32,32,77,32,32,32,32,32,74,32,32,32,32,32,32,86,32,32,32,32,32,83,32,32,32,32,32,32,68],"value":"L     M      M     J      V     S      D"},
 {"hash":206155893,"name":"tfplanning_enter.endtime.text","sourcebytes":[69,110,100,84,105,109,101],"value":"EndTime"}
 ]}
