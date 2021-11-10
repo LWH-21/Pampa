@@ -14,7 +14,8 @@ ref: assertion
 
 Les assertions sont le moyen utilisé par le langage Pascal (du moins dans sa version Free Pascal) pour mettre en oeuvre la programmation par contrat.
 
-Le principe en est très simple. On considère que chaque fonction, chaque procédure, chaque méthode et, en général, chaque partie du code, passe un *contrat* avec son environnement. 
+Le principe en est très simple. On considère que chaque fonction, chaque procédure, chaque méthode et, en général, chaque partie du code, passe un *contrat* avec son environnement, ce qui implique qu'elle ait des droits (les moyens de faire son travail) mais aussi des obligations (fournir un résutat conforme à celui attendu).
+
 Elle s'engage à fournir une réponse correcte si :
 - Les données qu'on lui fourni en entrée respectent les règles attendues. Par exemple, pour une fonction calculant une racine carré, il est nécessaire d'avoir un nombre positif ou nul en entrée. Pour une fonction faisant la division de *a* par *b*, il est nécessaire que *b* soit différent de zéro.
 - L'environnement reste conforme à ce qui est attendu. Par exemple, pour une fonction recherchant des informations dans une base de données, il faut que le programme reste connecté au SGBD.
@@ -22,7 +23,7 @@ Elle s'engage à fournir une réponse correcte si :
 
 L'idée est donc d'*enrichir* le code en ajoutant le controle de ces données contractuelles. On aura donc :
 
-- Des conditions initiales ou préconditions : ces conditions doivent être vérifiées avant le lancement d'un traitement donné. Elles garantissebt que l'exécution du traitement est possible sans erreur.
+- Des conditions initiales ou préconditions : ces conditions doivent être vérifiées avant le lancement d'un traitement donné. Elles garantissent que l'exécution du traitement est possible sans erreur.
 - Des règles permettant d'attester que, compte-tenu des données initiales, le traitement s'est bien passe (postconditions). 
 - Invariant : Il s'agit d'une condition qui est toujours vraie. Selon le type d'invariant, cette assertion caractérise l'état interne de tout le programme, ou seulement d'une partie comme pour un invariant de boucle ou un invariant d'objet.
 
