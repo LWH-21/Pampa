@@ -14,7 +14,7 @@ ref: assertion
 
 Les assertions sont le moyen utilisé par le langage Pascal (du moins dans sa version Free Pascal) pour mettre en oeuvre la programmation par contrat.
 
-Le principe en est très simple. On considère que chaque fonction, chaque procédure, chaque méthode et, en général, chaque partie du code, passe un *contrat* avec le reste du programme. 
+Le principe en est très simple. On considère que chaque fonction, chaque procédure, chaque méthode et, en général, chaque partie du code, passe un *contrat* avec son environnement. 
 Elle s'engage à fournir une réponse correcte si :
 - Les données qu'on lui fourni en entrée respectent les règles attendues. Par exemple, pour une fonction calculant une racine carré, il est nécessaire d'avoir un nombre positif ou nul en entrée. Pour une fonction faisant la division de *a* par *b*, il est nécessaire que *b* soit différent de zéro.
 - L'environnement reste conforme à ce qui est attendu. Par exemple, pour une fonction recherchant des informations dans une base de données, il faut que le programme reste connecté au SGBD.
@@ -22,7 +22,7 @@ Elle s'engage à fournir une réponse correcte si :
 
 L'idée est donc d'*enrichir* le code en ajoutant le controle de ces données contractuelles. On aura donc :
 
-- Des conditions initiales ou préconditions : La condition qui doit être vérifiée par le client avant le lancement d'un traitement donné. Cette condition doit garantir que l'exécution du traitement est possible sans erreur ;
+- Des conditions initiales ou préconditions : ces conditions doivent être vérifiées avant le lancement d'un traitement donné. Elles garantissebt que l'exécution du traitement est possible sans erreur.
 - Des règles permettant d'attester que, compte-tenu des données initiales, le traitement s'est bien passe (postconditions). 
 - Invariant : Il s'agit d'une condition qui est toujours vraie. Selon le type d'invariant, cette assertion caractérise l'état interne de tout le programme, ou seulement d'une partie comme pour un invariant de boucle ou un invariant d'objet.
 
@@ -74,14 +74,14 @@ begin
   (* ... *)
 end.
 ```
-Il est possible d'activer ou de désactiver les assertions à la compilation. Je sais qu'il y a tout un débat sur le fait qu'il faille livrer un programme en laissant les assertions actives ou non. Pour ma part, j'estime que les assertions sont une aide à la mise au point (de même que les commentaires, les vérifications faites par le compilateur etc.) et que les utiisateurs ne devraient pas à en avoir connaissance. Mais bon.
+Il est possible d'activer ou de désactiver les assertions à la compilation. Je sais qu'il y a tout un débat sur le fait qu'il faille livrer un programme en laissant les assertions actives ou non. Pour ma part, j'estime que les assertions sont une aide à la mise au point (de même que les commentaires, les vérifications faites par le compilateur etc.) et que les utiisateurs ne devraient pas à en avoir connaissance. Et aussi qu'il est inutile (et même contre-productif) des tester encore et encore les mêmes choses en production. Mais bon.
 
 En tous cas, il est possible de tester à l'intérieur du programme si les assertions sont actives ou non, à l'aide de la directive de compilation ```{$IFOPT C+} ... {$ENDIF}```. Exemple :
 
 ```pascal
 {$IFOPT C+}
 //This code will only be compiled if assertions are active.
-var OldErrorProc : TAssertErrorProc;
+var OldErrorProc : TAssertErrorProc;til
 
 procedure AssertionHandler( const Msg: ShortString; const Fname: ShortString; Lineno: LongInt; ErrorAddr: pointer);
 
@@ -102,7 +102,7 @@ begin
   OldErrorProc:=AssertErrorProc;
   // setting the new handler
   AssertErrorProc:=@AssertionHandler;  
-{$ENDIF}Ce
+{$ENDIF}
   (* ... *)
 end.
 ```
