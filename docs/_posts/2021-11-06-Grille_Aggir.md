@@ -22,7 +22,7 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 - **GIR 5**: Autonomie mentale totale et aucun problème pour ses déplacements dans son logement
 - **GIR 6**: Aucun problème dans la réalisation des actes de la vie courante
 
-Voici l'algorithme utilisé pour ce calcul, codé en Python :
+L'algorihme utilisé est celui décrit dans le [décret n°97-427 du 28 avril 1997](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006684183/) publié au journal officiel du 30 avril 1997. En voici le codé en Python :
 
 ```python
 # aggir=(COHERENCE, ORIENTATION, TOILETTE, HABILLAGE, ALIMENTATION, ELIMINATION, TRANSFERTS, DEPL. INT, DEPL EXT., COMMUNICATION )
