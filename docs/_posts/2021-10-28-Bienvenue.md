@@ -2,7 +2,7 @@
 layout: post
 title:  "Lancement"
 description: "Accueil sur le site"
-image: /images/2021-10-18-Pampa.png
+image: /images/2021-10-18-Pampa.jpg
 date:   2021-10-28
 last_modified_at: 2021-10-31
 author: LWH
