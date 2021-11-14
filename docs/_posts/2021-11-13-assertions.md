@@ -4,7 +4,7 @@ title:  "Assertions"
 description: "Emploi des assertions en pascal et programmation par contrat"
 image: /images/2021-11-13-assertions.jpg
 date:   2021-11-13
-last_modified_at: 2021-11-13
+last_modified_at: 2021-11-14
 author: LWH
 locale: fr
 categories: 
@@ -77,7 +77,7 @@ begin
   (* ... *)
 end.
 ```
-Il est possible d'activer ou de désactiver les assertions à la compilation avec l'option ```{$ASSERTIONS}``` (ou ```{$C}```). On les active avec ```{$ASSERTION ON}``` (ou ```{$C ON}```) et on les désactive avec ```{$ASSERTION OFF}``` (ou ```{$C OFF}```).  Je sais qu'il y a tout un débat sur le fait qu'il faille livrer un programme en laissant les assertions actives ou non. Pour ma part, j'estime que les assertions sont une aide à la mise au point (de même que les commentaires, les vérifications faites par le compilateur etc.) et que les utilisateurs ne devraient pas à en avoir connaissance. Et aussi qu'il est inutile (et même contre-productif) des tester encore et encore les mêmes choses en production. Mais bon.
+Il est possible d'activer ou de désactiver les assertions à la compilation avec l'option ```{$ASSERTIONS}``` (ou ```{$C}```). On les active avec ```{$ASSERTION ON}``` (ou ```{$C ON}```) et on les désactive avec ```{$ASSERTION OFF}``` (ou ```{$C OFF}```).  Je sais qu'il y a tout un débat sur le fait de livrer un programme en laissant les assertions actives ou non. Pour ma part, j'estime que les assertions sont une aide à la mise au point (de même que les commentaires, les vérifications faites par le compilateur etc.) et que les utilisateurs ne devraient pas à en avoir connaissance. Et aussi qu'il est inutile (et même contre-productif) des tester encore et encore les mêmes choses en production. Mais bon.
 
 En tous cas, il est possible de tester à l'intérieur du programme si les assertions sont actives ou non, à l'aide de la directive de compilation ```{$IFOPT C+} ... {$ENDIF}```. Exemple :
 
@@ -109,4 +109,22 @@ begin
   (* ... *)
 end.
 ```
+On peut se servir de cela pour faire des tests un peu plus compliqués. Par exemple, vérifier qu'une boucle se termine :
 
+```pascal
+procedure foo;
+
+var cpt : integer;
+
+begin
+    cpt:=0;
+    while (* some conditions *) do
+    begin
+    	(* some complex stuff *)
+	{$IFOPT C+}
+          inc(cpt);
+          Assert(cpt<1000,'Possible infinite loop');
+         {$ENDIF}
+    end;
+end;
+```
