@@ -120,6 +120,7 @@ inherited F_planning_01: TF_planning_01
     end
     object Minsert: TMenuItem
       Caption = 'Insérer une ligne'
+      OnClick = MinsertClick
     end
     object MCopy: TMenuItem
       Caption = 'Copier'

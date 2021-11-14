@@ -223,6 +223,10 @@ var
 
 
 begin
+  // todo : pour les copies écran
+  width:=1200;
+  height:=720;
+
   tabcontrol:=TLWPageControl.create(self);
   tabcontrol.Parent:=self;
   tabcontrol.left:=328; tabcontrol.TOP:=32;
@@ -1059,6 +1063,7 @@ begin
     on E: Exception do
          UException.Error(E, dberr_interface, 'TMainForm.FormResize');
   end;
+  //caption:='W: '+inttostr(width)+' H: '+inttostr(height);
 end;
 
 procedure TMainForm.MFileClick(Sender: TObject);

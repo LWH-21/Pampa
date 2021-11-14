@@ -4,45 +4,54 @@ inherited Fr_planning: TFr_planning
   ClientHeight = 485
   ClientWidth = 944
   OnResize = FrameResize
-  DesignLeft = -7
-  DesignTop = 287
-  object ScrollBar1: TScrollBar[0]
-    Left = 926
-    Height = 395
-    Top = 56
-    Width = 17
-    Anchors = []
-    Kind = sbVertical
-    PageSize = 0
-    TabOrder = 0
-  end
-  object Ed_code: TEdit[1]
+  DesignLeft = -1403
+  DesignTop = 351
+  object Ed_code: TEdit[0]
     Left = 8
     Height = 23
     Top = 19
     Width = 80
     ReadOnly = True
-    TabOrder = 1
+    TabOrder = 0
   end
-  object SB_rech: TSpeedButton[2]
+  object SB_rech: TSpeedButton[1]
     Left = 96
     Height = 22
     Top = 19
     Width = 23
     OnClick = SB_rechClick
   end
-  object Ed_name: TEdit[3]
+  object Ed_name: TEdit[2]
     Left = 128
     Height = 23
     Top = 19
     Width = 528
     ReadOnly = True
+    TabOrder = 1
+  end
+  object Bt_open_planning: TButton[3]
+    Left = 664
+    Height = 25
+    Top = 19
+    Width = 48
+    Caption = '...'
+    OnClick = Bt_open_planningClick
     TabOrder = 2
   end
-  object Ed_date: TDateEdit[4]
-    Left = 792
+  object SB_previous: TBitBtn[4]
+    Left = 24
     Height = 23
-    Top = 16
+    Top = 96
+    Width = 23
+    Images = MainForm.Images
+    ImageIndex = 20
+    OnClick = SB_previousClick
+    TabOrder = 3
+  end
+  object Ed_date: TDateEdit[5]
+    Left = 56
+    Height = 23
+    Top = 96
     Width = 103
     CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames, dsShowWeekNumbers, dsStartMonday]
     DefaultToday = True
@@ -51,44 +60,16 @@ inherited Fr_planning: TFr_planning
     NumGlyphs = 1
     MaxLength = 0
     OnChange = Ed_dateChange
-    TabOrder = 3
-  end
-  object SB_previous: TBitBtn[5]
-    Left = 752
-    Height = 23
-    Top = 16
-    Width = 23
-    Images = MainForm.Images
-    ImageIndex = 20
-    OnClick = SB_previousClick
     TabOrder = 4
   end
   object SB_next: TBitBtn[6]
-    Left = 896
+    Left = 168
     Height = 23
-    Top = 16
+    Top = 96
     Width = 23
     Images = MainForm.Images
     ImageIndex = 21
     OnClick = SB_nextClick
     TabOrder = 5
-  end
-  object Plan_pb: TPaintBox[7]
-    Left = 32
-    Height = 105
-    Top = 88
-    Width = 105
-    Color = 15138815
-    ParentColor = False
-    OnPaint = planPaintBuffer
-  end
-  object Bt_open_planning: TButton[8]
-    Left = 664
-    Height = 25
-    Top = 19
-    Width = 48
-    Caption = '...'
-    OnClick = Bt_open_planningClick
-    TabOrder = 6
   end
 end

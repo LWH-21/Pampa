@@ -11,7 +11,7 @@ uses
   ressourcesStrings,
   fpjson,jsonparser,
   BGRABitmap, BGRABitmapTypes,
-  dw_f, DWorker, Dateutils, FSearch, DPlanning, UF_planning_01;
+  dw_f, DWorker, Dateutils, FSearch, DPlanning, UF_planning_01, UPlanning;
 
 type
 
@@ -21,21 +21,19 @@ type
 
   TFr_planning = class(TW_F)
     Bt_open_planning: TButton;
-    Plan_pb: TPaintBox;
-    SB_previous: TBitBtn;
-    Ed_date: TDateEdit;
 
     Ed_code: TEdit;
+    Ed_date: TDateEdit;
     Ed_name: TEdit;
-    //plan: TPaintBox32;
     SB_next: TBitBtn;
-    ScrollBar1: TScrollBar;
+    SB_previous: TBitBtn;
     SB_rech: TSpeedButton;
 
 
     procedure Bt_open_planningClick(Sender: TObject);
     procedure Ed_dateChange(Sender: TObject);
     procedure FrameResize(Sender: TObject);
+    procedure GPlanResize(Sender: TObject);
     procedure planPaintBuffer(Sender: TObject);
     procedure SB_rechClick(Sender: TObject);
     procedure SB_previousClick(Sender: TObject);
@@ -46,10 +44,12 @@ type
     header,hline,limite : integer;
     startdate : tdatetime;
     col : TInterventions;
-    mat : TLPlanning;
+
+    GPlan: TGPlanning;
 
 
   public
+    constructor create(aowner: TComponent); override;
     function CanClose : boolean;override;
     procedure draw_week;
     function getcode : shortstring;override;
@@ -69,6 +69,14 @@ implementation
 
 uses Main;
 
+constructor TFr_planning.create(aowner: TComponent);
+
+begin
+  inherited;
+  GPlan:= TGPlanning.create(self);
+  GPlan.Parent:=self;
+end;
+
 function TFr_planning.CanClose : boolean;
 
 begin
@@ -83,6 +91,7 @@ procedure TFr_planning.init(Data: PtrInt);
 
 begin
   mode:=pm_week;
+
   Caption := rs_planning;
   startdate:=Today();
   startdate:=StartOfTheWeek(startdate);
@@ -141,7 +150,7 @@ begin
   end;
   setid(p_id);
   startdate:=StartOfTheWeek(startdate);
- // ed_date.date:=StartDate;
+  ed_date.date:=StartDate;
 
 
   if parent is TWincontrol then
@@ -157,7 +166,7 @@ procedure TFr_planning.planPaintBuffer(Sender: TObject);
 var w,h : integer;
 
 begin
-  w:=plan_pb.Width;
+{  w:=plan_pb.Width;
   h:=Plan_pb.height;
 
   plan_pb.Canvas.Clear;
@@ -170,41 +179,44 @@ begin
   case mode of
        pm_week : draw_week;
   end;
-
+      }
 end;
 
 procedure TFr_planning.FrameResize(Sender: TObject);
 
 begin
-  plan_pb.Left:=0;
-  plan_pb.Top:=Ed_code.top+Ed_code.height+20;
+  gplan.Left:=0;
+  gplan.Top:=Ed_code.top+Ed_code.height+20;
   if self.Width<720 then
   begin
-       plan_pb.Width:=720;
-       plan_pb.height:=self.height - plan_pb.top;
-       Scrollbar1.Visible:=false;
+       gplan.Width:=720;
+       gplan.height:=self.height - gplan.top;
   end else
   begin
-    Scrollbar1.Visible:=true;
-    plan_pb.Width:=self.Width - Scrollbar1.width - 5;
-    plan_pb.height:=self.height - plan_pb.top;
-    scrollbar1.Top:=plan_pb.top;
-    scrollbar1.Height:=plan_pb.height;
+    gplan.Width:=self.Width - 5;
+    gplan.height:=self.height - gplan.top;
   end;
-
+  gplan.FrameResize(self);
   header:=80;
   hline:=60;
-  limite:=plan_pb.Width div 4;
 
-  ed_date.Top:=plan_pb.Top+5;
-  ed_date.left:=plan_pb.left+((limite - ed_date.Width) div 2);
-  sb_previous.Top:=ed_date.top;
-  sb_previous.Left:=ed_date.left - sb_previous.Width - 10;
-  sb_next.top :=ed_date.top;
-  sb_next.Left:=ed_date.Left+ed_date.Width + 10;
-  sb_next.BringToFront;
-  sb_previous.bringToFront;
+  Ed_date.top := GPlan.top + 10;
+  SB_next.top:=Ed_date.top;
+  SB_previous.top:=Ed_date.top;
+  Ed_date.left:=50;
+  Sb_previous.left:=Ed_date.left - Sb_Previous.width - 10;
+  SB_next.left:=Ed_date.left+Ed_date.width+10;
   ed_date.BringToFront;
+  sb_next.BringToFront;
+  sb_previous.Bringtofront;
+ // limite:=plan_pb.Width div 4;
+
+
+end;
+
+procedure TFr_planning.GPlanResize(Sender: TObject);
+begin
+
 end;
 
 procedure TFr_planning.Ed_dateChange(Sender: TObject);
@@ -288,21 +300,28 @@ var w,h : integer;
 
 begin
 
-     w:=plan_pb.Width;
+ {    w:=plan_pb.Width;
      h:=Plan_pb.height;
 
      tsem := (w - limite) div 7;
 
+     plan_pb.Canvas.Brush.color:=clwhite;
+     plan_pb.Canvas.Brush.Style:=bsSolid;
+     plan_pb.Canvas.FillRect(0,0,w,h);
+
      //Header
-     plan_pb.Canvas.Brush.color:=TColor($FFF8DC);
+     plan_pb.Canvas.Brush.color:=TColor($e6e6e6);
      plan_pb.Canvas.Brush.Style:=bsSolid;
      plan_pb.Canvas.FillRect(1,1,w-1,header);
-     plan_pb.Canvas.pen.Color:=clblack;
+     plan_pb.Canvas.pen.Color:=clBlack;
 
      plan_pb.canvas.Rectangle(0,1,w-1,header-1);
+     plan_pb.canvas.Line(0,header - 1,0,h);
+     plan_pb.canvas.Line(w,header - 1,w,h);
+     plan_pb.canvas.Line(limite,header - 1,limite,h);
 
 
-     plan_pb.Canvas.pen.color:=clBlue;
+     plan_pb.Canvas.pen.color:=Tcolor($d4d4d4);
      plan_pb.canvas.Line(limite,1,limite,h - 1);
      tmpdate:=startdate;
      tstyle.alignment:=taCenter;
@@ -332,7 +351,7 @@ begin
      plan_pb.Canvas.Brush.Style:=bsclear;
      if assigned(mat) then
      begin
-       while (mat.lines[l].sy_id>0) and (l<mat.linescount) do
+       while (l<mat.linescount ) and (mat.lines[l].sy_id>0) do
        begin
          if (l<mat.linescount - 1) and (mat.lines[l].sy_id<>mat.lines[l+1].sy_id) then
          begin
@@ -363,7 +382,7 @@ begin
          end;
          inc(l);
        end;
-     end;
+     end;   }
 
 end;
 
@@ -409,16 +428,18 @@ begin
    old:=-1;
 
    ed_date.Caption:=datetostr(startdate);
-   if assigned(mat) then freeandnil(mat);
+
 
    if id>0 then
    begin
      enddate:=EndOfTheWeek(startdate);
      col:=Planning.loadW(id,startdate, enddate);
-     mat:=TLPlanning.create(startdate,enddate);
-     mat.load(col);
+    // mat:=TLPlanning.create(startdate,enddate);
+    // mat.load(col);
+    Gplan.load(col,startdate,enddate);
+
    end;
-   plan_pb.Refresh;
+
 end;
 
 
@@ -456,7 +477,7 @@ destructor TFr_planning.Destroy;
 begin
   inherited;
   if assigned(col) then freeAndNil(col);
-  if assigned(mat) then freeAndNil(mat);
+
 end;
 
 end.

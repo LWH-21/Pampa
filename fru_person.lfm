@@ -4,8 +4,8 @@ inherited Fr_Person: TFr_Person
   ClientHeight = 663
   ClientWidth = 1566
   OnResize = FormResize
-  DesignLeft = 164
-  DesignTop = 140
+  DesignLeft = -1555
+  DesignTop = 245
   object PageControl1: TPageControl[0]
     Left = 0
     Height = 623

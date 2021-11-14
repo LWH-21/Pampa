@@ -55,7 +55,7 @@ type
 
 implementation
 
-uses Main;
+uses Main,LWTabPage;
 
 {$R *.lfm}
 
@@ -104,6 +104,7 @@ end;
 procedure TFr_Person.BsearchClick(Sender: TObject);
 
 var ts : TTabSheet;
+     tab : TLWPageControl;
 
 begin
   if not CanClose then
@@ -130,15 +131,14 @@ begin
         begin
           if Query.RecordCount = 0 then
           begin
-            Close;
-            if self.Parent is TTabSheet then
+            if self.Parent is TLWPageControl then
             begin
                  try
-                    ts := self.Parent as TTabSheet;
-                    if assigned(ts) then ts.free;
+                    tab := self.Parent as TLWPageControl;
+                    if assigned(tab) then tab.Closetab(self);
                  except
                  end;
-            end;
+            end else Close;;
             exit;
           end;
         end;
@@ -154,30 +154,28 @@ begin
     end;
     mrCancel :
     begin
-      Close;
-      if self.Parent is TTabSheet then
+      if self.Parent is TLWPageControl then
       begin
            try
-              ts := self.Parent as TTabSheet;
-              if assigned(ts) then ts.free;
+              tab := self.Parent as TLWPageControl;
+              if assigned(tab) then tab.Closetab(self);
            except
            end;
-      end;
+      end else Close;
       exit;
     end
     else
     begin
       if Query.RecordCount = 0 then
       begin
-        Close;
-        if self.Parent is TTabSheet then
+        if self.Parent is TLWPageControl then
         begin
              try
-                ts := self.Parent as TTabSheet;
-                if assigned(ts) then ts.free;
+                tab := self.Parent as TLWPageControl;
+                if assigned(tab) then tab.Closetab(self);
              except
              end;
-        end;
+        end else Close;
         exit;
       end;
     end;

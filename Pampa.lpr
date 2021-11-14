@@ -36,7 +36,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   { you can add units after this }
   SysUtils, // une unité ajoutée pour PathDelim
   gettext, translations, datetimectrls, dworker, Ucfg_table_det, DCustomer,
-  DPlanning, LWTabPage, UPlanning_enter;
+  DPlanning, LWTabPage, UPlanning_enter, UPlanning;
 
 {$R *.res}
 

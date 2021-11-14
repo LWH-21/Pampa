@@ -15,7 +15,6 @@
         <TextName Value="LWH.Pampa"/>
         <TextDesc Value="Planification"/>
       </XPManifest>
-      <Icon Value="0"/>
     </General>
     <LazDoc Paths="FPdoc"/>
     <i18n>
@@ -39,39 +38,42 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="10">
+    <RequiredPackages Count="11">
       <Item1>
         <PackageName Value="BGRABitmapPack"/>
       </Item1>
       <Item2>
-        <PackageName Value="laz_fpspreadsheet_visual"/>
+        <PackageName Value="zcomponent"/>
       </Item2>
       <Item3>
-        <PackageName Value="zcomponent"/>
+        <PackageName Value="lr_zeosdb"/>
       </Item3>
       <Item4>
-        <PackageName Value="DateTimeCtrls"/>
+        <PackageName Value="lazreport"/>
       </Item4>
       <Item5>
-        <PackageName Value="virtualtreeview_package"/>
+        <PackageName Value="DateTimeCtrls"/>
       </Item5>
       <Item6>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="virtualtreeview_package"/>
       </Item6>
       <Item7>
-        <PackageName Value="LazControls"/>
+        <PackageName Value="SynEdit"/>
       </Item7>
       <Item8>
-        <PackageName Value="MemDSLaz"/>
+        <PackageName Value="LazControls"/>
       </Item8>
       <Item9>
-        <PackageName Value="FCL"/>
+        <PackageName Value="MemDSLaz"/>
       </Item9>
       <Item10>
-        <PackageName Value="LCL"/>
+        <PackageName Value="FCL"/>
       </Item10>
+      <Item11>
+        <PackageName Value="LCL"/>
+      </Item11>
     </RequiredPackages>
-    <Units Count="24">
+    <Units Count="23">
       <Unit0>
         <Filename Value="Pampa.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -109,154 +111,142 @@
         <UnitName Value="FRechIntervenant"/>
       </Unit4>
       <Unit5>
+        <Filename Value="w_f.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="W_A"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit5>
+      <Unit6>
         <Filename Value="da_table.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="DA_table"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DA_table"/>
-      </Unit5>
-      <Unit6>
+      </Unit6>
+      <Unit7>
         <Filename Value="uexception.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FException"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UException"/>
-      </Unit6>
-      <Unit7>
+      </Unit7>
+      <Unit8>
         <Filename Value="fru_intervenant.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fr_Intervenant"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Fru_intervenant"/>
-      </Unit7>
-      <Unit8>
+      </Unit8>
+      <Unit9>
         <Filename Value="uhistomanager.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UHistoManager"/>
-      </Unit8>
-      <Unit9>
+      </Unit9>
+      <Unit10>
         <Filename Value="ressourcesstrings.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="RessourcesStrings"/>
-      </Unit9>
-      <Unit10>
+      </Unit10>
+      <Unit11>
         <Filename Value="fru_planning.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fr_planning"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="Fru_planning"/>
-      </Unit10>
-      <Unit11>
+      </Unit11>
+      <Unit12>
         <Filename Value="ufbdd.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fbdd"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFbdd"/>
-      </Unit11>
-      <Unit12>
+      </Unit12>
+      <Unit13>
         <Filename Value="utw_tab.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="W_Tab"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UTW_Tab"/>
-      </Unit12>
-      <Unit13>
+      </Unit13>
+      <Unit14>
         <Filename Value="ufhistosup.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FHistoSup"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit13>
-      <Unit14>
+      </Unit14>
+      <Unit15>
         <Filename Value="ufbookmark.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FBookmark"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFbookmark"/>
-      </Unit14>
-      <Unit15>
+      </Unit15>
+      <Unit16>
         <Filename Value="ufr_histo.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fr_Histo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="UFr_histo"/>
-      </Unit15>
-      <Unit16>
+      </Unit16>
+      <Unit17>
         <Filename Value="datapanel.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DataPanel"/>
-      </Unit16>
-      <Unit17>
+      </Unit17>
+      <Unit18>
         <Filename Value="ufcustomdp.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FCustomDP"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFCustomDp"/>
-      </Unit17>
-      <Unit18>
+      </Unit18>
+      <Unit19>
         <Filename Value="ucfg_table.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FCfg_Table"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UCfg_table"/>
-      </Unit18>
-      <Unit19>
-        <Filename Value="ufcnx.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FCnx"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UFcnx"/>
       </Unit19>
       <Unit20>
-        <Filename Value="dcustomer.pas"/>
+        <Filename Value="testunit.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Customer"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="DataModule"/>
-        <UnitName Value="DCustomer"/>
-      </Unit20>
-      <Unit21>
-        <Filename Value="dplanning.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="Planning"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="DataModule"/>
-        <UnitName Value="DPlanning"/>
-      </Unit21>
-      <Unit22>
-        <Filename Value="uf_planning_01.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="F_planning_01"/>
+        <ComponentName Value="FTest"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UF_planning_01"/>
-      </Unit22>
-      <Unit23>
-        <Filename Value="uplanning_enter.pas"/>
+        <UnitName Value="TestUnit"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="lwtabpage.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="FPlanning_enter"/>
+        <UnitName Value="LWTabPage"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="uplanning.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="GPlanning"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <UnitName Value="UPlanning_enter"/>
-      </Unit23>
+        <UnitName Value="UPlanning"/>
+      </Unit22>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value=".\win64\Pampa"/>
+      <Filename Value=".\WIN64\Pampa"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
@@ -291,12 +281,15 @@
     </Linking>
     <Other>
       <Verbosity>
+        <ShoLineNum Value="True"/>
         <ShowHintsForUnusedUnitsInMainSrc Value="True"/>
       </Verbosity>
+      <WriteFPCLogo Value="False"/>
       <CompilerMessages>
-        <IgnoredMessages idx5024="True"/>
+        <IgnoredMessages idx5026="True" idx5024="True"/>
       </CompilerMessages>
-      <CustomOptions Value="-dDEBUG"/>
+      <CustomOptions Value="-dDEBUG
+-dTESTS"/>
     </Other>
   </CompilerOptions>
   <Debugging>

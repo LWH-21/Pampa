@@ -1,12 +1,12 @@
 inherited MainForm: TMainForm
-  Left = 208
-  Height = 811
-  Top = 197
-  Width = 1282
+  Left = 163
+  Height = 720
+  Top = 44
+  Width = 1200
   Anchors = [akTop, akLeft, akRight, akBottom]
   Caption = 'Pampa'
-  ClientHeight = 791
-  ClientWidth = 1282
+  ClientHeight = 700
+  ClientWidth = 1200
   Constraints.MinHeight = 200
   Constraints.MinWidth = 470
   DockSite = True
@@ -22,8 +22,8 @@ inherited MainForm: TMainForm
   object StatusBar1: TStatusBar[0]
     Left = 0
     Height = 23
-    Top = 768
-    Width = 1282
+    Top = 677
+    Width = 1200
     AutoHint = True
     Panels = <    
       item
@@ -45,7 +45,7 @@ inherited MainForm: TMainForm
     Left = 0
     Height = 34
     Top = 0
-    Width = 1282
+    Width = 1200
     Caption = 'ToolBar1'
     Images = Images
     TabOrder = 1
@@ -153,8 +153,8 @@ inherited MainForm: TMainForm
     end
   end
   object Splitter: TSplitter[2]
-    Left = 298
-    Height = 734
+    Left = 279
+    Height = 643
     Top = 34
     Width = 4
     Align = alNone

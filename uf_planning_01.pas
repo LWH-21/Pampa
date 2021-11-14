@@ -37,6 +37,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure ListSelection(Sender: TObject; aCol, aRow: Integer);
     procedure MchangeClick(Sender: TObject);
+    procedure MinsertClick(Sender: TObject);
     procedure pb_plan1Click(Sender: TObject);
     procedure pb_plan1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -47,7 +48,7 @@ type
    header,hline,wcol,limite : integer;
    nblines : integer;
    mat :   TLPlanning;
-   currentrow : integer;
+   currentrow : longint;
    selection : Tpoint;
    EnterPlanning: TFPlanning_enter;
   public
@@ -57,6 +58,7 @@ type
     procedure load_planning(pl_id : longint);
     procedure modify;
     procedure scrollbar_show;
+    procedure selquery(r : longint);
   end;
 
 implementation
@@ -80,6 +82,7 @@ procedure TF_planning_01.Btn_okClick(Sender: TObject);
 var s : string;
 
 begin
+     selquery(currentrow);
      s:=mat.CreateJson;
      query.Edit;
      query.fieldbyname('SY_DETAIL').AsString:=s;
@@ -159,6 +162,7 @@ begin
            if currentrow<>l then
            begin
                currentrow:=l;
+               selquery(l);
                s1:=List.Cells[0,aRow];
                if TryStrToInt(s1,l) then load_planning(l);
            end;
@@ -184,6 +188,32 @@ begin
     end;
     EnterPlanning.setInter(selection.x, Selection.y, mat.lines[selection.Y - 1].colums[selection.x - 1]);
     EnterPlanning.SetFocus;
+end;
+
+procedure TF_planning_01.MinsertClick(Sender: TObject);
+
+var i,j,k : integer;
+
+begin
+  assert(selection.y>0,'Incorrect line');
+  j:=selection.y;
+  i:=mat.linescount;
+  if (i<2) or (not mat.isLineEmpty(i - 2)) then
+  begin
+       mat.add_line;
+       i:=mat.linescount;
+  end;
+  for i:=mat.linescount-1 downto j do
+  begin
+    mat.lines[i].sy_id:=mat.lines[i-1].sy_id;
+    mat.lines[i].index:=mat.lines[i-1].index;
+    for k:=0 to mat.colscount-1 do mat.lines[i].colums[k]:=mat.lines[i-1].colums[k] ;
+  end;
+  for i:=0 to mat.colscount - 1 do
+  begin
+    mat.lines[j].colums[i]:=nil;
+  end;
+  pb_plan1.Refresh;
 end;
 
 procedure TF_planning_01.modify;
@@ -458,6 +488,25 @@ begin
           Scroll_planning_1.Max:=0;
           Scroll_planning_1.enabled:=false;
      end;
+end;
+
+procedure TF_planning_01.selquery(r : longint);
+
+var found : boolean;
+    l : longint;
+
+begin
+     assert(assigned(query),'Dataset not assigned');
+     assert(r>0,'Invalid parameter');
+     query.First;
+     found:=false;
+     while (not found) and (not query.eof) do
+     begin
+       l:=query.Fields[0].AsInteger;
+       found:=(r = l);
+       if not found then query.next;
+     end;
+     assert(l=r,'Record not found');
 end;
 
 end.

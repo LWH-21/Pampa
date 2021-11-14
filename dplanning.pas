@@ -53,7 +53,9 @@ Type TLPlanning = class
           constructor create;
           constructor create(s,e : tdatetime);
           procedure add_inter(inter : TIntervention);
+          function add_line : integer;
           function CreateJson : string;
+          function isLineEmpty(l : integer) : boolean;
           procedure load(l : TInterventions);
           procedure load(s : string);
           function loadID(s_id : longint) : integer;
@@ -360,11 +362,9 @@ begin
   start_date:=s;
   end_date:=e;
   colscount:=DaysBetween(start_date,end_date)+1;
-  linescount:=20;
-  setlength(lines,linescount);
-  for i:=0 to linescount-1 do
+  for i:=1 to 2 do
   begin
-       setLength(lines[i].colums,colscount);
+       add_line;
   end;
   setLength(libs,10);
 end;
@@ -397,24 +397,27 @@ begin
        end;
        if not found then
        begin
+            if nline>=(linescount-1) then add_line;
             inc(nline);
-            if nline>=(linescount-1) then
-            begin
-                linescount:=linescount+20;
-                setlength(lines,linescount);
-                for i:=nline to linescount-1 do
-                begin
-                     lines[i].SY_ID:=-1;
-                     setLength(lines[i].colums,colscount);
-                     for j:=0 to colscount - 1 do
-                     begin
-                          lines[i].colums[j]:=nil;
-                     end;
-                end;
-            end;
        end;
      end;
      assert(found=true,'not found');
+end;
+
+function TLPlanning.add_line : integer;
+
+var i,j : integer;
+
+begin
+     inc(linescount);
+     setLength(lines,linescount);
+     i:=linescount - 1;
+     lines[i].SY_ID:=-1;
+     setLength(lines[i].colums,colscount);
+     for j:=0 to colscount - 1 do
+     begin
+          lines[i].colums[j]:=nil;
+     end;
 end;
 
 function TLPlanning.CreateJson : string;
@@ -459,6 +462,21 @@ begin
      //Clipboard.AsText:=result;
 
      jsonobj.Free;
+end;
+
+function TLPlanning.isLineEmpty(l : integer) : boolean;
+
+var i : integer;
+
+begin
+  assert((l>0) and (l<linescount),'Incorrect line number');
+  result:=true;
+  i:=0;
+  while (result) and (i<colscount) do
+  begin
+       if assigned(lines[l-1].colums[i]) then result:=false else inc(i);
+  end;
+ // assert((not result) and (i=colscount),'Error searching in line');
 end;
 
 (*
