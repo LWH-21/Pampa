@@ -31,6 +31,12 @@ type TIntervention = Class
 Type
   TInterventions = specialize  TObjectList<TIntervention>;
 
+Type   TLine = record
+                    sy_id : longint;
+                    index : integer;
+                    colums : array of TIntervention;
+              end;
+
 Type TLPlanning = class
      private
 
@@ -44,11 +50,7 @@ Type TLPlanning = class
                              code : shortstring;
                              caption : string;
                        end;
-          lines : array of record
-                                  sy_id : longint;
-                                  index : integer;
-                                  colums : array of TIntervention;
-                            end;
+          lines : array of Tline;
 
           constructor create;
           constructor create(s,e : tdatetime);
@@ -715,12 +717,31 @@ procedure TLPlanning.normalize;
 
 var swap : boolean;
     l,c : integer;
+    tmp_line : Tline;
     temp : TIntervention;
     minl,minl1 : integer;
 
 begin
      swap:=true;
+     // Sort on sy_id
+     while swap do
+     begin
+       swap:=false;
+       l:=1;
+       while (l<linescount) do
+       begin
+         if (lines[l].sy_id>0) and (lines[l-1].sy_id>0) and (lines[l-1].sy_id>lines[l].sy_id) then
+         begin
+              swap:=true;
+              tmp_line:=lines[l];
+              lines[l]:=lines[l-1];
+              lines[l - 1]:=tmp_line;
+         end;
+         inc(l);
+       end;
+     end;
      //If the planning is on several lines, sort on hours.
+     swap:=true;
      while (swap) do
      begin
        swap:=false;

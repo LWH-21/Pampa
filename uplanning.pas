@@ -5,7 +5,7 @@ unit UPlanning;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, EditBtn, Buttons,
+  Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, EditBtn, Buttons,  Dialogs,
   dateutils,
   DPlanning,RessourcesStrings,
   Graphics,BGRABitmap, BGRABitmapTypes;
@@ -15,6 +15,8 @@ type
   { TGPlanning }
 
   TGPlanning = class(TFrame)
+      procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
+        Shift: TShiftState; X, Y: Integer);
       procedure SB_planningChange(Sender: TObject);
 
     private
@@ -22,6 +24,7 @@ type
     FColNumber : integer;
     w, h : integer;
     mat : TLPlanning;
+    selection : tpoint;
     margin, hline, header, colwidth : integer;
     procedure draw_frame(bmp : TBGRABitmap);
     procedure draw_header(bmp : TBGRABitmap);
@@ -61,6 +64,41 @@ begin
    header:=40;
    hline:=30;
    FColNumber:=7;
+   selection.x:=-1;
+   selection.y:=-1;
+end;
+
+procedure TGPlanning.PB_planningMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+
+var c, l  : integer;
+
+begin
+  // margin, hline, header, colwidth
+
+   assert(colwidth>0,'Col width equals to 0');
+   assert(hline>0,'Line height equals to 0');
+
+   if x<margin then
+   begin
+       c:=0;
+   end else
+   begin
+     c:= x - margin;
+     c:= (c div colwidth) + 1;
+   end;
+   if y<header then
+   begin
+       l:=0;
+   end else
+   begin
+     l:= y - header;
+     l:=(l div hline) + 1;
+   end;
+   l:=l+SB_planning.Position;
+   selection.x:=c;
+   selection.Y:=l;
+   PB_planning.Refresh;
 end;
 
 procedure TGPlanning.SB_planningChange(Sender: TObject);
@@ -138,8 +176,8 @@ var linenum : integer;
 
 begin
      bmp.FontHeight:=14;
-     bmp.fontname:='Arial';
-     bmp.FontStyle:=[fsBold];
+     bmp.fontname:='Helvetica';
+     bmp.FontStyle:=[];
      bmp.FontQuality:=fqFineAntialiasing;
      ts.RightToLeft:=false;
      ts.Clipping:=true;
@@ -173,56 +211,48 @@ begin
                ts.Alignment:=taCenter;
                for c:=0 to 6 do
                begin
+                    rect.Left:=margin + c*colwidth;
+                    rect.Width:=colwidth;
                     if assigned(mat.lines[linenum].colums[c ]) then
                     begin
                          s:=mat.lines[linenum].colums[c ].gethstart+' - '+mat.lines[linenum].colums[c].gethend;
-                         rect.Left:=margin + c*colwidth;
-                         rect.Width:=colwidth;
                          bmp.TextRect(rect,rect.left+5,rect.top+4,s,ts,BGRABlack);
                     end;
+                    if (linenum=selection.Y -1) and (c=selection.x - 1) then
+                    begin
+                         bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                    end;
                end;
-
-               inc(linenum);
+               if (linenum=selection.Y -1) and (selection.x =0 ) then
+               begin
+                   rect.Left:=1;
+                   rect.right:=margin;
+                   bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+               end;
 
           end else
           begin
             bmp.DrawLineAntialias(1,rect.bottom,w,rect.bottom,BGRA($d4,$d4,$d4),1);
+            if (linenum=selection.Y - 1) then
+            begin
+                 if (selection.x>0) then
+                 begin
+                   rect.Left:=margin + (selection.x - 1)*colwidth;
+                   rect.Width:=colwidth;
+                   bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                 end else
+                 if (selection.x=0) then
+                 begin
+                   rect.Left:=1;
+                   rect.right:=margin;
+                   bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                 end;
+            end;
           end;
 
+          inc(linenum);
           rect.top := rect.bottom;
      end;
-
-
-  {   if assigned(mat) then
-     begin
-           linenum:=0;
-           y:=header;
-           decal:=0;
-           while (linenum<mat.linescount ) and (mat.lines[linenum].sy_id>0) do
-           begin
-             y:=y + hline;
-             if ( linenum=mat.linescount-1) or ((linenum<mat.linescount-1) and (mat.lines[linenum].sy_id<>mat.lines[linenum+1].sy_id)) then
-             begin
-                  bmp.DrawLineAntialias(1,y,w,y,BGRABlack,1);
-                  //plan_pb.canvas.Line(0,header+hline*(linenum+1),w,header+hline*(linenum+1));
-             end else
-             begin
-                  bmp.DrawLineAntialias(margin+1,y,w,y,BGRA($d4,$d4,$d4),1);
-             end;
-
-
-
-             inc(linenum);
-           end;
-     end else
-     begin
-       y:=header;
-       while (y<h) do
-       begin
-         y:=y+hline;
-         bmp.DrawLineAntialias(1,y,w,y,BGRA($d4,$d4,$d4),1);
-       end;
-     end;   }
 end;
 
 procedure TGPlanning.FrameResize(Sender: TObject);
@@ -244,6 +274,8 @@ procedure TGPlanning.load(col :  TInterventions;startdate,enddate : tdatetime);
 
 begin
      if assigned(mat) then freeandnil(mat);
+     selection.x:=-1;
+     selection.y:=-1;
      mat:=TLPlanning.create(startdate,enddate);
      mat.load(col);
      PB_planning.Refresh;

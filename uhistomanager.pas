@@ -445,6 +445,7 @@ begin
   assert(assigned(Query),'Query not assigned');
   if not MainData.isConnected then exit;
   if not changed then exit;
+  if (Query.FieldCount<=0) then exit;
   Screen.Cursor := crHourGlass;
   MainForm.StatusBar1.Panels[0].Text := rs_savehisto;
   try

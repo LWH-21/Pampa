@@ -14,6 +14,7 @@ object GPlanning: TGPlanning
     Height = 105
     Top = 104
     Width = 105
+    OnMouseDown = PB_planningMouseDown
     OnPaint = PB_planningPaint
   end
   object SB_planning: TScrollBar
