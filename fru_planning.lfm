@@ -4,8 +4,8 @@ inherited Fr_planning: TFr_planning
   ClientHeight = 485
   ClientWidth = 944
   OnResize = FrameResize
-  DesignLeft = -1403
-  DesignTop = 351
+  DesignLeft = 613
+  DesignTop = 280
   object Ed_code: TEdit[0]
     Left = 8
     Height = 23
@@ -71,5 +71,14 @@ inherited Fr_planning: TFr_planning
     ImageIndex = 21
     OnClick = SB_nextClick
     TabOrder = 5
+  end
+  object CheckBox1: TCheckBox[7]
+    Left = 736
+    Height = 19
+    Top = 22
+    Width = 61
+    Caption = 'Graphic'
+    OnClick = CheckBox1Click
+    TabOrder = 6
   end
 end

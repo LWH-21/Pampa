@@ -14,13 +14,16 @@ type
 
   { TGPlanning }
 
+  Planning_kind=(pl_week, pl_month, pl_graphic, pl_text, pl_edit, pl_consult);
+  TPlanning_kind= set of Planning_kind;
+
   TGPlanning = class(TFrame)
       procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
         Shift: TShiftState; X, Y: Integer);
       procedure SB_planningChange(Sender: TObject);
 
     private
-    FeditMode : boolean;
+    FKind: TPlanning_kind;
     FColNumber : integer;
     w, h : integer;
     mat : TLPlanning;
@@ -31,12 +34,14 @@ type
     procedure draw_header_week(bmp : TBGRABitmap);
     procedure draw_week(bmp : TBGRABitmap);
 
+    procedure draw_graphics(bmp : TBGRABitmap);
 
 
   published
     PB_planning: TPaintBox;
     SB_planning: TScrollBar;
-    property EditMode : boolean READ FEditMode WRITE FeditMode;
+    procedure SetKind(k : TPlanning_kind);
+    property Mode : TPlanning_kind READ FKind WRITE SetKind;
     procedure FrameResize(Sender: TObject);
     procedure PB_planningPaint(Sender: TObject);
 
@@ -59,7 +64,7 @@ constructor TGPlanning.create(aowner: TComponent);
 
 begin
    inherited create(aOwner);
-   FeditMode:=false;
+   FKind:=[pl_week, pl_text, pl_consult];
    margin:=SB_planning.Width div 4;
    header:=40;
    hline:=30;
@@ -112,9 +117,89 @@ begin
    bmp.RectangleAntialias(0,0,w-1,h,BGRABlack,1,BGRAWhite);
 end;
 
+procedure TGPlanning.draw_graphics(bmp : TBGRABitmap);
+
+var decal : integer;
+    hstart,hend : integer;
+    rect : trect;
+    s : string;
+    nline, ncol : integer;
+    inter : TIntervention;
+    debh : integer;
+    deby : integer;
+
+begin
+     bmp.FontHeight:=14;
+     bmp.fontname:='Helvetica';
+     bmp.FontStyle:=[];
+     bmp.FontQuality:=fqFineAntialiasing;
+
+
+     decal:=SB_planning.Position;
+     hstart:=decal - (trunc((h - header) / hline) div 2);
+     decal:=hline div 4;
+     hend:=hstart+trunc((h - header) / hline);
+
+     rect.top:=header;rect.bottom:=h;
+     rect.left:=1;rect.right:=w;
+     bmp.ClipRect:=rect;
+
+     rect.top:=header;rect.left:=margin-20;rect.height:=hline;
+     rect.right:=margin;
+
+     deby:=rect.bottom;
+     debh:=(hstart - 2) * 100;
+
+     while rect.bottom<h do
+     begin
+
+          if rect.bottom>decal*2 then bmp.DrawLineAntialias(margin-5,rect.bottom-(decal*2),w-2,rect.bottom-(decal*2),Bgra($e6,$e6,$e6),1);
+          if rect.bottom>decal then bmp.DrawLineAntialias(margin-5,rect.bottom-decal,w-2,rect.bottom-decal,Bgra($e6,$e6,$e6),1);
+          bmp.DrawLineAntialias(margin-10,rect.bottom,w-2,rect.bottom,BGRABlack,1);
+          if rect.bottom+decal<h then bmp.DrawLineAntialias(margin-5,rect.bottom+decal,w-2,rect.bottom+decal,Bgra($e6,$e6,$e6),1);
+
+          if (hstart>0) and (hstart<25) then
+          begin
+               s:=inttostr(hstart);
+               bmp.TextOut(margin-30,rect.bottom-10,s,BGRABlack,false);
+          end;
+          rect.bottom:=rect.bottom+hline;
+          rect.top:=rect.top+hline;
+
+          inc(hstart);
+     end;
+
+     if assigned(mat) then
+     begin
+       for nline:=0 to mat.linescount-1 do
+       begin
+            for ncol:=0 to mat.colscount-1 do
+            begin
+                 if assigned(mat.lines[nline].colums[ncol]) then
+                 begin
+                      inter:=mat.lines[nline].colums[ncol];
+
+                      rect.left:=margin+(ncol*colwidth);
+                      rect.right:=rect.left+colwidth;
+                      rect.top:= round(((inter.h_start - debh)/100) * hline);
+                      rect.bottom:=rect.top+round(((inter.h_end - inter.h_start)/100) * hline);
+                      //rect.bottom:=rect.top +20;
+                      bmp.RectangleAntialias(rect.left,rect.top,rect.right,rect.bottom,BGRABlack,1,vgared);
+                 end;
+            end;
+       end;
+     end;
+
+     rect.top:=0;rect.bottom:=h;
+     rect.left:=0;rect.right:=w;
+     bmp.ClipRect:=rect;
+
+end;
+
 procedure TGPlanning.draw_header(bmp : TBGRABitmap);
 
 var i,x : integer;
+
 
 begin
      bmp.RectangleAntialias(0,0,w-1,header,BGRABlack,1,Bgra($e6,$e6,$e6));
@@ -126,7 +211,7 @@ begin
           bmp.DrawLineAntialias(x,0,x,header,BGRABlack,2);
           bmp.DrawLineAntialias(x,header+1,x,h,BGRABlack,1);
      end;
-     draw_header_week(bmp);
+     if pl_week in FKind then draw_header_week(bmp);
 end;
 
 procedure TGPlanning.draw_header_week(bmp : TBGRABitmap);
@@ -256,6 +341,9 @@ begin
 end;
 
 procedure TGPlanning.FrameResize(Sender: TObject);
+
+var n : integer;
+
 begin
      SB_planning.Top:=0;
      SB_planning.Left:=self.Width - SB_planning.Width - 1;
@@ -265,6 +353,17 @@ begin
      PB_planning.Height:=self.height -  1;
      PB_planning.Width:=SB_planning.Left - 10;
      margin:=PB_planning.Width div 4;
+     hline:=30;
+
+     if pl_graphic in Fkind then
+     begin
+          hline:=50;
+          n:=trunc((self.Height / hline)/ 2);
+          Sb_planning.min:=n - 1;
+          Sb_planning.max:=24 - n;
+          Sb_planning.Position:=12;
+          margin:=PB_planning.Width div 4;
+     end;
 
      colwidth:=(PB_planning.Width - margin) div FColNumber;
      PB_planning.Refresh;
@@ -292,7 +391,17 @@ begin
       bmp := TBGRABitmap.Create(w,h, BGRAWhite);
       draw_frame(bmp);
       draw_header(bmp);
-      draw_week(bmp);
+      if pl_week in FKind then
+      begin
+           if pl_graphic in Fkind then
+           begin
+               draw_graphics(bmp);
+           end;
+           if pl_text in Fkind then
+           begin
+               draw_week(bmp);
+           end;
+      end;
       bmp.Draw(PB_planning.Canvas, 0, 0, True);
    finally
      bmp.free;
@@ -302,6 +411,23 @@ end;
 procedure TGPlanning.refresh;
 
 begin
+   FrameResize(self);
+end;
+
+procedure TGPlanning.SetKind(k : TPlanning_kind);
+
+begin
+   Fkind:=k;
+   if pl_graphic in Fkind then
+   begin
+        Sb_planning.Max:=24;
+        Sb_planning.Position:=12;
+   end else
+   begin
+     Sb_planning.min:=0;
+     Sb_planning.Max:=10;
+     Sb_planning.Position:=0;
+   end;
    FrameResize(self);
 end;
 

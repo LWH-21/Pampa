@@ -130,7 +130,6 @@ begin
          end;
          if assigned(query) then
          begin
-            save;
             query.close;
          end;
 
@@ -166,6 +165,7 @@ begin
               end;
               query.Next;
          END;
+         changed:=false;
        Except
           on E: Exception do
                 Error(E, dber_none, 'THistoManager.LoadHisto()');
@@ -445,11 +445,22 @@ begin
   assert(assigned(Query),'Query not assigned');
   if not MainData.isConnected then exit;
   if not changed then exit;
-  if (Query.FieldCount<=0) then exit;
+  if (Query.FieldCount<=0) then
+  begin
+      loadhisto;
+      exit;
+  end;
   Screen.Cursor := crHourGlass;
   MainForm.StatusBar1.Panels[0].Text := rs_savehisto;
   try
-    if MainData.WriteDataSet(Query,'THistoManager.save') then changed:=false;
+    if MainData.WriteDataSet(Query,'THistoManager.save') then
+    begin
+      changed:=false;
+      if (Query.FieldCount<=0) then
+      begin
+        loadhisto;
+      end;
+    end;
   finally
     Screen.Cursor := crDefault;
     MainForm.StatusBar1.Panels[0].Text := rs_ready;

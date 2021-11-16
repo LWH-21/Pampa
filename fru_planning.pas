@@ -21,6 +21,7 @@ type
 
   TFr_planning = class(TW_F)
     Bt_open_planning: TButton;
+    CheckBox1: TCheckBox;
 
     Ed_code: TEdit;
     Ed_date: TDateEdit;
@@ -31,6 +32,7 @@ type
 
 
     procedure Bt_open_planningClick(Sender: TObject);
+    procedure CheckBox1Click(Sender: TObject);
     procedure Ed_dateChange(Sender: TObject);
     procedure FrameResize(Sender: TObject);
     procedure GPlanResize(Sender: TObject);
@@ -242,6 +244,17 @@ begin
   f:=TF_planning_01.Create(MainForm);
   f.w_id:=self.id;
   f.ShowModal;
+end;
+
+procedure TFr_planning.CheckBox1Click(Sender: TObject);
+begin
+  if  CheckBox1.Checked then
+  begin
+    Gplan.SetKind([pl_week,pl_graphic,pl_consult]);
+  end else
+  begin
+   Gplan.SetKind([pl_week,pl_text,pl_consult]);
+  end;
 end;
 
 procedure TFr_planning.SB_rechClick(Sender: TObject);
