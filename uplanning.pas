@@ -123,17 +123,26 @@ var decal : integer;
     hstart,hend : integer;
     rect : trect;
     s : string;
+    ts : ttextstyle;
     nline, ncol : integer;
     inter : TIntervention;
-    debh : integer;
-    deby : integer;
+    ref_h   : real;
+    ref_pos : integer;
+    h1,h2 : real;
+    lineheight : integer;
 
 begin
      bmp.FontHeight:=14;
      bmp.fontname:='Helvetica';
      bmp.FontStyle:=[];
-     bmp.FontQuality:=fqFineAntialiasing;
+     bmp.FontQuality:=fqFineClearTypeRGB; ;
 
+     lineheight:=bmp.FontPixelMetric.Lineheight;
+     lineheight:=lineheight div 2;
+
+     ts.RightToLeft:=false;
+     ts.SingleLine:=false;
+     ts.Clipping:=true;
 
      decal:=SB_planning.Position;
      hstart:=decal - (trunc((h - header) / hline) div 2);
@@ -147,8 +156,8 @@ begin
      rect.top:=header;rect.left:=margin-20;rect.height:=hline;
      rect.right:=margin;
 
-     deby:=rect.bottom;
-     debh:=(hstart - 2) * 100;
+     ref_h:=-1;
+     ref_pos:=-1;
 
      while rect.bottom<h do
      begin
@@ -160,8 +169,13 @@ begin
 
           if (hstart>0) and (hstart<25) then
           begin
+               if (ref_h<0) then
+               begin
+                   ref_h:=hstart;
+                   ref_pos:=rect.bottom;
+               end;
                s:=inttostr(hstart);
-               bmp.TextOut(margin-30,rect.bottom-10,s,BGRABlack,false);
+               bmp.TextOut(margin-30,rect.bottom-lineheight,s,BGRABlack,false);
           end;
           rect.bottom:=rect.bottom+hline;
           rect.top:=rect.top+hline;
@@ -169,6 +183,8 @@ begin
           inc(hstart);
      end;
 
+     bmp.FontHeight:=12;
+     lineheight:=bmp.FontPixelMetric.Lineheight;
      if assigned(mat) then
      begin
        for nline:=0 to mat.linescount-1 do
@@ -178,13 +194,17 @@ begin
                  if assigned(mat.lines[nline].colums[ncol]) then
                  begin
                       inter:=mat.lines[nline].colums[ncol];
+                      h1:=inter.getDecimalHstart;
+                      h2:=inter.getDecimalHEnd;
 
                       rect.left:=margin+(ncol*colwidth);
                       rect.right:=rect.left+colwidth;
-                      rect.top:= round(((inter.h_start - debh)/100) * hline);
-                      rect.bottom:=rect.top+round(((inter.h_end - inter.h_start)/100) * hline);
-                      //rect.bottom:=rect.top +20;
-                      bmp.RectangleAntialias(rect.left,rect.top,rect.right,rect.bottom,BGRABlack,1,vgared);
+                      rect.top:= round(ref_pos+(h1 - ref_h) * hline);
+                      rect.bottom:=rect.top+round((h2 - h1) * hline);
+                      bmp.RectangleAntialias(rect.left,rect.top,rect.right,rect.bottom,BGRABlack,1,VGAColors.ByIndex[mat.lines[nline].index+5]);
+                      s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
+
+                      if rect.Height>lineheight then bmp.TextRect(rect, s,taLeftJustify,tlCenter,BGRABlack);
                  end;
             end;
        end;
@@ -221,12 +241,14 @@ var d : tdatetime;
     ts : TTextStyle;
     s : string;
     r : trect;
+    lineheight : integer;
 
 begin
      bmp.FontHeight:=12;
      bmp.FontName:='Arial';
      bmp.FontQuality:=fqFineAntialiasing;
      bmp.FontStyle:=[fsBold];
+     lineheight:=bmp.FontPixelMetric.Lineheight;
      ts.Clipping:=true;
      ts.Alignment:=taCenter;
      if assigned(mat) then
@@ -238,12 +260,13 @@ begin
        begin
          r.right:=r.left+colwidth;
          s:=cdays[DayOfTheWeek(d)];
-         r.top:=2;r.bottom:=15;
+         r.top:=0;r.bottom:=lineheight;
          if c<6 then bmp.TextRect(r,r.left,r.top,s,ts,VGABlue)
          else bmp.TextRect(r,r.left,r.top,s,ts,VGARed);
          s:=datetostr(d);
-         r.top:=16;r.bottom:=header;
-         bmp.TextRect(r,r.left+5,r.top+15,s,ts,BGRABlack);
+         r.Bottom:=header;
+         r.top:=R.bottom-lineheight;
+         bmp.TextRect(r,r.left,r.top,s,ts,BGRABlack);
          r.Left:=r.right;
          d:=incday(d,1);
        end;
@@ -263,7 +286,7 @@ begin
      bmp.FontHeight:=14;
      bmp.fontname:='Helvetica';
      bmp.FontStyle:=[];
-     bmp.FontQuality:=fqFineAntialiasing;
+     bmp.FontQuality:=fqFineClearTypeRGB;
      ts.RightToLeft:=false;
      ts.Clipping:=true;
      decal:=SB_planning.Position;
