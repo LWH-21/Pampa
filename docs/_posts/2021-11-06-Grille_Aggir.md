@@ -4,7 +4,7 @@ title:  "Grille Aggir"
 description: "Formulaire grille Aggir, modifiable avec calcul du GIR"
 image: /images/2021-11-06-aggir.png
 date:   2021-11-06
-last_modified_at: 2021-11-06
+last_modified_at: 2021-11-18
 author: LWH
 locale: fr
 categories: [social]
@@ -21,6 +21,10 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 - **GIR 4**: Autonomie mentale et capacités à se déplacer au sein du domicile mais des difficultés sur certaines tâches quotidiennes
 - **GIR 5**: Autonomie mentale totale et aucun problème pour ses déplacements dans son logement
 - **GIR 6**: Aucun problème dans la réalisation des actes de la vie courante
+
+Le formulaire est proposé en deux versions, avec ou sans les adverbes :
+
+![Formumaire AGGIR](https://lwh-21.github.io/Pampa/images/aggir_01.jpg)
 
 L'algorihme utilisé est celui décrit dans le [décret n°97-427 du 28 avril 1997](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006684183/) publié au journal officiel du 30 avril 1997. En voici le codé en Python :
 
