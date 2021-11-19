@@ -12,7 +12,7 @@ ref: screenshots
 ---
 Le projet avance rapidement. Une bonne partie de l'architecture est en place, même s'il reste encore beaucoup à faire. Voici déjà quelques écrans de Pampa au 20 novembre :
 
-<div id="Pampa" class="carousel slide" data-ride="carousel">
+<div id="Pampa" class="carousel slide" data-ride="carousel" style="color:black;">
   <div class="carousel-inner">
     <div class="carousel-item active">
       <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_01.jpg' | relative_url }}" alt="First slide">
@@ -52,11 +52,11 @@ Le projet avance rapidement. Une bonne partie de l'architecture est en place, m�
   </div>
   
     <a class="carousel-control-prev" href="#Pampa" role="button" data-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true" style="color:red;"></span>
+    <span class="fa fa-angle-left" aria-hidden="true" ></span>
     <span class="sr-only">Previous</span>
   </a>
   <a class="carousel-control-next" href="#Pampa" role="button" data-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true" style="color:red;" ></span>
+    <span class="fa fa-angle-right" aria-hidden="true"  ></span>
     <span class="sr-only">Next</span>
   </a>
   
