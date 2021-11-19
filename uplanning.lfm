@@ -7,14 +7,19 @@ object GPlanning: TGPlanning
   ClientWidth = 840
   OnResize = FrameResize
   TabOrder = 0
-  DesignLeft = -1171
-  DesignTop = 324
+  DesignLeft = 614
+  DesignTop = 178
   object PB_planning: TPaintBox
     Left = 64
-    Height = 105
+    Height = 272
+    Hint = 'test'
     Top = 104
-    Width = 105
+    Width = 368
+    ParentShowHint = False
+    ShowHint = True
     OnMouseDown = PB_planningMouseDown
+    OnMouseMove = PB_planningMouseMove
+    OnMouseWheel = PB_planningMouseWheel
     OnPaint = PB_planningPaint
   end
   object SB_planning: TScrollBar

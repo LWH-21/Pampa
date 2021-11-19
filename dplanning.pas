@@ -5,13 +5,17 @@ unit DPlanning;
 interface
 
 uses
-  Classes, Objects, SysUtils, DateUtils,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
+  Classes, Types, SysUtils, DateUtils,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
   Generics.Collections,Generics.Defaults,
-  fpjson,jsonparser,Graphics,
+  fpjson,jsonparser,Graphics,BGRABitmap, BGRABitmapTypes,
   RessourcesStrings,clipbrd;
 
 
 type TIntervention = Class
+     private
+          dh_start : real;
+          dh_end : real;
+          bounds : Trect;
      public
           dt : TdateTime;
           week_day : integer;
@@ -22,10 +26,15 @@ type TIntervention = Class
           c_id : longint;
           col_index : integer;
 
+
           constructor create (d : tdatetime; hs,he : integer; p,w,c : longint);
           constructor create (i_day,hs,he : integer; p,w,c : longint);
+          function Contains(x,y : integer) : boolean;
           function gethstart : shortstring;
           function gethend : shortstring;
+          function getDecimalHstart : real;
+          function getDecimalHEnd : real;
+          procedure setBounds(r : trect);
      end;
 
 Type
@@ -49,6 +58,7 @@ Type TLPlanning = class
                              id : longint;
                              code : shortstring;
                              caption : string;
+                             color : TBGRAPixel;
                        end;
           lines : array of Tline;
 
@@ -57,12 +67,14 @@ Type TLPlanning = class
           procedure add_inter(inter : TIntervention);
           function add_line : integer;
           function CreateJson : string;
+          function getInterAt(x,y : integer) : TIntervention;
           function isLineEmpty(l : integer) : boolean;
           procedure load(l : TInterventions);
           procedure load(s : string);
           function loadID(s_id : longint) : integer;
           procedure normalize;
           procedure reset;
+          procedure setBounds(line,col : integer;r : trect);
           destructor destroy();override;
      end;
 
@@ -96,6 +108,31 @@ uses UException;
 
 {$R *.lfm}
 
+Const
+   colcount = 189;
+   colors: array [1..colcount] of string =
+       (
+       '#810541', '#7D0541', '#7D0552', '#872657', '#7E354D', '#7F4E52', '#7F525D', '#7F5A58', '#997070', '#B38481',
+       '#BC8F8F', '#C5908E', '#C48189', '#C48793', '#E8ADAA', '#C4AEAD', '#ECC5C0', '#FFCBA4', '#F8B88B', '#EDC9AF',
+       '#FFDDCA', '#FDD7E4', '#FFE6E8', '#FFE4E1', '#FFDFDD', '#FFCCCB', '#FBCFCD', '#FBBBB9', '#FFC0CB', '#FFB6C1',
+       '#FAAFBE', '#FAAFBA', '#F9A7B0', '#FEA3AA', '#E7A1B0', '#E799A3', '#E38AAE', '#F778A1', '#E56E94', '#DB7093',
+       '#D16587', '#C25A7C', '#C25283', '#E75480', '#F660AB', '#FF69B4', '#FC6C85', '#F6358A', '#F52887', '#FF1493',
+       '#F535AA', '#FD349C', '#E45E9D', '#E3319D', '#E4287C', '#E30B5D', '#DC143C', '#C32148', '#C21E56', '#C12869',
+       '#C12267', '#CA226B', '#C71585', '#C12283', '#B3446C', '#B93B8F', '#DA70D6', '#DF73D4', '#EE82EE', '#F433FF',
+       '#FF00FF', '#E238EC', '#D462FF', '#C45AEC', '#BA55D3', '#A74AC7', '#B048B5', '#D291BC', '#915F6D', '#7E587E',
+       '#614051', '#583759', '#5E5A80', '#4E5180', '#6A5ACD', '#6960EC', '#736AFF', '#7B68EE', '#7575CF', '#6C2DC7',
+       '#6A0DAD', '#5453A6', '#483D8B', '#4E387E', '#571B7E', '#4B0150', '#36013F', '#461B7E', '#4B0082', '#342D7E',
+       '#663399', '#6A287E', '#8B008B', '#800080', '#86608E', '#9932CC', '#9400D3', '#8D38C9', '#A23BEC', '#B041FF',
+       '#842DCE', '#8A2BE2', '#7A5DC7', '#7F38EC', '#9D00FF', '#8E35EF', '#893BFF', '#967BB6', '#9370DB', '#8467D7',
+       '#9172EC', '#9E7BFF', '#CCCCFF', '#DCD0FF', '#E0B0FF', '#D891EF', '#B666D2', '#C38EC7', '#C8A2C8', '#DDA0DD',
+       '#E6A9EC', '#F2A2E8', '#F9B7FF', '#C6AEC7', '#D2B9D3', '#D8BFD8', '#E9CFEC', '#FCDFFF', '#EBDDE2', '#E9E4D4',
+       '#EDE6D6', '#FAF0DD', '#F8F0E3', '#FFF0F5', '#FDEEF4', '#FFF9E3', '#FDF5E6', '#FAF0E6', '#FFF5EE', '#FF0000',
+       '#00FF00', '#FF00FF', '#C0C0C0', '#00FFFF', '#800000', '#FFFF00', '#008000', '#800080', '#008080', '#A4C400',
+       '#87794E', '#60A917', '#76608A', '#008A00', '#647687', '#00ABA9', '#6D8764', '#00AFF0', '#825A2C', '#1BA1E2',
+       '#E3C800', '#0050EF', '#F0A30A', '#6A00FF', '#FA6800', '#AA00FF', '#CE352C', '#DC4FAD', '#A20025', '#D80073',
+       '#4390DF', '#59CDE2', '#7AD61D', '#FFC194', '#F472D0', '#00CCFF', '#45FFFD', '#78AA1C', '#DA5A53'
+        ) ;
+
 function IsoStrToDate(s : shortstring) : TdateTime;
 
 var y,m,d : integer;
@@ -121,6 +158,9 @@ begin
   w_id:=w;
   c_id:=c;
   week_day:=DayOfTheWeek(dt);
+  dh_start:=(h_start div 100)+((h_start mod 100) / 60);
+  dh_end:=(h_end div 100)+((h_end mod 100) / 60);
+  bounds.left:=0;bounds.right:=0;bounds.top:=0;bounds.bottom:=0;
 end;
 
 constructor TIntervention.create (i_day,hs,he : integer; p,w,c : longint);
@@ -132,6 +172,33 @@ begin
      w_id:=w;
      c_id:=c;
      week_day:=i_day;
+     dh_start:=(h_start div 100)+((h_start mod 100) / 60);
+     dh_end:=(h_end div 100)+((h_end mod 100) / 60);
+     bounds.left:=0;bounds.right:=0;bounds.top:=0;bounds.bottom:=0;
+end;
+
+function TIntervention.Contains(x,y : integer) : boolean;
+
+var p : tpoint;
+
+begin
+     assert((x>=0) and (y>=0),'Invalid coordinates');
+     p.x:=x;
+     p.y:=y;
+     result:=false;
+     result:=bounds.Contains(p);
+end;
+
+function TIntervention.getDecimalHstart : real;
+
+begin
+     result:=dh_start;
+end;
+
+function TIntervention.getDecimalHEnd : real;
+
+begin
+     result:=dh_end;
 end;
 
 function TIntervention.gethstart : shortstring;
@@ -147,6 +214,11 @@ begin
   result:=format('%0.2d:%1.2d',[h_end div 100,h_end mod 100]);
 end;
 
+procedure TIntervention.setBounds(r : trect);
+
+begin
+  bounds:=r;
+end;
 
 procedure Tplanning.add_json_planning(s : string; dstart,dend : tdatetime; p_id, w_id : longint; result : TInterventions);
 
@@ -466,6 +538,29 @@ begin
      jsonobj.Free;
 end;
 
+function TLPlanning.getInterAt(x,y : integer) : TIntervention;
+
+var i, j : integer;
+
+begin
+     assert((x>=0) and (y>=0),'Invalid coordinates x:'+inttostr(x)+' y:'+inttostr(y));
+     result:=nil;
+     for i:=0 to linescount-1 do
+     begin
+          for j:=0 to colscount-1 do
+          begin
+               if assigned(lines[i].colums[j]) then
+               begin
+                 if lines[i].colums[j].contains(x,y) then
+                 begin
+                   result:=lines[i].colums[j];
+                   exit;
+                 end;
+               end;
+          end;
+     end;
+end;
+
 function TLPlanning.isLineEmpty(l : integer) : boolean;
 
 var i : integer;
@@ -542,43 +637,6 @@ begin
           for inter in l do
           begin
                add_inter(inter);
-               {nline:=0; found:=false;
-               ncol:=DaysBetween(start_date,inter.dt);
-               while not found do
-               begin
-                 if lines[nline].SY_ID<=0 then
-                 begin
-                      num_index:=loadID(inter.c_id);
-                      lines[nline].sy_id:=inter.c_id;
-                      lines[nline].index:=num_index;
-                 end;
-                 if lines[nline].SY_ID=inter.c_id then
-                 begin
-                      if not assigned(lines[nline].colums[ncol]) then
-                      begin
-                           lines[nline].colums[ncol]:=inter;
-                           found:=true;
-                      end;
-                 end;
-                 if not found then
-                 begin
-                      inc(nline);
-                      if nline>=(linescount-1) then
-                      begin
-                          linescount:=linescount+20;
-                          setlength(lines,linescount);
-                          for i:=nline to linescount-1 do
-                          begin
-                               lines[i].SY_ID:=-1;
-                               setLength(lines[i].colums,colscount);
-                               for j:=0 to colscount - 1 do
-                               begin
-                                    lines[i].colums[j]:=nil;
-                               end;
-                          end;
-                      end;
-                 end;
-               end; }
           end;
           normalize;
      end;
@@ -607,6 +665,7 @@ var json : TJSONData;
 
 begin
      reset();
+     if s<=' ' then exit;
      json:=GetJson(s);
      IF assigned(json) then
      begin
@@ -651,6 +710,20 @@ var i, j : integer;
     query : Tdataset;
     sql : string;
 
+
+    function calc_code (s : string) : integer;
+
+    var i : integer;
+
+    begin
+      result:=0;
+      for i:=1 to s.Length do
+      begin
+           result:=result+i*ord(s[i]);
+           result:=result+i;
+       end;
+    end;
+
 begin
      j:=length(libs);
      found:=false;
@@ -676,7 +749,7 @@ begin
              i:=j + 1;
          end;
          query:=nil;
-         sql:=MainData.getQuery('Q0014','SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM WORKER WHERE SY_ID=%id');
+         sql:=MainData.getQuery('Q0014','SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM CUSTOMER WHERE SY_ID=%id');
          sql:=sql.Replace('%id',inttostr(s_id));
          Maindata.readDataSet(query,sql,true);
          if query.RecordCount>0 then
@@ -685,6 +758,11 @@ begin
               libs[i].code:=query.fields[0].asString;
               libs[i].caption:=query.fields[1].asString+' '+query.fields[2].asString;
          end;
+
+         sql := libs[i].code+'-'+libs[i].caption;
+         j:=calc_code(sql);
+         j:=(j mod colcount) + 1;
+         libs[i].color.FromString(colors[j]);
          query.close;
          query.free;
          result:=i;
@@ -792,6 +870,19 @@ begin
               end;
 
           end;
+     end;
+end;
+
+procedure TLPlanning.setBounds(line,col : integer;r : trect);
+
+begin
+     assert((col<colscount) and (col>=0) ,'Invalid column : '+inttostr(col));
+     assert((line<linescount) and (line>=0),'Invalid line : '+inttostr(line));
+     assert( not r.IsEmpty,'Rectangle is empty');
+     assert( assigned(lines[line].colums[col]),'Nothing at line '+inttostr(line)+' column '+inttostr(col));
+     if assigned(lines[line].colums[col]) then
+     begin
+          lines[line].colums[col].setBounds(r);
      end;
 end;
 

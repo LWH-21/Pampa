@@ -57,7 +57,7 @@ type
 
   end;
 
-
+function crc32(crc: cardinal; buf: Pbyte; len: cardinal): longint;
 
 implementation
 
@@ -575,6 +575,19 @@ begin
               begin
                    exit;
               end;
+         end else
+         if (length(result)=7) and (copy(result,1,4)<>'????') then
+         begin
+           sql:=Maindata.getQuery('QID04','SELECT SY_CODE from %t where SY_CODE=''%code'' ');
+           sql:=sql.Replace('%t',table);
+           sql:=sql.Replace('%code',result);
+           MainData.readDataSet(QueryCode,sql,true);
+           if querycode.RecordCount=0 then
+           begin
+                querycode.close;
+                querycode.free;
+                exit;
+           end;
          end;
        end;
        lname:='';fname:='';
@@ -621,7 +634,7 @@ begin
          inc(n);
          result:=leftstr(base,4);
          base:=inttostr(n);
-         while length(base)<4 do base:='0'+base;
+         while length(base)<3 do base:='0'+base;
          result:=trim(result+base);
        end;
      end;
@@ -931,6 +944,7 @@ begin
   if not Modified(R) then
   begin
        Screen.Cursor := crDefault;
+       R.Cancel;
        R.Refresh;
        exit;
   end;
