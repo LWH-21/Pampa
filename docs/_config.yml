@@ -44,7 +44,6 @@ exclude:
   - serve_*
   - build_*
   - gem_*
-  - pdf
   - mobi
 
 #sidebar
