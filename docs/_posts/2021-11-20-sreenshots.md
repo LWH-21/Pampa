@@ -16,35 +16,35 @@ Le projet avance rapidement. Une bonne partie de l'architecture est en place, m�
   <div class="carousel-inner">
     <div class="carousel-item active">
       <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_01.jpg' | relative_url }}" alt="First slide">
-      <div class="carousel-caption d-none d-md-block" style="color:black;>
+      <div class="carousel-caption d-none d-md-block" style="color:black;">
         <h5>Saisie du planning</h5>
         <p>Saisie du planning en mode texte</p>
       </div>
     </div>
     <div class="carousel-item">
        <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_02.jpg' | relative_url }}" alt="First slide">
-      <div class="carousel-caption d-none d-md-block" style="color:black;>
+      <div class="carousel-caption d-none d-md-block" style="color:black;">
         <h5>Personnalisation des écrans</h5>
         <p>Il est possible de personnaliser les écrans, de déplacer les contrôles, d'en ajouter ou d'en supprimer</p>
       </div>    
     </div>
     <div class="carousel-item">
        <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_03.jpg' | relative_url }}" alt="First slide">
-      <div class="carousel-caption d-none d-md-block" style="color:black;>
+      <div class="carousel-caption d-none d-md-block" style="color:black;">
         <h5>Planning hebdomadaire</h5>
         <p>Affichage du planning en mode texte</p>
       </div>  
     </div>
     <div class="carousel-item">
        <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_04.jpg' | relative_url }}" alt="First slide">
-      <div class="carousel-caption d-none d-md-block" style="color:black;>
+      <div class="carousel-caption d-none d-md-block" style="color:black;">
         <h5>Historique</h5>
         <p>Pampa garde l'historique de tous les dossiers concernés. Il peut être consulté, comme sur un navigateur internet</p>
       </div>  
     </div> 
     <div class="carousel-item">
        <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_05.jpg' | relative_url }}" alt="First slide">
-      <div class="carousel-caption d-none d-md-block" style="color:black;>
+      <div class="carousel-caption d-none d-md-block" style="color:black;">
         <h5>Connexion à la base de données</h5>
         <p>Pampa peut fonctionner avec SQLIte, MySQL, Posgresql, Mariadb, Firebird</p>
       </div>  
@@ -52,11 +52,11 @@ Le projet avance rapidement. Une bonne partie de l'architecture est en place, m�
   </div>
   
     <a class="carousel-control-prev" href="#Pampa" role="button" data-slide="prev">
-    <span class="fa fa-angle-left" aria-hidden="true" style="color:black; ></span>
+    <span class="fa fa-angle-left" aria-hidden="true" style="color:black;" ></span>
     <span class="sr-only">Previous</span>
   </a>
   <a class="carousel-control-next" href="#Pampa" role="button" data-slide="next">
-    <span class="fa fa-angle-right" aria-hidden="true" style="color:black;  ></span>
+    <span class="fa fa-angle-right" aria-hidden="true" style="color:black;" ></span>
     <span class="sr-only">Next</span>
   </a>
   
