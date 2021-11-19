@@ -10,7 +10,7 @@ locale: fr
 categories: [pampa]
 ref: screenshots 
 ---
-Voici quelques écrans de Pampa au 20 novembre :
+Le projet avance rapidement. Une bonne partie de l'architecture est en place, même s'il reste encore beaucoup à faire. Voici déjà quelques écrans de Pampa au 20 novembre :
 
 <div id="Pampa" class="carousel slide" data-ride="carousel">
   <div class="carousel-inner">
