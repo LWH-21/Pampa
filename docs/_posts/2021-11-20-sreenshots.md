@@ -24,5 +24,15 @@ Voici quelques écrans de Pampa au 20 novembre :
        <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_03.jpg' | relative_url }}" alt="First slide">
     </div>
   </div>
+  
+    <a class="carousel-control-prev" href="#Pampa" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#Pampa" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+  
 </div>
 
