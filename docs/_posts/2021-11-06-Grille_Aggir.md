@@ -25,7 +25,7 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 Le formulaire est proposé en deux versions (avec ou sans les adverbes) que vous pouvez télécharger à partir de ces liens :
 
 - **Sans les adverbes** : [Formulaire_aggir.pdf](https://github.com/LWH-21/Aggir/blob/e7ebddcfeb4568caa1bf6589ebf4ffe0e896c9c3/Formulaire_aggir.pdf)
-- **Avec les adverbes** : [Formulaire_aggir_sthc.pdf](https://lwh-21.github.io/assets/files/Formulaire_aggir_sthc.pdf)
+- **Avec les adverbes** : [Formulaire_aggir_sthc.pdf](https://github.com/LWH-21/Aggir/blob/e7ebddcfeb4568caa1bf6589ebf4ffe0e896c9c3/Formulaire_aggir_sthc.pdf)
 
 ![Formumaire AGGIR](https://lwh-21.github.io/Pampa/images/aggir_01.jpg)
 
