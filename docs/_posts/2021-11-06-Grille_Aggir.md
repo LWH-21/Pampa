@@ -22,7 +22,10 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 - **GIR 5**: Autonomie mentale totale et aucun problème pour ses déplacements dans son logement
 - **GIR 6**: Aucun problème dans la réalisation des actes de la vie courante
 
-Le formulaire est proposé en deux versions, avec ou sans les adverbes :
+Le formulaire est proposé en deux versions (avec ou sans les adverbes) que vous pouvez télécharger à partir de ces liens :
+
+- **Sans les adverbes** : [formulaire_aggir.pdf](https://lwh-21.github.io/assets/files/Formulaire_aggir.pdf)
+- **Avec les adverbes** : [Formulaire_aggir_sthc.pdf](https://lwh-21.github.io/assets/files/Formulaire_aggir_sthc.pdf)
 
 ![Formumaire AGGIR](https://lwh-21.github.io/Pampa/images/aggir_01.jpg)
 
