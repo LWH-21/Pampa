@@ -50,7 +50,7 @@ Le projet avance rapidement. Une bonne partie de l'architecture est en place, m√
       </div>  
     </div>    
     <div class="carousel-item">
-       <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_05.jpg' | relative_url }}" alt="First slide">
+       <img class="d-block w-100" src="{{ '/images/2021-11-20-pampa_06.jpg' | relative_url }}" alt="First slide">
       <div class="carousel-caption d-none d-md-block" style="color:blue;">
         <h4><b>Planning</b></h4>
         <p><b>Affichage du planning en mode graphique</b></p>
