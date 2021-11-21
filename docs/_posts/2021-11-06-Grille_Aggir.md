@@ -10,7 +10,7 @@ locale: fr
 categories: [social]
 ref: aggir 
 ---
-Vous trouverez [ici](https://github.com/LWH-21/Aggir "Dépôt Github pour les formulaires PDF") un formulaire PDF permettant de calculer le GIR d'une personne. Cette  [grille AGGIR](https://github.com/LWH-21/Aggir/blob/e7ebddcfeb4568caa1bf6589ebf4ffe0e896c9c3/Formulaire_aggir.pdf "Formulaire Aggir") calcule le Gir en fonction des dix variables relatives à la perte d'autonomie dites *discriminantes* (en fait seules les 8 premières influent réellement sur le Gir).
+Vous trouverez [ici](https://github.com/LWH-21/Aggir "Dépôt Github pour les formulaires PDF") un formulaire PDF permettant de calculer le GIR d'une personne. Cette  [grille AGGIR](https://lwh-21.github.io/Pampa/assets/files/Formulaire_aggir.pdf "Formulaire Aggir") calcule le Gir en fonction des dix variables relatives à la perte d'autonomie dites *discriminantes* (en fait seules les 8 premières influent réellement sur le Gir).
 
 Le Gir est un nombre entre 1 et 6 indiquant le degré d'autonomie de la personne évaluée.
 Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de dépendance suivants :
@@ -24,8 +24,8 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 
 Le formulaire est proposé en deux versions (avec ou sans les adverbes) que vous pouvez télécharger à partir de ces liens :
 
-- **Sans les adverbes** : [Formulaire_aggir.pdf](https://github.com/LWH-21/Aggir/blob/e7ebddcfeb4568caa1bf6589ebf4ffe0e896c9c3/Formulaire_aggir.pdf)
-- **Avec les adverbes** : [Formulaire_aggir_sthc.pdf](https://github.com/LWH-21/Aggir/blob/e7ebddcfeb4568caa1bf6589ebf4ffe0e896c9c3/Formulaire_aggir_sthc.pdf)
+- **Sans les adverbes** : [Formulaire_aggir.pdf](https://lwh-21.github.io/Pampa/assets/files//Formulaire_aggir.pdf)
+- **Avec les adverbes** : [Formulaire_aggir_sthc.pdf](https://lwh-21.github.io/Pampa/assets/files/Formulaire_aggir_sthc.pdf)
 
 ![Formumaire AGGIR](https://lwh-21.github.io/Pampa/images/aggir_01.jpg)
 
