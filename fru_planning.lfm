@@ -1,11 +1,11 @@
 inherited Fr_planning: TFr_planning
   Height = 485
-  Width = 944
+  Width = 1000
   ClientHeight = 485
-  ClientWidth = 944
+  ClientWidth = 1000
   OnResize = FrameResize
-  DesignLeft = 613
-  DesignTop = 280
+  DesignLeft = 643
+  DesignTop = 270
   object Ed_code: TEdit[0]
     Left = 8
     Height = 23
@@ -37,48 +37,5 @@ inherited Fr_planning: TFr_planning
     Caption = '...'
     OnClick = Bt_open_planningClick
     TabOrder = 2
-  end
-  object SB_previous: TBitBtn[4]
-    Left = 24
-    Height = 23
-    Top = 96
-    Width = 23
-    Images = MainForm.Images
-    ImageIndex = 20
-    OnClick = SB_previousClick
-    TabOrder = 3
-  end
-  object Ed_date: TDateEdit[5]
-    Left = 56
-    Height = 23
-    Top = 96
-    Width = 103
-    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames, dsShowWeekNumbers, dsStartMonday]
-    DefaultToday = True
-    DateOrder = doNone
-    ButtonWidth = 23
-    NumGlyphs = 1
-    MaxLength = 0
-    OnChange = Ed_dateChange
-    TabOrder = 4
-  end
-  object SB_next: TBitBtn[6]
-    Left = 168
-    Height = 23
-    Top = 96
-    Width = 23
-    Images = MainForm.Images
-    ImageIndex = 21
-    OnClick = SB_nextClick
-    TabOrder = 5
-  end
-  object CheckBox1: TCheckBox[7]
-    Left = 736
-    Height = 19
-    Top = 22
-    Width = 61
-    Caption = 'Graphic'
-    OnClick = CheckBox1Click
-    TabOrder = 6
   end
 end

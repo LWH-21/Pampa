@@ -7,8 +7,8 @@ object GPlanning: TGPlanning
   ClientWidth = 840
   OnResize = FrameResize
   TabOrder = 0
-  DesignLeft = 614
-  DesignTop = 178
+  DesignLeft = 577
+  DesignTop = 235
   object PB_planning: TPaintBox
     Left = 64
     Height = 272
@@ -31,5 +31,77 @@ object GPlanning: TGPlanning
     PageSize = 0
     TabOrder = 0
     OnChange = SB_planningChange
+  end
+  object PToolbar: TToolBar
+    Left = 0
+    Height = 26
+    Top = 0
+    Width = 840
+    Images = MainForm.Images
+    TabOrder = 1
+    object TB_prev: TToolButton
+      Left = 24
+      Top = 2
+      Caption = 'Prev'
+      ImageIndex = 20
+      OnClick = TB_prevClick
+    end
+    object TB_date: TDateEdit
+      Left = 47
+      Height = 23
+      Top = 2
+      Width = 103
+      CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+      DateOrder = doNone
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      OnChange = TB_dateChange
+      TabOrder = 0
+      Text = 'TB_date'
+    end
+    object TB_next: TToolButton
+      Left = 150
+      Top = 2
+      Caption = 'TB_next'
+      ImageIndex = 21
+      OnClick = TB_nextClick
+    end
+    object TB_graph: TToolButton
+      Left = 1
+      Top = 2
+      Caption = 'TB_graph'
+      ImageIndex = 7
+      OnClick = TB_graphClick
+      Style = tbsCheck
+    end
+    object TB_export: TToolButton
+      Left = 181
+      Top = 2
+      Caption = 'Export'
+      DropdownMenu = PopM_export
+      ImageIndex = 2
+    end
+    object ToolButton2: TToolButton
+      Left = 173
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton2'
+      Style = tbsSeparator
+    end
+  end
+  object PopM_export: TPopupMenu
+    Left = 712
+    Top = 56
+    object Mexcel: TMenuItem
+      Caption = 'Excel'
+      OnClick = MexcelClick
+    end
+    object Mtexte: TMenuItem
+      Caption = 'Texte'
+    end
+    object MPdf: TMenuItem
+      Caption = 'PDF'
+    end
   end
 end

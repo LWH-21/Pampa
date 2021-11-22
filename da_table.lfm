@@ -1,7 +1,7 @@
 object DA_table: TDA_table
   OldCreateOrder = False
   Height = 663
-  HorizontalOffset = 223
-  VerticalOffset = 183
+  HorizontalOffset = 247
+  VerticalOffset = 304
   Width = 1550
 end

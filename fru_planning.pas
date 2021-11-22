@@ -21,17 +21,14 @@ type
 
   TFr_planning = class(TW_F)
     Bt_open_planning: TButton;
-    CheckBox1: TCheckBox;
 
     Ed_code: TEdit;
-    Ed_date: TDateEdit;
     Ed_name: TEdit;
-    SB_next: TBitBtn;
-    SB_previous: TBitBtn;
     SB_rech: TSpeedButton;
 
 
     procedure Bt_open_planningClick(Sender: TObject);
+    procedure CheckBox1Change(Sender: TObject);
     procedure CheckBox1Click(Sender: TObject);
     procedure Ed_dateChange(Sender: TObject);
     procedure FrameResize(Sender: TObject);
@@ -45,7 +42,7 @@ type
     mode : TPlanMode;
     header,hline,limite : integer;
     startdate : tdatetime;
-    col : TInterventions;
+
 
     GPlan: TGPlanning;
 
@@ -97,7 +94,6 @@ begin
   Caption := rs_planning;
   startdate:=Today();
   startdate:=StartOfTheWeek(startdate);
-  ed_date.date:=StartDate;
   id:=-1;
   if parent is TWincontrol then
   begin
@@ -117,7 +113,7 @@ begin
   Caption := rs_planning;
   startdate:=Today();
 
-  if assigned(col) then freeandnil(col);
+  //if assigned(col) then freeandnil(col);
   if j>' ' then
   begin
     try
@@ -152,7 +148,7 @@ begin
   end;
   setid(p_id);
   startdate:=StartOfTheWeek(startdate);
-  ed_date.date:=StartDate;
+
 
 
   if parent is TWincontrol then
@@ -202,15 +198,7 @@ begin
   header:=80;
   hline:=60;
 
-  Ed_date.top := GPlan.top + 10;
-  SB_next.top:=Ed_date.top;
-  SB_previous.top:=Ed_date.top;
-  Ed_date.left:=50;
-  Sb_previous.left:=Ed_date.left - Sb_Previous.width - 10;
-  SB_next.left:=Ed_date.left+Ed_date.width+10;
-  ed_date.BringToFront;
-  sb_next.BringToFront;
-  sb_previous.Bringtofront;
+
  // limite:=plan_pb.Width div 4;
 
 
@@ -226,14 +214,7 @@ procedure TFr_planning.Ed_dateChange(Sender: TObject);
 var start : Tdatetime;
 
 begin
-  start:=Ed_date.Date;
-  start:=StartOfTheWeek(start);
-  Ed_date.Date:=start;
-  if start<>startdate then
-  begin
-    startdate:=start;
-    remplir_planning;
-  end;
+
 end;
 
 procedure TFr_planning.Bt_open_planningClick(Sender: TObject);
@@ -246,15 +227,14 @@ begin
   f.ShowModal;
 end;
 
+procedure TFr_planning.CheckBox1Change(Sender: TObject);
+begin
+
+end;
+
 procedure TFr_planning.CheckBox1Click(Sender: TObject);
 begin
-  if  CheckBox1.Checked then
-  begin
-    Gplan.SetKind([pl_week,pl_graphic,pl_consult]);
-  end else
-  begin
-   Gplan.SetKind([pl_week,pl_text,pl_consult]);
-  end;
+
 end;
 
 procedure TFr_planning.SB_rechClick(Sender: TObject);
@@ -436,23 +416,11 @@ var  inter : Tintervention;
      sql,s : string;
 
 begin
-   if assigned(col) then freeAndNil(col);
-   query:=nil;
-   old:=-1;
-
-   ed_date.Caption:=datetostr(startdate);
-
-
    if id>0 then
    begin
      enddate:=EndOfTheWeek(startdate);
-     col:=Planning.loadW(id,startdate, enddate);
-    // mat:=TLPlanning.create(startdate,enddate);
-    // mat.load(col);
-    Gplan.load(col,startdate,enddate);
-
+     Gplan.load(id,startdate);
    end;
-
 end;
 
 
@@ -489,7 +457,7 @@ destructor TFr_planning.Destroy;
 
 begin
   inherited;
-  if assigned(col) then freeAndNil(col);
+ // if assigned(col) then freeAndNil(col);
 
 end;
 

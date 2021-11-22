@@ -1,7 +1,7 @@
 object FCustomDP: TFCustomDP
-  Left = 1000
+  Left = 392
   Height = 439
-  Top = 307
+  Top = 243
   Width = 442
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
@@ -13,6 +13,7 @@ object FCustomDP: TFCustomDP
   OnActivate = FormActivate
   OnClose = FormClose
   OnDragOver = FormDragOver
+  Position = poDefault
   LCLVersion = '2.0.12.0'
   object Tab: TPageControl
     Left = 0

@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, EditBtn, Buttons,  Dialogs,
   dateutils,
   DPlanning,RessourcesStrings,
-  Graphics,BGRABitmap, BGRABitmapTypes, Types;
+  Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
 
 type
 
@@ -18,6 +18,18 @@ type
   TPlanning_kind= set of Planning_kind;
 
   TGPlanning = class(TFrame)
+      Mtexte: TMenuItem;
+      MPdf: TMenuItem;
+      Mexcel: TMenuItem;
+      PopM_export: TPopupMenu;
+      TB_date: TDateEdit;
+      PToolbar: TToolBar;
+      TB_prev: TToolButton;
+      TB_next: TToolButton;
+      TB_graph: TToolButton;
+      TB_export: TToolButton;
+      ToolButton2: TToolButton;
+      procedure MexcelClick(Sender: TObject);
       procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
         Shift: TShiftState; X, Y: Integer);
       procedure PB_planningMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -25,8 +37,15 @@ type
       procedure PB_planningMouseWheel(Sender: TObject; Shift: TShiftState;
         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
       procedure SB_planningChange(Sender: TObject);
+      procedure TB_dateChange(Sender: TObject);
+      procedure TB_graphClick(Sender: TObject);
+      procedure TB_nextClick(Sender: TObject);
+      procedure TB_prevClick(Sender: TObject);
 
     private
+    id : longint;
+    colplan : TInterventions;
+    start : tdatetime;
     FKind: TPlanning_kind;
     FColNumber : integer;
     w, h : integer;
@@ -55,6 +74,7 @@ type
 
   public
     constructor create(aowner: TComponent);override;
+    procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure refresh;
     destructor destroy; override;
@@ -115,6 +135,11 @@ begin
    PB_planning.Refresh;
 end;
 
+procedure TGPlanning.MexcelClick(Sender: TObject);
+begin
+
+end;
+
 procedure TGPlanning.PB_planningMouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 
@@ -169,6 +194,58 @@ end;
 procedure TGPlanning.SB_planningChange(Sender: TObject);
 begin
    PB_planning.Refresh;
+end;
+
+procedure TGPlanning.TB_dateChange(Sender: TObject);
+
+var d : tdatetime;
+
+begin
+     d:=TB_date.Date;
+     if pl_week in FKind then
+     begin
+          d:=StartOfTheWeek(d);
+     end;
+     if  CompareDate(start,d) <> 0 then
+     begin
+         load(id,d);
+     end;
+end;
+
+procedure TGPlanning.TB_graphClick(Sender: TObject);
+
+var k : TPlanning_kind;
+
+begin
+   k:=FKind;
+   if  TB_graph.Down then
+   begin
+        k:=k - [pl_text];
+        k:=k + [pl_graphic];
+   end else
+   begin
+     k:=k + [pl_text];
+     k:=k - [pl_graphic];
+   end;
+   SetKind(k);
+end;
+
+procedure TGPlanning.TB_nextClick(Sender: TObject);
+begin
+  if pl_week in FKind then
+  begin
+       start:=incday(start,7);
+       load(id,start);
+  end;
+end;
+
+procedure TGPlanning.TB_prevClick(Sender: TObject);
+begin
+  if pl_week in FKind then
+  begin
+       start:=incday(start,-7);
+       load(id,start);
+  end;
 end;
 
 procedure TGPlanning.draw_frame(bmp : TBGRABitmap);
@@ -635,13 +712,14 @@ procedure TGPlanning.FrameResize(Sender: TObject);
 var n : integer;
 
 begin
-     SB_planning.Top:=0;
+     SB_planning.Top:=PToolbar.Height + 1;
      SB_planning.Left:=self.Width - SB_planning.Width - 1;
-     SB_planning.height:=Self.Height - 1;
-     PB_planning.Top:=0;
+     SB_planning.height:=Self.Height -  SB_planning.Top - 1;
+     PB_planning.Top:=PToolbar.Height + 1;  ;
      PB_planning.left:=0;
-     PB_planning.Height:=self.height -  1;
+     PB_planning.Height:=self.height -  SB_planning.Top - 1;
      PB_planning.Width:=SB_planning.Left - 10;
+     PToolbar.width:=SB_planning.Left;
      margin:=PB_planning.Width div 4;
      hline:=30;
 
@@ -654,9 +732,38 @@ begin
           margin:=PB_planning.Width div 4;
           prepare_graphics;
      end;
+     if pl_edit in Fkind then
+     begin
+       TB_date.enabled:=false;
+       TB_prev.enabled:=false;
+       TB_next.enabled:=false;
+     end else
+     begin
+       TB_date.enabled:=true;
+       TB_prev.enabled:=true;
+       TB_next.enabled:=true;
+     end;
 
      colwidth:=(PB_planning.Width - margin) div FColNumber;
      PB_planning.Refresh;
+end;
+
+procedure TGPlanning.load(lid : longint; startdate : tdatetime);
+
+var endDate : tdatetime;
+
+begin
+     id:=lid;
+     self.start:=startdate;
+     if assigned(colplan) then freeAndNil(colplan);
+     endDate:=start;
+     if pl_week in Fkind then
+     begin
+          start:=StartOfTheWeek(start);
+          enddate:=EndOfTheWeek(start);
+          colplan:=Planning.loadW(id,startdate, enddate);
+     end;
+     load(colplan,start,endDate);
 end;
 
 procedure TGPlanning.load(col :  TInterventions;startdate,enddate : tdatetime);
@@ -668,6 +775,7 @@ begin
      mat:=TLPlanning.create(startdate,enddate);
      mat.load(col);
      if pl_graphic in Fkind then prepare_graphics;
+     TB_date.Date:=startdate;
      PB_planning.Refresh;
 end;
 
@@ -727,6 +835,7 @@ destructor TGPlanning.destroy;
 begin
    if assigned(mat) then freeAndNil(mat);
    if assigned(cache) then freeAndNil(cache);
+   if assigned(colplan) then freeAndNil(colplan);
    inherited destroy;
 end;
 
