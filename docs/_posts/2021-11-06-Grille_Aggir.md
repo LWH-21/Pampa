@@ -1,16 +1,16 @@
 ---
 layout: post
 title:  "Grille Aggir"
-description: "Formulaire grille Aggir, modifiable avec calcul du GIR"
+description: "Formulaire PDF interactif grille Aggir, modifiable avec calcul du GIR"
 image: /images/2021-11-06-aggir.png
 date:   2021-11-06
-last_modified_at: 2021-11-18
+last_modified_at: 2021-11-22
 author: LWH
 locale: fr
 categories: [social]
 ref: aggir 
 ---
-Vous trouverez [ici](https://github.com/LWH-21/Aggir "Dépôt Github pour les formulaires PDF") un formulaire PDF permettant de calculer le GIR d'une personne. Cette  [grille AGGIR](https://lwh-21.github.io/Pampa/assets/files/Formulaire_aggir.pdf "Formulaire Aggir") calcule le Gir en fonction des dix variables relatives à la perte d'autonomie dites *discriminantes* (en fait seules les 8 premières influent réellement sur le Gir).
+Vous trouverez [ici](https://github.com/LWH-21/Aggir "Dépôt Github pour les formulaires PDF") un formulaire PDF interactif permettant de calculer le GIR d'une personne. Cette  [grille AGGIR](https://lwh-21.github.io/Pampa/assets/files/Formulaire_aggir.pdf "Formulaire Aggir") calcule le Gir en fonction des dix variables relatives à la perte d'autonomie dites *discriminantes* (en fait seules les 8 premières influent réellement sur le Gir).
 
 Le Gir est un nombre entre 1 et 6 indiquant le degré d'autonomie de la personne évaluée.
 Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de dépendance suivants :
@@ -22,7 +22,7 @@ Plus ce nombre est grand, plus une personne est autonome. On a les niveaux de d�
 - **GIR 5**: Autonomie mentale totale et aucun problème pour ses déplacements dans son logement
 - **GIR 6**: Aucun problème dans la réalisation des actes de la vie courante
 
-Le formulaire est proposé en deux versions (avec ou sans les adverbes) que vous pouvez télécharger à partir de ces liens :
+Le formulaire interactif est proposé en deux versions (avec ou sans les adverbes) que vous pouvez télécharger à partir de ces liens :
 
 - **Sans les adverbes** : [Formulaire_aggir.pdf](https://lwh-21.github.io/Pampa/assets/files/Formulaire_aggir.pdf)
 - **Avec les adverbes** : [Formulaire_aggir_sthc.pdf](https://lwh-21.github.io/Pampa/assets/files/Formulaire_aggir_sthc.pdf)
