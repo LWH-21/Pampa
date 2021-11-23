@@ -7,8 +7,8 @@ object GPlanning: TGPlanning
   ClientWidth = 840
   OnResize = FrameResize
   TabOrder = 0
-  DesignLeft = 577
-  DesignTop = 235
+  DesignLeft = 649
+  DesignTop = 258
   object PB_planning: TPaintBox
     Left = 64
     Height = 272
@@ -40,14 +40,14 @@ object GPlanning: TGPlanning
     Images = MainForm.Images
     TabOrder = 1
     object TB_prev: TToolButton
-      Left = 24
+      Left = 55
       Top = 2
       Caption = 'Prev'
       ImageIndex = 20
       OnClick = TB_prevClick
     end
     object TB_date: TDateEdit
-      Left = 47
+      Left = 78
       Height = 23
       Top = 2
       Width = 103
@@ -61,7 +61,7 @@ object GPlanning: TGPlanning
       Text = 'TB_date'
     end
     object TB_next: TToolButton
-      Left = 150
+      Left = 181
       Top = 2
       Caption = 'TB_next'
       ImageIndex = 21
@@ -76,18 +76,31 @@ object GPlanning: TGPlanning
       Style = tbsCheck
     end
     object TB_export: TToolButton
-      Left = 181
+      Left = 212
       Top = 2
       Caption = 'Export'
       DropdownMenu = PopM_export
       ImageIndex = 2
     end
     object ToolButton2: TToolButton
-      Left = 173
+      Left = 204
       Height = 22
       Top = 2
       Caption = 'ToolButton2'
       Style = tbsSeparator
+    end
+    object ToolButton1: TToolButton
+      Left = 47
+      Height = 22
+      Top = 2
+      Caption = 'ToolButton1'
+      Style = tbsSeparator
+    end
+    object TB_freq: TToolButton
+      Left = 24
+      Top = 2
+      DropdownMenu = PopM_freq
+      ImageIndex = 9
     end
   end
   object PopM_export: TPopupMenu
@@ -102,6 +115,22 @@ object GPlanning: TGPlanning
     end
     object MPdf: TMenuItem
       Caption = 'PDF'
+    end
+  end
+  object PopM_freq: TPopupMenu
+    Left = 712
+    Top = 108
+    object MWeek: TMenuItem
+      Caption = 'Hebdomadaire'
+      OnClick = MWeekClick
+    end
+    object M2weeks: TMenuItem
+      Caption = 'Quinzaine'
+      OnClick = M2weeksClick
+    end
+    object MMonth: TMenuItem
+      Caption = 'Mensuel'
+      OnClick = MMonthClick
     end
   end
 end

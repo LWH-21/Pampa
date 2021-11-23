@@ -14,22 +14,31 @@ type
 
   { TGPlanning }
 
-  Planning_kind=(pl_week, pl_month, pl_graphic, pl_text, pl_edit, pl_consult);
+  Planning_kind=(pl_week,pl_2weeks, pl_month, pl_graphic, pl_text, pl_edit, pl_consult);
   TPlanning_kind= set of Planning_kind;
 
   TGPlanning = class(TFrame)
+      M2weeks: TMenuItem;
+      MMonth: TMenuItem;
+      MWeek: TMenuItem;
       Mtexte: TMenuItem;
       MPdf: TMenuItem;
       Mexcel: TMenuItem;
       PopM_export: TPopupMenu;
+      PopM_freq: TPopupMenu;
       TB_date: TDateEdit;
       PToolbar: TToolBar;
       TB_prev: TToolButton;
       TB_next: TToolButton;
       TB_graph: TToolButton;
       TB_export: TToolButton;
+      ToolButton1: TToolButton;
       ToolButton2: TToolButton;
+      TB_freq: TToolButton;
+      procedure M2weeksClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
+      procedure MWeekClick(Sender: TObject);
+      procedure MMonthClick(Sender: TObject);
       procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
         Shift: TShiftState; X, Y: Integer);
       procedure PB_planningMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -57,7 +66,7 @@ type
     procedure draw_frame(bmp : TBGRABitmap);
     procedure draw_header(bmp : TBGRABitmap);
     procedure draw_header_week(bmp : TBGRABitmap);
-    procedure draw_week(bmp : TBGRABitmap);
+    procedure draw_text(bmp : TBGRABitmap);
 
     procedure prepare_graphics();
     procedure draw_graphics(bmp : TBGRABitmap);
@@ -76,6 +85,7 @@ type
     constructor create(aowner: TComponent);override;
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
+    procedure reload;
     procedure refresh;
     destructor destroy; override;
   end;
@@ -94,12 +104,14 @@ constructor TGPlanning.create(aowner: TComponent);
 begin
    inherited create(aOwner);
    FKind:=[pl_week, pl_text, pl_consult];
+   start:=StartOfTheWeek(Today());
+   TB_date.Date:=start;
    margin:=SB_planning.Width div 4;
    header:=40;
    hline:=30;
-   FColNumber:=7;
    selection.x:=-1;
    selection.y:=-1;
+   setKind(Fkind);
 end;
 
 procedure TGPlanning.PB_planningMouseDown(Sender: TObject;
@@ -140,6 +152,45 @@ begin
 
 end;
 
+procedure TGPlanning.M2weeksClick(Sender: TObject);
+
+var k : TPlanning_kind;
+
+begin
+   k:=FKind;
+   k:=k - [pl_week];
+   k:=k - [pl_month];
+   k:=k + [pl_2weeks];
+   SetKind(k);
+   reload;
+end;
+
+procedure TGPlanning.MWeekClick(Sender: TObject);
+
+var k : TPlanning_kind;
+
+begin
+   k:=FKind;
+   k:=k - [pl_2weeks];
+   k:=k - [pl_month];
+   k:=k + [pl_week];
+   SetKind(k);
+   reload;
+end;
+
+procedure TGPlanning.MMonthClick(Sender: TObject);
+
+var k : TPlanning_kind;
+
+begin
+   k:=FKind;
+   k:=k - [pl_2weeks];
+   k:=k - [pl_week];
+   k:=k + [pl_month];
+   SetKind(k);
+   reload;
+end;
+
 procedure TGPlanning.PB_planningMouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 
@@ -159,7 +210,7 @@ begin
               inter:=mat.getInterAt(x,ny);
               if assigned(inter) then
               begin
-                   PB_planning.hint:=inter.gethstart+'-'+inter.gethend;
+                   PB_planning.hint:=inter.getHint;
                    PB_planning.showhint:=true;
                    exit;
               end;
@@ -236,6 +287,16 @@ begin
   begin
        start:=incday(start,7);
        load(id,start);
+  end else
+  if pl_2weeks in Fkind then
+  begin
+       start:=incday(start,14);
+       load(id,start);
+  end else
+  if pl_month in Fkind then
+  begin
+      start:=incday(start,32);
+      load(id,start);
   end;
 end;
 
@@ -245,6 +306,16 @@ begin
   begin
        start:=incday(start,-7);
        load(id,start);
+  end else
+  if pl_2weeks in Fkind then
+  begin
+       start:=incday(start,-14);
+       load(id,start);
+  end else
+  if pl_month in Fkind then
+  begin
+      start:=incday(start,-20);
+      load(id,start);
   end;
 end;
 
@@ -318,9 +389,15 @@ begin
         end;
      end;
 
-     cache.FontHeight:=12;
+     cache.FontHeight:=13;
+     if colwidth<120 then cache.FontHeight:=12;
+     if colwidth<100 then cache.FontHeight:=11;
+     if colwidth<80 then cache.FontHeight:=10;
+     if colwidth<60 then cache.FontHeight:=9;
+
      lineheight:=cache.FontPixelMetric.Lineheight;
      nb_dest:=0;
+
      if assigned(mat) then
      begin
        for nline:=0 to mat.linescount-1 do
@@ -418,148 +495,6 @@ begin
      bmp.PutImagePart(1,header+1,cache,rect,dmSet);
 end;
 
-(*procedure TGPlanning.draw_graphics(bmp : TBGRABitmap);
-
-var decal : integer;
-    hstart,hend : integer;
-    rect, textrect : trect;
-    s : string;
-    ts : ttextstyle;
-    nline, ncol : integer;
-    inter : TIntervention;
-    ref_h   : real;
-    ref_pos : integer;
-    h1,h2 : real;
-    lineheight,carwidth ,nb_dest: integer;
-
-begin
-     bmp.FontHeight:=14;
-     bmp.fontname:='Helvetica';
-     bmp.FontStyle:=[];
-     bmp.FontQuality:=fqFineClearTypeRGB; ;
-
-     lineheight:=bmp.FontPixelMetric.Lineheight;
-     lineheight:=lineheight div 2;
-     carwidth:=0;
-
-     ts.RightToLeft:=false;
-     ts.SingleLine:=false;
-     ts.Clipping:=true;
-
-     decal:=SB_planning.Position;
-     hstart:=decal - (trunc((h - header) / hline) div 2);
-     decal:=hline div 4;
-     hend:=hstart+trunc((h - header) / hline);
-
-     rect.top:=header;rect.bottom:=h;
-     rect.left:=1;rect.right:=w;
-     bmp.ClipRect:=rect;
-
-     rect.top:=header;rect.left:=margin-20;rect.height:=hline;
-     rect.right:=margin;
-
-     ref_h:=-1;
-     ref_pos:=-1;
-
-     while rect.bottom<h do
-     begin
-
-          if rect.bottom>decal*2 then bmp.DrawLineAntialias(margin-5,rect.bottom-(decal*2),w-2,rect.bottom-(decal*2),Bgra($e6,$e6,$e6),1);
-          if rect.bottom>decal then bmp.DrawLineAntialias(margin-5,rect.bottom-decal,w-2,rect.bottom-decal,Bgra($e6,$e6,$e6),1);
-          bmp.DrawLineAntialias(margin-10,rect.bottom,w-2,rect.bottom,BGRABlack,1);
-          if rect.bottom+decal<h then bmp.DrawLineAntialias(margin-5,rect.bottom+decal,w-2,rect.bottom+decal,Bgra($e6,$e6,$e6),1);
-
-          if (hstart>0) and (hstart<25) then
-          begin
-               if (ref_h<0) then
-               begin
-                   ref_h:=hstart;
-                   ref_pos:=rect.bottom;
-               end;
-               s:=format('%0.2d:%1.2d',[hstart,0]);
-               if carwidth=0 then
-               begin
-                    carwidth:=bmp.TextSize(s).Width+10;
-               end;
-               bmp.TextOut(margin-carwidth,rect.bottom-lineheight,s,BGRABlack,false);
-          end;
-          rect.bottom:=rect.bottom+hline;
-          rect.top:=rect.top+hline;
-
-          inc(hstart);
-     end;
-
-     bmp.FontHeight:=12;
-     lineheight:=bmp.FontPixelMetric.Lineheight;
-     nb_dest:=0;
-     if assigned(mat) then
-     begin
-       for nline:=0 to mat.linescount-1 do
-       begin
-            if (nline=0) or ( mat.lines[nline].sy_id<>mat.lines[nline-1].sy_id) then
-            begin
-                 if mat.lines[nline].sy_id>0 then inc(nb_dest);
-            end;
-            for ncol:=0 to mat.colscount-1 do
-            begin
-                 if assigned(mat.lines[nline].colums[ncol]) then
-                 begin
-                      inter:=mat.lines[nline].colums[ncol];
-                      h1:=inter.getDecimalHstart;
-                      h2:=inter.getDecimalHEnd;
-
-                      rect.left:=margin+(ncol*colwidth);
-                      rect.right:=rect.left+colwidth;
-                      rect.top:= round(ref_pos+(h1 - ref_h) * hline);
-                      rect.bottom:=rect.top+round((h2 - h1) * hline);
-                      bmp.RectangleAntialias(rect.left,rect.top,rect.right,rect.bottom,BGRABlack,1,mat.libs[mat.lines[nline].index].color);
-                      s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
-
-                      if rect.Height>lineheight then bmp.TextRect(rect, s,taLeftJustify,tlTop,BGRABlack);
-                 end;
-            end;
-       end;
-
-       bmp.FontHeight:=14;
-       decal:=1;
-       if nb_dest<=12 then decal:=2;
-       if nb_dest<6 then decal:=3;
-       decal:=2;
-       //rect.top:=round(ref_pos+(12 - (nb_dest div 2) - ref_h) * hline);
-       rect.top:=ref_pos;
-
-       rect.left:=5;rect.right:=margin - carwidth - 20;
-       for nline:=0 to mat.linescount-1 do
-       begin
-            if (nline=0) or ( mat.lines[nline].sy_id<>mat.lines[nline-1].sy_id) then
-            begin
-                if mat.lines[nline].sy_id>0 then
-                begin
-                     rect.bottom:=rect.top + hline*decal;
-                     s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
-                     bmp.RectangleAntialias(rect.left,rect.top+2,rect.right,rect.bottom-2,mat.libs[mat.lines[nline].index].color,1,BGRAWhite);
-                     textrect:=rect;
-                     textrect.Inflate(-5,-5,-10,-5);
-                     bmp.TextRect(textrect, s,taLeftJustify,tlTop,BGRABlack);
-                     textrect:=rect;
-                     textrect.Inflate(-(rect.width - 10),-2,0,-2);
-                     bmp.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,mat.libs[mat.lines[nline].index].color,1,mat.libs[mat.lines[nline].index].color);
-                end;
-                rect.top:=rect.Top+hline*decal;
-            end;
-       end;
-
-     end;
-
-
-
-
-     rect.top:=0;rect.bottom:=h;
-     rect.left:=0;rect.right:=w;
-     bmp.ClipRect:=rect;
-
-end;    *)
-
 procedure TGPlanning.draw_header(bmp : TBGRABitmap);
 
 var i,x : integer;
@@ -617,7 +552,7 @@ begin
      end;
 end;
 
-procedure TGPlanning.draw_week(bmp : TBGRABitmap);
+procedure TGPlanning.draw_text(bmp : TBGRABitmap);
 
 var linenum : integer;
     rect : trect;
@@ -759,10 +694,27 @@ begin
      endDate:=start;
      if pl_week in Fkind then
      begin
+          assert(not (pl_2weeks in Fkind),'Error type planning');
+          assert(not (pl_month in Fkind),'Error type planning');
           start:=StartOfTheWeek(start);
           enddate:=EndOfTheWeek(start);
-          colplan:=Planning.loadW(id,startdate, enddate);
+     end else
+     if pl_2weeks in Fkind then
+     begin
+          assert(not (pl_week  in Fkind),'Error type planning');
+          assert(not (pl_month in Fkind),'Error type planning');
+          start:=StartOfTheWeek(start);
+          enddate:=incday(start,10);
+          enddate:=EndOfTheWeek(enddate);
      end;
+     if pl_month in Fkind then
+     begin
+          assert(not (pl_week in Fkind),'Error type planning');
+          assert(not (pl_2weeks in Fkind),'Error type planning');
+          start:=StartOfTheMonth(start);
+          enddate:=EndOfTheMonth(start);
+     end;
+     colplan:=Planning.loadW(id,start, enddate);
      load(colplan,start,endDate);
 end;
 
@@ -790,21 +742,24 @@ begin
       bmp := TBGRABitmap.Create(w,h, BGRAWhite);
       draw_frame(bmp);
       draw_header(bmp);
-      if pl_week in FKind then
+      if pl_graphic in Fkind then
       begin
-           if pl_graphic in Fkind then
-           begin
-               draw_graphics(bmp);
-           end;
-           if pl_text in Fkind then
-           begin
-               draw_week(bmp);
-           end;
+          draw_graphics(bmp);
+      end;
+      if pl_text in Fkind then
+      begin
+          draw_text(bmp);
       end;
       bmp.Draw(PB_planning.Canvas, 0, 0, True);
    finally
      bmp.free;
    end;
+end;
+
+procedure TGPlanning.reload;
+
+begin
+     load(id,start);
 end;
 
 procedure TGPlanning.refresh;
@@ -827,6 +782,23 @@ begin
      Sb_planning.Max:=10;
      Sb_planning.Position:=0;
    end;
+   FColNumber:=7;
+   if pl_week in Fkind then begin
+      MWeek.checked:=true;
+      FColNumber:=7;
+   end else MWeek.checked:=false;
+   if pl_2weeks in Fkind then
+   begin
+        M2weeks.checked:=true;
+        FColNumber:=14;
+   end
+   else M2weeks.checked:=false;
+   if pl_month in Fkind then
+   begin
+        MMonth.checked:=true;
+        FColNumber:=31;
+   end
+   else MMonth.checked:=false;
    FrameResize(self);
 end;
 

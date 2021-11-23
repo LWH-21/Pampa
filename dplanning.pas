@@ -34,6 +34,7 @@ type TIntervention = Class
           function gethend : shortstring;
           function getDecimalHstart : real;
           function getDecimalHEnd : real;
+          function getHint : string;
           procedure setBounds(r : trect);
      end;
 
@@ -83,7 +84,7 @@ Type TLPlanning = class
 type
   TPlanning = class(TDa_table)
   private
-
+       refdate : tdatetime;
        procedure add_json_planning(s : string; dstart,dend : tdatetime; p_id, w_id : longint; result : TInterventions);
   public
        procedure init (D : TMainData);
@@ -214,6 +215,13 @@ begin
   result:=format('%0.2d:%1.2d',[h_end div 100,h_end mod 100]);
 end;
 
+function TIntervention.getHint : string;
+
+begin
+  result:= datetostr(dt)+' ('+cdays[week_day]+')'+LineEnding;
+  result:=result+gethstart+'-'+gethend+' '+LineEnding;
+end;
+
 procedure TIntervention.setBounds(r : trect);
 
 begin
@@ -245,7 +253,7 @@ var json : TJSONData;
            begin
                 inter:=Tintervention.create(dtemp,i_start,i_end,p_id,w_id,c_id);
                 result.Add(inter);
-                inter.col_index:=DaysBetween(dstart,dtemp)+1;
+                inter.col_index:=DaysBetween(refdate,dtemp)+1;
             end;
             dtemp:=IncDay(dtemp);
        end;
@@ -355,10 +363,8 @@ var Query : TdataSet;
     dstart, dend,dtemp : tdatetime;
     inter : Tintervention;
 
-
-
-
 begin
+  refdate:=start;
   Query:=nil;
   result:=nil;
   sql:=Maindata.getQuery('QPL01','SELECT SY_ID, SY_WID, SY_FORMAT, SY_START, SY_END, SY_DETAIL FROM PLANNING WHERE SY_WID=%w AND SY_START<=''%end'' AND SY_END>=''%start''');
@@ -452,7 +458,7 @@ var
 
 begin
      nline:=0; found:=false;
-     ncol:=inter.week_day - 1;
+     ncol:=inter.col_index - 1;
      while not found do
      begin
        if lines[nline].SY_ID<=0 then
