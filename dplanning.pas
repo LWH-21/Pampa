@@ -68,6 +68,7 @@ Type TLPlanning = class
           procedure add_inter(inter : TIntervention);
           function add_line : integer;
           function CreateJson : string;
+          function getColor(l: integer) : TBGRAPixel;
           function getInterAt(x,y : integer) : TIntervention;
           function isLineEmpty(l : integer) : boolean;
           procedure load(l : TInterventions);
@@ -426,6 +427,7 @@ var i : integer;
 begin
   colscount:=7;
   linescount:=20;
+  start_date:=today();
   setlength(lines,linescount);
   for i:=0 to linescount-1 do
   begin
@@ -542,6 +544,19 @@ begin
      //Clipboard.AsText:=result;
 
      jsonobj.Free;
+end;
+
+function TLPlanning.getColor(l : integer) : TBGRAPixel;
+
+begin
+     result:=BGRAWhite;
+     assert((l>=0) ,'Invalid coordinates line:'+inttostr(l));
+     assert(l<linescount,'Invalid line: '+inttostr(l));
+     if (lines[l].sy_id>0) then
+     begin
+          assert( (lines[l].index>=0) and (lines[l].index<length(libs)),'Invalid index');
+          result := libs[lines[l].index].color;
+     end;
 end;
 
 function TLPlanning.getInterAt(x,y : integer) : TIntervention;

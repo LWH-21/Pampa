@@ -35,6 +35,7 @@ type
       ToolButton1: TToolButton;
       ToolButton2: TToolButton;
       TB_freq: TToolButton;
+      TB_refresh: TToolButton;
       procedure M2weeksClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
@@ -50,6 +51,7 @@ type
       procedure TB_graphClick(Sender: TObject);
       procedure TB_nextClick(Sender: TObject);
       procedure TB_prevClick(Sender: TObject);
+      procedure TB_refreshClick(Sender: TObject);
 
     private
     id : longint;
@@ -66,9 +68,11 @@ type
     procedure draw_frame(bmp : TBGRABitmap);
     procedure draw_header(bmp : TBGRABitmap);
     procedure draw_header_week(bmp : TBGRABitmap);
+    procedure draw_header_2weeks(bmp : TBGRABitmap);
     procedure draw_text(bmp : TBGRABitmap);
 
     procedure prepare_graphics();
+    procedure prepare_text();
     procedure draw_graphics(bmp : TBGRABitmap);
 
 
@@ -319,6 +323,11 @@ begin
   end;
 end;
 
+procedure TGPlanning.TB_refreshClick(Sender: TObject);
+begin
+  reload;
+end;
+
 procedure TGPlanning.draw_frame(bmp : TBGRABitmap);
 
 begin
@@ -473,6 +482,7 @@ begin
      end;
 end;
 
+
 procedure TGPlanning.draw_graphics(bmp : TBGRABitmap);
 
 var rect  : Trect;
@@ -510,7 +520,61 @@ begin
           bmp.DrawLineAntialias(x,0,x,header,BGRABlack,2);
           bmp.DrawLineAntialias(x,header+1,x,h,BGRABlack,1);
      end;
-     if pl_week in FKind then draw_header_week(bmp);
+     if pl_week in FKind then draw_header_week(bmp) else
+     if pl_2weeks in FKind then draw_header_2weeks(bmp);
+end;
+
+procedure TGPlanning.draw_header_2weeks(bmp : TBGRABitmap);
+
+var d : tdatetime;
+    c : integer;
+    ts : TTextStyle;
+    s : string;
+    r : trect;
+    lineheight : integer;
+
+begin
+     assert(pl_2weeks in FKind,'pl_2weeks not in FKind');
+     if assigned(mat) then assert(YearOf(mat.start_date)>1900,'Invalid date');
+     bmp.FontHeight:=12;
+     bmp.FontName:='Arial';
+     bmp.FontQuality:=fqFineAntialiasing;
+     bmp.FontStyle:=[fsBold];
+     lineheight:=bmp.FontPixelMetric.Lineheight;
+     ts.Clipping:=true;
+     ts.Alignment:=taCenter;
+     if assigned(mat) then
+     begin
+       d:=mat.start_date;
+       for c:=0 to 1 do
+       begin
+            r.left:=margin+1+c*colwidth*7;r.right:=r.left-1+colwidth*7;
+            if (c=1) then r.right:=w - 1;
+            r.top:=1;
+            r.bottom:=(header div 2);
+            bmp.RectangleAntialias(r.left,r.Top,r.right,r.bottom,BGRABlack,1,Bgra($e6,$e6,$e6));
+            s:=inttostr(WeekOfTheYear(d));
+            bmp.TextRect(r,r.left,r.top,s,ts,VGABlue);
+            d:=incday(d,7);
+       end;
+       r.left:=margin;
+       d:=mat.start_date;
+       for c:=0 to 14 do
+       begin
+         r.right:=r.left+colwidth;
+         s:=cdays[DayOfTheWeek(d)];
+         (*r.top:=0;r.bottom:=lineheight;
+         if c=7 then bmp.TextRect(r,r.left,r.top,s,ts,VGABlue)
+         else bmp.TextRect(r,r.left,r.top,s,ts,VGARed);*)
+         s:=s[1]+' '+FormatDateTime(rs_daymonth,d);
+         r.Bottom:=header;
+         r.top:=R.bottom-lineheight;
+         if (c=6) or (c=13) then bmp.TextRect(r,r.left,r.top,s,ts,VGARed)
+         else bmp.TextRect(r,r.left,r.top,s,ts,VGABlue);
+         r.Left:=r.right;
+         d:=incday(d,1);
+       end;
+     end;
 end;
 
 procedure TGPlanning.draw_header_week(bmp : TBGRABitmap);
@@ -552,37 +616,64 @@ begin
      end;
 end;
 
-procedure TGPlanning.draw_text(bmp : TBGRABitmap);
+procedure TGPlanning.prepare_text();
 
-var linenum : integer;
-    rect : trect;
+var nb,x,i : integer;
+    linenum : integer;
+    rect,r : trect;
     TS: TTextStyle;
     c : integer;
     s : string;
-    decal : integer;
+    bkcolor : TBGRAPixel;
 
 begin
-     bmp.FontHeight:=14;
-     bmp.fontname:='Helvetica';
-     bmp.FontStyle:=[];
-     bmp.FontQuality:=fqFineClearTypeRGB;
+     if assigned(mat) then nb:=mat.linescount + 5 else nb:=10;
+     if nb<10 then nb:=20;
+     nb:=hline * nb;
+     if nb<h then nb:=h+hline;
+     if not assigned(cache) then
+     begin
+          cache:=TBGRABitmap.Create(w,nb, BGRAWhite);
+     end else
+     begin
+       cache.SetSize(w,nb);
+       cache.Fill(BGRAWhite);
+     end;
+     cache.FontHeight:=14;
+     cache.fontname:='Helvetica';
+     cache.FontStyle:=[];
+     cache.FontQuality:=fqFineClearTypeRGB;
+     if colwidth<120 then cache.FontHeight:=12;
+     if colwidth<100 then cache.FontHeight:=11;
+     if colwidth<80 then cache.FontHeight:=10;
+     if colwidth<60 then cache.FontHeight:=9;
      ts.RightToLeft:=false;
      ts.Clipping:=true;
-     decal:=SB_planning.Position;
-     rect.top:=header;
+
+     x:=margin;
+     cache.DrawLineAntialias(margin,0,margin,cache.height,BGRABlack,2);
+     cache.DrawLineAntialias(w - 1,0,w - 1,cache.height,BGRABlack,2);
+     for i:=1 to FColNumber - 1 do
+     begin
+          x:=x+colWidth;
+          cache.DrawLineAntialias(x,0,x,cache.height,BGRABlack,1);
+     end;
+
+     rect.top:=0;
      rect.bottom:=rect.top+hline;
-     linenum:=decal;
+     linenum:=0;
      while (rect.bottom<=h) do
      begin
           rect.bottom:=rect.top+hline;
           if assigned(mat) and (linenum<mat.linescount ) and (mat.lines[linenum].sy_id>0) then
           begin
+               bkcolor:=mat.getColor(linenum);
                if ( linenum=mat.linescount-1) or ((linenum<mat.linescount-1) and (mat.lines[linenum].sy_id<>mat.lines[linenum+1].sy_id)) then
                begin
-                    bmp.DrawLineAntialias(1,rect.bottom,w,rect.bottom,BGRABlack,1);
+                    cache.DrawLineAntialias(1,rect.bottom,w,rect.bottom,BGRABlack,1);
                end else
                begin
-                    bmp.DrawLineAntialias(margin+1,rect.bottom,w,rect.bottom,BGRA($d4,$d4,$d4),1);
+                    cache.DrawLineAntialias(margin+1,rect.bottom,w,rect.bottom,BGRA($d4,$d4,$d4),1);
                end;
                rect.left:=5;rect.right:=margin;
 
@@ -592,47 +683,51 @@ begin
                     ts.Alignment:=taLeftJustify;
                     c:=mat.lines[linenum].index;
                     s:=mat.libs[c].code+' '+mat.libs[c].caption;
-                    bmp.TextRect(rect,rect.left+5,rect.top+5,s,ts,BGRABlack);
+                    cache.TextRect(rect,rect.left+5,rect.top+5,s,ts,BGRABlack);
                end;
 
                ts.Alignment:=taCenter;
-               for c:=0 to 6 do
+               for c:=0 to mat.colscount-1 do
                begin
                     rect.Left:=margin + c*colwidth;
                     rect.Width:=colwidth;
+
                     if assigned(mat.lines[linenum].colums[c ]) then
                     begin
                          s:=mat.lines[linenum].colums[c ].gethstart+' - '+mat.lines[linenum].colums[c].gethend;
-                         bmp.TextRect(rect,rect.left+5,rect.top+4,s,ts,BGRABlack);
+                         r:=rect;
+                         inflaterect(r,-1,-1);
+                         cache.fillrect(r,bkcolor,dmset,32000);
+                         cache.TextRect(rect,rect.left+5,rect.top+4,s,ts,BGRABlack);
                     end;
                     if (linenum=selection.Y -1) and (c=selection.x - 1) then
                     begin
-                         bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                         cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                     end;
                end;
                if (linenum=selection.Y -1) and (selection.x =0 ) then
                begin
                    rect.Left:=1;
                    rect.right:=margin;
-                   bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                   cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                end;
 
           end else
           begin
-            bmp.DrawLineAntialias(1,rect.bottom,w,rect.bottom,BGRA($d4,$d4,$d4),1);
+            cache.DrawLineAntialias(1,rect.bottom,w,rect.bottom,BGRA($d4,$d4,$d4),1);
             if (linenum=selection.Y - 1) then
             begin
                  if (selection.x>0) then
                  begin
                    rect.Left:=margin + (selection.x - 1)*colwidth;
                    rect.Width:=colwidth;
-                   bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                   cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                  end else
                  if (selection.x=0) then
                  begin
                    rect.Left:=1;
                    rect.right:=margin;
-                   bmp.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                   cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                  end;
             end;
           end;
@@ -640,6 +735,27 @@ begin
           inc(linenum);
           rect.top := rect.bottom;
      end;
+end;
+
+procedure TGPlanning.draw_text(bmp : TBGRABitmap);
+
+var rect  : Trect;
+    i,lh : integer;
+
+begin
+     assert(pl_text in Fkind ,'Not in text mode');
+     assert(assigned(bmp),'Bitmap not assigned');
+     if not assigned(cache) then exit;
+     if not assigned(bmp) then exit;
+
+     rect.Left:=1;rect.Right:=w-1;
+     lh := h - header;
+     i:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
+     rect.Top :=i;
+     rect.Bottom:=rect.top+lh;
+     rect.left:=0;rect.right:=w;
+     assert(not rect.isEmpty,'Source rectangle is empty');
+     bmp.PutImagePart(1,header+1,cache,rect,dmSet);
 end;
 
 procedure TGPlanning.FrameResize(Sender: TObject);
@@ -666,6 +782,10 @@ begin
           Sb_planning.Position:=12;
           margin:=PB_planning.Width div 4;
           prepare_graphics;
+     end else
+     if pl_text in FKind then
+     begin
+          prepare_text;
      end;
      if pl_edit in Fkind then
      begin
@@ -721,13 +841,16 @@ end;
 procedure TGPlanning.load(col :  TInterventions;startdate,enddate : tdatetime);
 
 begin
+     assert((pl_graphic in Fkind) or (pl_text in Fkind),'Not graphic neither text');
      if assigned(mat) then freeandnil(mat);
      selection.x:=-1;
      selection.y:=-1;
      mat:=TLPlanning.create(startdate,enddate);
+     assert(assigned(mat),'Mat not assigned');
      mat.load(col);
-     if pl_graphic in Fkind then prepare_graphics;
      TB_date.Date:=startdate;
+     if pl_graphic in Fkind then prepare_graphics else
+     if pl_text in FKind then prepare_text;
      PB_planning.Refresh;
 end;
 

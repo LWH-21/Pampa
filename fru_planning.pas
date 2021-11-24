@@ -72,6 +72,7 @@ constructor TFr_planning.create(aowner: TComponent);
 
 begin
   inherited;
+  startdate:=today();
   GPlan:= TGPlanning.create(self);
   GPlan.Parent:=self;
 end;
@@ -293,89 +294,6 @@ var w,h : integer;
 
 begin
 
- {    w:=plan_pb.Width;
-     h:=Plan_pb.height;
-
-     tsem := (w - limite) div 7;
-
-     plan_pb.Canvas.Brush.color:=clwhite;
-     plan_pb.Canvas.Brush.Style:=bsSolid;
-     plan_pb.Canvas.FillRect(0,0,w,h);
-
-     //Header
-     plan_pb.Canvas.Brush.color:=TColor($e6e6e6);
-     plan_pb.Canvas.Brush.Style:=bsSolid;
-     plan_pb.Canvas.FillRect(1,1,w-1,header);
-     plan_pb.Canvas.pen.Color:=clBlack;
-
-     plan_pb.canvas.Rectangle(0,1,w-1,header-1);
-     plan_pb.canvas.Line(0,header - 1,0,h);
-     plan_pb.canvas.Line(w,header - 1,w,h);
-     plan_pb.canvas.Line(limite,header - 1,limite,h);
-
-
-     plan_pb.Canvas.pen.color:=Tcolor($d4d4d4);
-     plan_pb.canvas.Line(limite,1,limite,h - 1);
-     tmpdate:=startdate;
-     tstyle.alignment:=taCenter;
-     tstyle.Opaque:=false;
-     tstyle.SingleLine:=false;
-     tstyle.Wordbreak:=true;
-     tstyle.Clipping:=true;
-     tstyle.systemFont:=true;
-     tstyle.rightToLeft:=false;
-     for i:=0 to 6 do
-     begin
-       if i>0 then plan_pb.Canvas.Line(limite + i*tsem,1,limite+ i*tsem,h - 1);
-       r.Left:=limite + i*tsem;r.right:=r.left+tsem;
-       r.top:=2;r.bottom:=header;
-       s:=cdays[DayOfTheWeek(tmpdate)];
-       plan_pb.Canvas.TextRect(r,0,0,s,tstyle);
-       r.top:=20;
-       s:=datetostr(tmpdate);
-       plan_pb.Canvas.TextRect(r,0,0,s,tstyle);
-       tmpdate:=incday(tmpdate,1);
-     end;
-
-
-//     plan.Buffer.Line(0,header,w,header,color32(0,0,128,255),true);
-
-     l:=0;
-     plan_pb.Canvas.Brush.Style:=bsclear;
-     if assigned(mat) then
-     begin
-       while (l<mat.linescount ) and (mat.lines[l].sy_id>0) do
-       begin
-         if (l<mat.linescount - 1) and (mat.lines[l].sy_id<>mat.lines[l+1].sy_id) then
-         begin
-              plan_pb.canvas.Line(0,header+hline*(l+1),w,header+hline*(l+1));
-         end else
-         begin
-              plan_pb.canvas.Line(limite,header+hline*(l+1),w,header+hline*(l+1));
-         end;
-         if (l=0) or (mat.lines[l].sy_id<>mat.lines[l-1].sy_id) then
-         begin
-              r.left:=10;r.right:=limite;
-              r.bottom:=header+hline*(l+1);r.top:=r.bottom-hline;
-              tstyle.Alignment:=taLeftJustify;
-              c:=mat.lines[l].index;
-              s:=mat.libs[c].code+' '+mat.libs[c].caption;
-              plan_pb.Canvas.TextRect(r,15,5,s,tstyle);
-         end;
-
-         for c:=0 to 6 do
-         begin
-           if assigned(mat.lines[l].colums[c ]) then
-           begin
-                 s:=mat.lines[l].colums[c ].gethstart+' - '+mat.lines[l].colums[c].gethend;
-                 r.Left:=limite + c*tsem;r.Top:=header+hline*(l);
-                 r.Width:=tsem;r.height:=hline;
-                 plan_pb.Canvas.TextRect(r,r.left+5,r.top,s,tstyle);
-           end;
-         end;
-         inc(l);
-       end;
-     end;   }
 
 end;
 

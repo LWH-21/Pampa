@@ -76,14 +76,14 @@ object GPlanning: TGPlanning
       Style = tbsCheck
     end
     object TB_export: TToolButton
-      Left = 212
+      Left = 235
       Top = 2
       Caption = 'Export'
       DropdownMenu = PopM_export
       ImageIndex = 2
     end
     object ToolButton2: TToolButton
-      Left = 204
+      Left = 227
       Height = 22
       Top = 2
       Caption = 'ToolButton2'
@@ -101,6 +101,13 @@ object GPlanning: TGPlanning
       Top = 2
       DropdownMenu = PopM_freq
       ImageIndex = 9
+    end
+    object TB_refresh: TToolButton
+      Left = 204
+      Top = 2
+      Caption = 'Refresh'
+      ImageIndex = 6
+      OnClick = TB_refreshClick
     end
   end
   object PopM_export: TPopupMenu

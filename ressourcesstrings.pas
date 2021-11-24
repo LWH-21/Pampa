@@ -37,6 +37,7 @@ resourcestring
   rs_insert = 'Insertion';
   rs_last7days = 'Les 7 derniers jours';
   rs_monthyear = 'mmmm YYYY';
+  rs_daymonth = 'DD/MM';
   rs_more6 = 'Il y a plus de 6 mois';
   rs_non='&Non';
   rs_new='Nouveau';
