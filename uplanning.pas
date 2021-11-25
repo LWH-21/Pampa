@@ -36,6 +36,7 @@ type
       ToolButton2: TToolButton;
       TB_freq: TToolButton;
       TB_refresh: TToolButton;
+      TB_zoom: TTrackBar;
       procedure M2weeksClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
@@ -52,6 +53,7 @@ type
       procedure TB_nextClick(Sender: TObject);
       procedure TB_prevClick(Sender: TObject);
       procedure TB_refreshClick(Sender: TObject);
+      procedure TB_zoomChange(Sender: TObject);
 
     private
     id : longint;
@@ -205,18 +207,21 @@ begin
      PB_planning.hint:='';PB_planning.showhint:=false;
      if assigned(mat) then
      begin
-         if (pl_graphic in Fkind) and (x>margin) and (y>0) and (assigned(cache)) then
+         if (x>margin) and (y>0) and (assigned(cache)) then
          begin
               lh := h - header;
               ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
               ny:=ny+y-header;
-              assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
-              inter:=mat.getInterAt(x,ny);
-              if assigned(inter) then
+              if ((ny>0) and (ny<cache.height)) then
               begin
-                   PB_planning.hint:=inter.getHint;
-                   PB_planning.showhint:=true;
-                   exit;
+                assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
+                inter:=mat.getInterAt(x,ny);
+                if assigned(inter) then
+                begin
+                     PB_planning.hint:=inter.getHint;
+                     PB_planning.showhint:=true;
+                     exit;
+                end;
               end;
          end;
      end;
@@ -328,6 +333,20 @@ begin
   reload;
 end;
 
+procedure TGPlanning.TB_zoomChange(Sender: TObject);
+begin
+  hline:=  TB_zoom.position;
+  if pl_graphic in Fkind then
+  begin
+       prepare_graphics;
+  end else
+  if pl_text in FKind then
+  begin
+       prepare_text;
+  end;
+  PB_planning.Refresh;
+end;
+
 procedure TGPlanning.draw_frame(bmp : TBGRABitmap);
 
 begin
@@ -345,16 +364,20 @@ var x : integer;
     h1,h2 : real;
     nb_dest: integer;
     rect, textrect : trect;
+    TS: TTextStyle;
 
 begin
+     i:=hline * 25;
+     if i<h then i:=h+hline;
      if not assigned(cache) then
      begin
-          cache:=TBGRABitmap.Create(w,24 * hline, BGRAWhite);
+          cache:=TBGRABitmap.Create(w,i, BGRAWhite);
      end else
      begin
-       cache.SetSize(w,24*hline);
+       cache.SetSize(w,i);
        cache.Fill(BGRAWhite);
      end;
+
      cache.FontHeight:=14;
      cache.fontname:='Helvetica';
      cache.FontStyle:=[];
@@ -364,6 +387,7 @@ begin
      lineheight:=cache.FontPixelMetric.Lineheight;
      lineheight:=lineheight div 2;
      carwidth:=-1;
+     TS.Clipping:=true;
 
      x:=margin;
      cache.DrawLineAntialias(margin,0,margin,cache.height,BGRABlack,2);
@@ -424,18 +448,24 @@ begin
                       h2:=inter.getDecimalHEnd;
 
                       rect.left:=margin+(ncol*colwidth);
-                      rect.right:=rect.left+colwidth;
+                      rect.right:=rect.left+colwidth+1;
                       rect.top:= round(h1* hline);
-                      rect.bottom:=round(h2* hline);
+                      rect.bottom:=round(h2* hline)+1;
                       mat.setBounds(nline,ncol,rect);
                       col:=mat.libs[mat.lines[nline].index].color;
-                      cache.RectangleAntialias(rect.left,rect.top,rect.right,rect.bottom,BGRABlack,1,col);
+                      cache.Rectangle(rect,BGRABlack,BGRAWhite,dmset);
+                      cache.Rectangle(rect,vgablack,col,dmset,32000);
                       s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
                       rect.Inflate(-1,-1,-1,-1);
                       if rect.Height>lineheight then
                       begin
-                        col.Lightness:=65535 - col.Lightness;
-                        cache.TextRect(rect, s,taLeftJustify,tlTop,col);
+                        if (col.Lightness<32000) then
+                        begin
+                           cache.TextRect(rect,rect.left,rect.top,s,ts,BGRAWhite);
+                        end else
+                        begin
+                           cache.TextRect(rect,rect.left,rect.top,s,ts,BGRABlack);
+                        end;
                       end;
 
                  end;
@@ -677,7 +707,6 @@ begin
                end;
                rect.left:=5;rect.right:=margin;
 
-
                if (linenum=0) or (mat.lines[linenum].sy_id<>mat.lines[linenum-1].sy_id) then
                begin
                     ts.Alignment:=taLeftJustify;
@@ -697,6 +726,7 @@ begin
                          s:=mat.lines[linenum].colums[c ].gethstart+' - '+mat.lines[linenum].colums[c].gethend;
                          r:=rect;
                          inflaterect(r,-1,-1);
+                         mat.setBounds(linenum,c,rect);
                          cache.fillrect(r,bkcolor,dmset,32000);
                          cache.TextRect(rect,rect.left+5,rect.top+4,s,ts,BGRABlack);
                     end;
@@ -753,7 +783,7 @@ begin
      i:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
      rect.Top :=i;
      rect.Bottom:=rect.top+lh;
-     rect.left:=0;rect.right:=w;
+
      assert(not rect.isEmpty,'Source rectangle is empty');
      bmp.PutImagePart(1,header+1,cache,rect,dmSet);
 end;
@@ -772,11 +802,10 @@ begin
      PB_planning.Width:=SB_planning.Left - 10;
      PToolbar.width:=SB_planning.Left;
      margin:=PB_planning.Width div 4;
-     hline:=30;
-
+     w:=PB_planning.Width;
+     h:=PB_planning.Height;
      if pl_graphic in Fkind then
      begin
-          hline:=50;
           Sb_planning.min:=0;
           Sb_planning.max:=24;
           Sb_planning.Position:=12;
@@ -859,8 +888,6 @@ procedure TGPlanning.PB_planningPaint(Sender: TObject);
 var bmp: TBGRABitmap;
 
 begin
-   w:=PB_planning.Width;
-   h:=PB_planning.Height;
    try
       bmp := TBGRABitmap.Create(w,h, BGRAWhite);
       draw_frame(bmp);

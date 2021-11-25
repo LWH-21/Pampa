@@ -7,8 +7,8 @@ object GPlanning: TGPlanning
   ClientWidth = 840
   OnResize = FrameResize
   TabOrder = 0
-  DesignLeft = 649
-  DesignTop = 258
+  DesignLeft = 55
+  DesignTop = 347
   object PB_planning: TPaintBox
     Left = 64
     Height = 272
@@ -40,14 +40,14 @@ object GPlanning: TGPlanning
     Images = MainForm.Images
     TabOrder = 1
     object TB_prev: TToolButton
-      Left = 55
+      Left = 163
       Top = 2
       Caption = 'Prev'
       ImageIndex = 20
       OnClick = TB_prevClick
     end
     object TB_date: TDateEdit
-      Left = 78
+      Left = 186
       Height = 23
       Top = 2
       Width = 103
@@ -61,7 +61,7 @@ object GPlanning: TGPlanning
       Text = 'TB_date'
     end
     object TB_next: TToolButton
-      Left = 181
+      Left = 289
       Top = 2
       Caption = 'TB_next'
       ImageIndex = 21
@@ -76,21 +76,21 @@ object GPlanning: TGPlanning
       Style = tbsCheck
     end
     object TB_export: TToolButton
-      Left = 235
+      Left = 351
       Top = 2
       Caption = 'Export'
       DropdownMenu = PopM_export
       ImageIndex = 2
     end
     object ToolButton2: TToolButton
-      Left = 227
+      Left = 335
       Height = 22
       Top = 2
       Caption = 'ToolButton2'
       Style = tbsSeparator
     end
     object ToolButton1: TToolButton
-      Left = 47
+      Left = 147
       Height = 22
       Top = 2
       Caption = 'ToolButton1'
@@ -103,11 +103,22 @@ object GPlanning: TGPlanning
       ImageIndex = 9
     end
     object TB_refresh: TToolButton
-      Left = 204
+      Left = 312
       Top = 2
       Caption = 'Refresh'
       ImageIndex = 6
       OnClick = TB_refreshClick
+    end
+    object TB_zoom: TTrackBar
+      Left = 47
+      Height = 22
+      Top = 2
+      Width = 100
+      Max = 180
+      Min = 20
+      OnChange = TB_zoomChange
+      Position = 50
+      TabOrder = 1
     end
   end
   object PopM_export: TPopupMenu
