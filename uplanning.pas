@@ -5,12 +5,20 @@ unit UPlanning;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, EditBtn, Buttons,  Dialogs,
+  Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn, Buttons,  Dialogs,
   dateutils,
   DPlanning,RessourcesStrings,
   Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
 
 type
+
+  TLWPaintBox = class(TPaintBox)
+
+    protected
+
+    procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
+
+  end;
 
   { TGPlanning }
 
@@ -43,8 +51,6 @@ type
       procedure MMonthClick(Sender: TObject);
       procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
         Shift: TShiftState; X, Y: Integer);
-      procedure PB_planningMouseMove(Sender: TObject; Shift: TShiftState; X,
-        Y: Integer);
       procedure PB_planningMouseWheel(Sender: TObject; Shift: TShiftState;
         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
       procedure SB_planningChange(Sender: TObject);
@@ -66,6 +72,7 @@ type
     selection : tpoint;
     margin, hline, header, colwidth : integer;
     cache : TBGRABitmap;
+    PB_planning :  TLWPaintBox;
 
     procedure draw_frame(bmp : TBGRABitmap);
     procedure draw_header(bmp : TBGRABitmap);
@@ -79,7 +86,6 @@ type
 
 
   published
-    PB_planning: TPaintBox;
     SB_planning: TScrollBar;
     procedure SetKind(k : TPlanning_kind);
     property Mode : TPlanning_kind READ FKind WRITE SetKind;
@@ -89,6 +95,7 @@ type
 
   public
     constructor create(aowner: TComponent);override;
+    function getHint(pt : Tpoint) : string;
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure reload;
@@ -98,17 +105,36 @@ type
 
 implementation
 
+uses Main;
+
 {$R *.lfm}
 
 { TGPlanning }
 
+procedure TLWPaintBox.CMHintShow(var Message: TCMHintShow);
 
-
+var aparent : TGPlanning;
+    s : string;
+begin
+   inherited;
+   if (parent is TGPlanning) then
+   begin
+     aparent:=parent as TGPlanning;
+     s:=aparent.getHint(TCMHintShow(Message).HintInfo^.CursorPos);
+     TCMHintShow(Message).HintInfo^.HintStr:=s;
+   end;
+end;
 
 constructor TGPlanning.create(aowner: TComponent);
 
 begin
    inherited create(aOwner);
+   PB_planning:=TLWPaintBox.create(self);
+   PB_planning.Parent:=self;
+   PB_planning.onMouseDown:=@PB_planningMouseDown;
+   PB_planning.OnMouseWheel:=@PB_planningMouseWheel;
+   PB_planning.OnPaint:=@PB_planningPaint;
+   PB_planning.ShowHint:=true;
    FKind:=[pl_week, pl_text, pl_consult];
    start:=StartOfTheWeek(Today());
    TB_date.Date:=start;
@@ -120,37 +146,88 @@ begin
    setKind(Fkind);
 end;
 
+
+function TGPlanning.getHint(pt : Tpoint) : string;
+
+var ny, lh : integer;
+    inter : Tintervention;
+begin
+   result:='';
+   if assigned(mat) then
+   begin
+         if (pt.x>margin) and (pt.y>0) and (assigned(cache)) then
+         begin
+              lh := h - header;
+              ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
+              ny:=ny+pt.y-header;
+              if ((ny>0) and (ny<cache.height)) then
+              begin
+                assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(pt.y));
+                inter:=mat.getInterAt(pt.x,ny);
+                if assigned(inter) then
+                begin
+                     result:=inter.getHint;
+                end;
+              end;
+         end;
+     end;
+end;
+
 procedure TGPlanning.PB_planningMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
-var c, l  : integer;
+var c, l,lh,ny  : integer;
+    inter : TIntervention;
+    selchanged : boolean;
+    s : string;
 
 begin
-  // margin, hline, header, colwidth
-
    assert(colwidth>0,'Col width equals to 0');
    assert(hline>0,'Line height equals to 0');
-
-   if x<margin then
+   selchanged:=false;
+   s:='';
+   if (x>margin) and (y>0) and (assigned(cache)) then
    begin
-       c:=0;
-   end else
-   begin
-     c:= x - margin;
-     c:= (c div colwidth) + 1;
+        lh := h - header;
+        ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
+        ny:=ny+y-header;
+        if ((ny>0) and (ny<cache.height)) then
+        begin
+             assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
+             inter:=mat.getInterAt(x,ny);
+             if assigned(inter) then
+             begin
+                  s:=inter.getHint;
+                  if not inter.selected then
+                  begin
+                      inter.selected:=true;
+                      selchanged:=true;
+                  end;
+             end;
+        end;
    end;
-   if y<header then
+   for l:=0 to mat.linescount -1 do
    begin
-       l:=0;
-   end else
-   begin
-     l:= y - header;
-     l:=(l div hline) + 1;
+       for c:=0 to mat.colscount-1 do
+       begin
+            if assigned(mat.lines[l].colums[c]) then
+            begin
+                if (mat.lines[l].colums[c].selected) then
+                begin
+                    if (not assigned(inter)) or (inter<>mat.lines[l].colums[c]) then
+                    begin
+                         mat.lines[l].colums[c].selected:=false;
+                         selchanged:=true;
+                    end;
+                end;
+            end;
+       end;
    end;
-   l:=l+SB_planning.Position;
-   selection.x:=c;
-   selection.Y:=l;
-   PB_planning.Refresh;
+   if selchanged then
+   begin
+        refresh();
+        MainForm.setMicroHelp(s);
+   end;
 end;
 
 procedure TGPlanning.MexcelClick(Sender: TObject);
@@ -197,35 +274,6 @@ begin
    reload;
 end;
 
-procedure TGPlanning.PB_planningMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-
-var ny, lh : integer;
-    inter : Tintervention;
-
-begin
-     PB_planning.hint:='';PB_planning.showhint:=false;
-     if assigned(mat) then
-     begin
-         if (x>margin) and (y>0) and (assigned(cache)) then
-         begin
-              lh := h - header;
-              ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
-              ny:=ny+y-header;
-              if ((ny>0) and (ny<cache.height)) then
-              begin
-                assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
-                inter:=mat.getInterAt(x,ny);
-                if assigned(inter) then
-                begin
-                     PB_planning.hint:=inter.getHint;
-                     PB_planning.showhint:=true;
-                     exit;
-                end;
-              end;
-         end;
-     end;
-end;
 
 procedure TGPlanning.PB_planningMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
@@ -455,6 +503,10 @@ begin
                       col:=mat.libs[mat.lines[nline].index].color;
                       cache.Rectangle(rect,BGRABlack,BGRAWhite,dmset);
                       cache.Rectangle(rect,vgablack,col,dmset,32000);
+                      if  inter.selected then
+                      begin
+                            cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                      end;
                       s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
                       rect.Inflate(-1,-1,-1,-1);
                       if rect.Height>lineheight then
@@ -467,6 +519,7 @@ begin
                            cache.TextRect(rect,rect.left,rect.top,s,ts,BGRABlack);
                         end;
                       end;
+
 
                  end;
             end;
@@ -729,6 +782,10 @@ begin
                          mat.setBounds(linenum,c,rect);
                          cache.fillrect(r,bkcolor,dmset,32000);
                          cache.TextRect(rect,rect.left+5,rect.top+4,s,ts,BGRABlack);
+                         if  mat.lines[linenum].colums[c ].selected then
+                         begin
+                            cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                         end;
                     end;
                     if (linenum=selection.Y -1) and (c=selection.x - 1) then
                     begin
@@ -915,7 +972,15 @@ end;
 procedure TGPlanning.refresh;
 
 begin
-   FrameResize(self);
+     if pl_graphic in Fkind then
+     begin
+         prepare_graphics;
+     end;
+     if pl_text in Fkind then
+     begin
+         prepare_text;
+     end;
+    PB_planning.Refresh;
 end;
 
 procedure TGPlanning.SetKind(k : TPlanning_kind);

@@ -9,19 +9,6 @@ object GPlanning: TGPlanning
   TabOrder = 0
   DesignLeft = 55
   DesignTop = 347
-  object PB_planning: TPaintBox
-    Left = 64
-    Height = 272
-    Hint = 'test'
-    Top = 104
-    Width = 368
-    ParentShowHint = False
-    ShowHint = True
-    OnMouseDown = PB_planningMouseDown
-    OnMouseMove = PB_planningMouseMove
-    OnMouseWheel = PB_planningMouseWheel
-    OnPaint = PB_planningPaint
-  end
   object SB_planning: TScrollBar
     Left = 640
     Height = 121
@@ -40,14 +27,14 @@ object GPlanning: TGPlanning
     Images = MainForm.Images
     TabOrder = 1
     object TB_prev: TToolButton
-      Left = 163
+      Left = 155
       Top = 2
       Caption = 'Prev'
       ImageIndex = 20
       OnClick = TB_prevClick
     end
     object TB_date: TDateEdit
-      Left = 186
+      Left = 178
       Height = 23
       Top = 2
       Width = 103
@@ -61,7 +48,7 @@ object GPlanning: TGPlanning
       Text = 'TB_date'
     end
     object TB_next: TToolButton
-      Left = 289
+      Left = 281
       Top = 2
       Caption = 'TB_next'
       ImageIndex = 21
@@ -76,14 +63,14 @@ object GPlanning: TGPlanning
       Style = tbsCheck
     end
     object TB_export: TToolButton
-      Left = 351
+      Left = 335
       Top = 2
       Caption = 'Export'
       DropdownMenu = PopM_export
       ImageIndex = 2
     end
     object ToolButton2: TToolButton
-      Left = 335
+      Left = 327
       Height = 22
       Top = 2
       Caption = 'ToolButton2'
@@ -103,7 +90,7 @@ object GPlanning: TGPlanning
       ImageIndex = 9
     end
     object TB_refresh: TToolButton
-      Left = 312
+      Left = 304
       Top = 2
       Caption = 'Refresh'
       ImageIndex = 6

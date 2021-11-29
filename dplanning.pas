@@ -18,6 +18,7 @@ type TIntervention = Class
           bounds : Trect;
      public
           dt : TdateTime;
+          selected : boolean;
           week_day : integer;
           h_start :  integer;
           h_end : integer;
@@ -153,6 +154,7 @@ end;
 constructor TIntervention.create (d : tdatetime;  hs,he : integer; p,w,c : longint);
 
 begin
+  selected:=false;
   dt:=d;
   h_start:=hs;
   h_end:=he;
@@ -168,6 +170,7 @@ end;
 constructor TIntervention.create (i_day,hs,he : integer; p,w,c : longint);
 
 begin
+     selected:=false;
      h_start:=hs;
      h_end:=he;
      planning:=p;
