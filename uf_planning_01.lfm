@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = 216
+  Left = 2387
   Height = 613
-  Top = 315
+  Top = 314
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613
@@ -36,42 +36,7 @@ inherited F_planning_01: TF_planning_01
     Width = 880
     TabOrder = 2
   end
-  object Plannings: TPageControl[3]
-    Left = 8
-    Height = 384
-    Top = 176
-    Width = 1000
-    ActivePage = Planning_1
-    TabIndex = 0
-    TabOrder = 3
-    object Planning_1: TTabSheet
-      Caption = 'Planning_1'
-      ClientHeight = 356
-      ClientWidth = 992
-      object pb_plan1: TPaintBox
-        Left = 0
-        Height = 336
-        Top = 0
-        Width = 960
-        Anchors = [akTop, akLeft, akBottom]
-        OnClick = pb_plan1Click
-        OnMouseDown = pb_plan1MouseDown
-        OnPaint = pb_plan1Paint
-      end
-      object Scroll_planning_1: TScrollBar
-        Left = 968
-        Height = 344
-        Top = 0
-        Width = 17
-        Anchors = []
-        Kind = sbVertical
-        PageSize = 0
-        TabOrder = 0
-        OnChange = Scroll_planning_1Change
-      end
-    end
-  end
-  object List: TStringGrid[4]
+  object List: TStringGrid[3]
     Left = 16
     Height = 100
     Top = 48
@@ -105,10 +70,10 @@ inherited F_planning_01: TF_planning_01
       end>
     FixedCols = 0
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goRowSelect, goSmoothScroll]
-    TabOrder = 4
+    TabOrder = 3
     OnSelection = ListSelection
   end
-  object Planning_menu: TPopupMenu[5]
+  object Planning_menu: TPopupMenu[4]
     Left = 136
     Top = 568
     object Mchange: TMenuItem

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,DateUtils,
   DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, Menus, ListFilterEdit, W_A, DB,
-  memds, DataAccess, DPlanning, UPlanning_enter;
+  memds, DataAccess, DPlanning, UPlanning, UPlanning_enter;
 
 type
 
@@ -22,11 +22,7 @@ type
     MDel: TMenuItem;
     Minsert: TMenuItem;
     MCopy: TMenuItem;
-    pb_plan1: TPaintBox;
-    Plannings: TPageControl;
-    Planning_1: TTabSheet;
     Planning_menu: TPopupMenu;
-    Scroll_planning_1: TScrollBar;
     List: TStringGrid;
     procedure Btn_okClick(Sender: TObject);
     procedure DBGrid1CellClick(Column: TColumn);
@@ -51,6 +47,7 @@ type
    currentrow : longint;
    selection : Tpoint;
    EnterPlanning: TFPlanning_enter;
+   GPlan: TGPlanning;
   public
     w_id : longint;
     procedure draw_planning_1;
@@ -91,6 +88,9 @@ end;
 
 procedure TF_planning_01.FormCreate(Sender: TObject);
 begin
+     GPlan:= TGPlanning.create(self);
+     GPlan.Parent:=self;
+     GPlan.setEditMode;
      EnterPlanning:= TFPlanning_enter.Create(self);
      EnterPlanning.parent:=self;
      EnterPlanning.left:=0;
@@ -122,23 +122,13 @@ end;
 
 procedure TF_planning_01.FormResize(Sender: TObject);
 begin
-  Plannings.Left:=8;
-  Plannings.top:=176;
-  Plannings.height:=Self.height -Plannings.top - 50;
-  Plannings.width := Self.width - 20;
-  Btn_ok.Top := Plannings.top + Plannings.height + 10;
+  GPlan.Left:=8;
+  GPlan.top:=176;
+  GPlan.height:=Self.height -GPlan.top - 50;
+  GPlan.width := Self.width - 20;
+  Btn_ok.Top := GPlan.top + GPlan.height + 10;
   caption:='W = '+inttostr(self.width)+' H = '+inttostr(self.height);
-  scrollbar_show;
-  Scroll_planning_1.top:=pb_plan1.top;
-  Scroll_planning_1.height:=pb_plan1.height;
-  Scroll_planning_1.left := planning_1.Width - Scroll_planning_1.width;
-  pb_plan1.width := Scroll_planning_1.left - pb_plan1.left;
-
-  limite:=pb_plan1.Width div 6;
-  wcol:=(pb_plan1.Width - limite) div 7;
-
   EnterPlanning.visible:=false;
-  pb_plan1.Refresh;
 end;
 
 procedure TF_planning_01.FormShow(Sender: TObject);
@@ -173,7 +163,7 @@ end;
 procedure TF_planning_01.MchangeClick(Sender: TObject);
 
 begin
-    EnterPlanning.Left:=pb_plan1.left + limite + selection.x*wcol;
+ (*   EnterPlanning.Left:=pb_plan1.left + limite + selection.x*wcol;
     if EnterPlanning.Left+EnterPlanning.Width > self.width then
     begin
         EnterPlanning.Left:=pb_plan1.left + limite + (selection.x - 1)*wcol - EnterPlanning.width;
@@ -187,7 +177,7 @@ begin
          if EnterPlanning.top<(pb_plan1.top - EnterPlanning.height div 2)  then EnterPlanning.top:=(pb_plan1.top - EnterPlanning.height div 2);
     end;
     EnterPlanning.setInter(selection.x, Selection.y, mat.lines[selection.Y - 1].colums[selection.x - 1]);
-    EnterPlanning.SetFocus;
+    EnterPlanning.SetFocus;          *)
 end;
 
 procedure TF_planning_01.MinsertClick(Sender: TObject);
@@ -195,7 +185,7 @@ procedure TF_planning_01.MinsertClick(Sender: TObject);
 var i,j,k : integer;
 
 begin
-  assert(selection.y>0,'Incorrect line');
+{  assert(selection.y>0,'Incorrect line');
   j:=selection.y;
   i:=mat.linescount;
   if (i<2) or (not mat.isLineEmpty(i - 2)) then
@@ -213,7 +203,7 @@ begin
   begin
     mat.lines[j].colums[i]:=nil;
   end;
-  pb_plan1.Refresh;
+  pb_plan1.Refresh;   }
 end;
 
 procedure TF_planning_01.modify;
@@ -221,7 +211,7 @@ procedure TF_planning_01.modify;
 var inter : TIntervention;
 
 begin
-    inter:=mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1];
+ {   inter:=mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1];
     if not assigned(inter) then
     begin
          inter:=TIntervention.create(EnterPlanning.col,0,0,0,w_id,mat.lines[EnterPlanning.line - 1].sy_id);
@@ -232,7 +222,7 @@ begin
          inter.h_start:=HourOf(EnterPlanning.StartTime.Time)*100 + MinuteOf(EnterPlanning.StartTime.Time);
          inter.h_end:=HourOf(EnterPlanning.EndTime.Time)*100 + MinuteOf(EnterPlanning.EndTime.Time);
     end;
-    pb_plan1.Refresh;
+    pb_plan1.Refresh;    }
 end;
 
 procedure TF_planning_01.pb_plan1Click(Sender: TObject);
@@ -246,7 +236,7 @@ procedure TF_planning_01.pb_plan1MouseDown(Sender: TObject;
 var l,c : integer;
 
 begin
-     assert(wcol>0,'Col width equals to 0');
+   {  assert(wcol>0,'Col width equals to 0');
      assert(hline>0,'Line height equals to 0');
      EnterPlanning.Visible:=false;
      if x<limite then
@@ -271,7 +261,7 @@ begin
      if Button=mbRight then
      begin
          Planning_menu.PopUp;
-     end;
+     end; }
 end;
 
 procedure TF_planning_01.pb_plan1Paint(Sender: TObject);
@@ -279,7 +269,7 @@ procedure TF_planning_01.pb_plan1Paint(Sender: TObject);
 var w,h : integer;
 
 begin
-    w:=pb_plan1.Width;
+ {   w:=pb_plan1.Width;
     h:=pb_plan1.height;
 
     pb_plan1.Canvas.Clear;
@@ -289,12 +279,12 @@ begin
     pb_plan1.Canvas.FrameRect(0,0,w,h);
     pb_plan1.canvas.Rectangle(0,0,w,h);
 
-    draw_planning_1;
+    draw_planning_1;  }
 end;
 
 procedure TF_planning_01.Scroll_planning_1Change(Sender: TObject);
 begin
-  pb_plan1.Refresh;
+ // pb_plan1.Refresh;
 end;
 
 procedure TF_planning_01.draw_planning_1;
@@ -309,8 +299,8 @@ var w,h : integer;
 
 
 begin
-     w:=pb_plan1.Width;
-     h:=pb_plan1.height;
+ //    w:=pb_plan1.Width;
+   //  h:=pb_plan1.height;
 
      {if nblines>((h-header) div hline) then
      begin
@@ -322,7 +312,7 @@ begin
      end;}
 
      //Header
-     pb_plan1.Canvas.Brush.color:=TColor($FFF8DC);
+{     pb_plan1.Canvas.Brush.color:=TColor($FFF8DC);
      pb_plan1.Canvas.Brush.Style:=bsSolid;
      pb_plan1.Canvas.FillRect(1,1,w-1,header);
      pb_plan1.Canvas.pen.Color:=clblack;
@@ -396,7 +386,7 @@ begin
          end;
          inc(index);
        end;
-     end;
+     end;  }
 
 end;
 
@@ -437,13 +427,10 @@ begin
     end_date:=query.Fields[4].AsString;
 
     s:=query.Fields[5].AsString;
-//    mat.load(s);
-//    s:=copy(s,1,500);
     List.InsertRowWithValues(1,[inttostr(l),start_date,end_date,s]);
     query.Next;
   end;
   List.Row:=1;
-  draw_planning_1;
 end;
 
 procedure TF_planning_01.load_planning(pl_id : longint);
@@ -453,7 +440,6 @@ var s : string;
 
 
 begin
-  mat.reset;
   query.First;
   while not query.eof do
   begin
@@ -461,12 +447,8 @@ begin
        if l=pl_id then
        begin
          s:=query.Fields[5].AsString;
-         mat.load(s);
+         GPlan.load(s);
          nblines:=0;
-         while (nblines<mat.linescount) and (mat.lines[nblines].sy_id>0) do inc(nblines);
-         nblines:=nblines+5;
-         if nblines>mat.linescount then nblines:=mat.linescount;
-         FormResize(self);
          exit;
        end;
        query.Next;
@@ -478,7 +460,7 @@ procedure TF_planning_01.scrollbar_show;
 var h : integer;
 
 begin
-     h:=pb_plan1.Height;
+  {   h:=pb_plan1.Height;
      if nblines>((h-header) div hline) then
      begin
           Scroll_planning_1.Enabled:=true;
@@ -487,7 +469,7 @@ begin
      begin
           Scroll_planning_1.Max:=0;
           Scroll_planning_1.enabled:=false;
-     end;
+     end;   }
 end;
 
 procedure TF_planning_01.selquery(r : longint);

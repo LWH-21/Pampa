@@ -98,8 +98,10 @@ type
     function getHint(pt : Tpoint) : string;
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
+    procedure load(planning_def : string);
     procedure reload;
     procedure refresh;
+    procedure setEditMode;
     destructor destroy; override;
   end;
 
@@ -685,14 +687,17 @@ begin
        for c:=0 to 6 do
        begin
          r.right:=r.left+colwidth;
-         s:=cdays[DayOfTheWeek(d)];
+         s:=cdays[c+1];
          r.top:=0;r.bottom:=lineheight;
          if c<6 then bmp.TextRect(r,r.left,r.top,s,ts,VGABlue)
          else bmp.TextRect(r,r.left,r.top,s,ts,VGARed);
-         s:=datetostr(d);
-         r.Bottom:=header;
-         r.top:=R.bottom-lineheight;
-         bmp.TextRect(r,r.left,r.top,s,ts,BGRABlack);
+         if not (pl_edit in FKind) then
+         begin
+              s:=datetostr(d);
+              r.Bottom:=header;
+              r.top:=R.bottom-lineheight;
+              bmp.TextRect(r,r.left,r.top,s,ts,BGRABlack);
+         end;
          r.Left:=r.right;
          d:=incday(d,1);
        end;
@@ -850,6 +855,7 @@ procedure TGPlanning.FrameResize(Sender: TObject);
 var n : integer;
 
 begin
+     Assert(FColNumber>0,'Colnumber = 0');
      SB_planning.Top:=PToolbar.Height + 1;
      SB_planning.Left:=self.Width - SB_planning.Width - 1;
      SB_planning.height:=Self.Height -  SB_planning.Top - 1;
@@ -861,6 +867,7 @@ begin
      margin:=PB_planning.Width div 4;
      w:=PB_planning.Width;
      h:=PB_planning.Height;
+     colwidth:=(w - margin) div FColNumber;
      if pl_graphic in Fkind then
      begin
           Sb_planning.min:=0;
@@ -885,7 +892,6 @@ begin
        TB_next.enabled:=true;
      end;
 
-     colwidth:=(PB_planning.Width - margin) div FColNumber;
      PB_planning.Refresh;
 end;
 
@@ -940,6 +946,20 @@ begin
      PB_planning.Refresh;
 end;
 
+procedure TGPlanning.load(planning_def : string);
+
+begin
+     if assigned(mat) then freeandnil(mat);
+     selection.x:=-1;
+     selection.y:=-1;
+     mat:=TLPlanning.create();
+     assert(assigned(mat),'Mat not assigned');
+     mat.load(planning_def);
+     if pl_graphic in Fkind then prepare_graphics else
+     if pl_text in FKind then prepare_text;
+     PB_planning.Refresh;
+end;
+
 procedure TGPlanning.PB_planningPaint(Sender: TObject);
 
 var bmp: TBGRABitmap;
@@ -981,6 +1001,15 @@ begin
          prepare_text;
      end;
     PB_planning.Refresh;
+end;
+
+procedure TGPlanning.setEditMode;
+
+begin
+   setKind([pl_edit, pl_week, pl_text]);
+   TB_date.Enabled:=false;
+   TB_prev.Enabled:=false;
+   TB_next.Enabled:=false;
 end;
 
 procedure TGPlanning.SetKind(k : TPlanning_kind);

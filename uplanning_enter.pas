@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, EditBtn, ExtCtrls, Buttons,
-  MaskEdit, W_A, DPlanning, DateUtils;
+  MaskEdit, W_A, UPlanning, DPlanning, DateUtils;
 
 type
 
