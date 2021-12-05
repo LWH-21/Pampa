@@ -225,6 +225,7 @@ var f : TF_planning_01;
 begin
   f:=TF_planning_01.Create(MainForm);
   f.w_id:=self.id;
+  f.DefaultMonitor:=dmActiveForm;
   f.ShowModal;
 end;
 

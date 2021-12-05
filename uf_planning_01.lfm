@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = 2387
+  Left = -1485
   Height = 613
-  Top = 314
+  Top = 233
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613
@@ -13,6 +13,7 @@ inherited F_planning_01: TF_planning_01
   OnDestroy = FormDestroy
   OnResize = FormResize
   OnShow = FormShow
+  Position = poScreenCenter
   object Btn_ok: TBitBtn[0]
     Left = 16
     Height = 30
@@ -74,8 +75,8 @@ inherited F_planning_01: TF_planning_01
     OnSelection = ListSelection
   end
   object Planning_menu: TPopupMenu[4]
-    Left = 136
-    Top = 568
+    Left = 184
+    Top = 496
     object Mchange: TMenuItem
       Caption = 'Modifier'
       OnClick = MchangeClick

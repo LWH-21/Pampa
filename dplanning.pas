@@ -26,11 +26,13 @@ type TIntervention = Class
           w_id : longint;
           c_id : longint;
           col_index : integer;
+          line_index: integer;
 
 
           constructor create (d : tdatetime; hs,he : integer; p,w,c : longint);
           constructor create (i_day,hs,he : integer; p,w,c : longint);
           function Contains(x,y : integer) : boolean;
+          function getBounds : Trect;
           function gethstart : shortstring;
           function gethend : shortstring;
           function getDecimalHstart : real;
@@ -48,20 +50,23 @@ Type   TLine = record
                     colums : array of TIntervention;
               end;
 
+Type Tlibs =  array of record
+                             id : longint;
+                             code : shortstring;
+                             caption : string;
+                             color : TBGRAPixel;
+                       end;
+
 Type TLPlanning = class
      private
+          src : char; // C=collection, J=json
 
      public
           start_date : tdatetime;
           end_date   : tdatetime;
           linescount : integer;
           colscount  : integer;
-          libs       : array of record
-                             id : longint;
-                             code : shortstring;
-                             caption : string;
-                             color : TBGRAPixel;
-                       end;
+          libs       : Tlibs;
           lines : array of Tline;
 
           constructor create;
@@ -204,6 +209,12 @@ function TIntervention.getDecimalHEnd : real;
 
 begin
      result:=dh_end;
+end;
+
+function TIntervention.getBounds : Trect;
+
+begin
+     result:=bounds;
 end;
 
 function TIntervention.gethstart : shortstring;
@@ -477,6 +488,8 @@ begin
             if not assigned(lines[nline].colums[ncol]) then
             begin
                  lines[nline].colums[ncol]:=inter;
+                 inter.col_index:=ncol;
+                 inter.line_index:=nline;
                  found:=true;
             end;
        end;
@@ -658,12 +671,21 @@ begin
      reset;
      if assigned(l) then
      begin
+       while (l.Count>0) do
+       begin
+            inter:=l.ExtractIndex(0);
+            add_inter(inter);
+       end;
+       normalize;
+     end;
+(*     if assigned(l) then
+     begin
           for inter in l do
           begin
                add_inter(inter);
           end;
           normalize;
-     end;
+     end; *)
 end;
 
 procedure TLPlanning.load(s : String);
@@ -689,6 +711,7 @@ var json : TJSONData;
 
 begin
      reset();
+     src:='C';
      if s<=' ' then exit;
      json:=GetJson(s);
      IF assigned(json) then
@@ -749,6 +772,7 @@ var i, j : integer;
     end;
 
 begin
+     src:='J';
      j:=length(libs);
      found:=false;
      for i:=0 to j-1 do
@@ -915,7 +939,17 @@ destructor TLPlanning.destroy();
 var i,j : integer;
 
 begin
-    // reset;
+   //  if (src='J') then
+//     begin
+         for i:=0 to linescount-1 do
+         begin
+           for j:=0 to colscount-1 do
+           begin
+             if (assigned(lines[i].colums[j])) then freeAndNil(lines[i].colums[j]);
+           end;
+         end;
+  //   end;
+     inherited;
 end;
 
 end.

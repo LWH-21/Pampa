@@ -41,13 +41,8 @@ type
     procedure Scroll_planning_1Change(Sender: TObject);
   private
    query : TDataset;
-   header,hline,wcol,limite : integer;
-   nblines : integer;
-   mat :   TLPlanning;
-   currentrow : longint;
-   selection : Tpoint;
-   EnterPlanning: TFPlanning_enter;
    GPlan: TGPlanning;
+   currentrow : integer;
   public
     w_id : longint;
     procedure draw_planning_1;
@@ -79,11 +74,11 @@ procedure TF_planning_01.Btn_okClick(Sender: TObject);
 var s : string;
 
 begin
-     selquery(currentrow);
+  {   selquery(currentrow);
      s:=mat.CreateJson;
      query.Edit;
      query.fieldbyname('SY_DETAIL').AsString:=s;
-     MainData.WriteDataSet(query,'TF_planning_01');
+     MainData.WriteDataSet(query,'TF_planning_01');}
 end;
 
 procedure TF_planning_01.FormCreate(Sender: TObject);
@@ -91,28 +86,14 @@ begin
      GPlan:= TGPlanning.create(self);
      GPlan.Parent:=self;
      GPlan.setEditMode;
-     EnterPlanning:= TFPlanning_enter.Create(self);
-     EnterPlanning.parent:=self;
-     EnterPlanning.left:=0;
-     EnterPlanning.top:=0;
-     mat:=TLPlanning.create;
      w_id:=-1;
      query:=nil;
-     header:=40;
-     hline:=30;
-     currentrow:= -1;
-     EnterPlanning.init(self);
+     currentrow:=-1;
      FormResize(self);
 end;
 
 procedure TF_planning_01.FormDestroy(Sender: TObject);
 begin
-  if assigned(EnterPlanning) then FreeAndNil(EnterPlanning);
-  if assigned(mat) then
-  begin
-    mat.reset;
-    freeAndNil(mat);
-  end;
   if assigned(query) then
   begin
     query.close;
@@ -128,7 +109,6 @@ begin
   GPlan.width := Self.width - 20;
   Btn_ok.Top := GPlan.top + GPlan.height + 10;
   caption:='W = '+inttostr(self.width)+' H = '+inttostr(self.height);
-  EnterPlanning.visible:=false;
 end;
 
 procedure TF_planning_01.FormShow(Sender: TObject);
@@ -448,7 +428,6 @@ begin
        begin
          s:=query.Fields[5].AsString;
          GPlan.load(s);
-         nblines:=0;
          exit;
        end;
        query.Next;

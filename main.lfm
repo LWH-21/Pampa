@@ -1,7 +1,7 @@
 inherited MainForm: TMainForm
-  Left = 423
+  Left = -1670
   Height = 720
-  Top = 92
+  Top = 191
   Width = 1200
   Anchors = [akTop, akLeft, akRight, akBottom]
   Caption = 'Pampa'
@@ -9,6 +9,7 @@ inherited MainForm: TMainForm
   ClientWidth = 1200
   Constraints.MinHeight = 200
   Constraints.MinWidth = 470
+  DefaultMonitor = dmPrimary
   DockSite = True
   FormStyle = fsMDIForm
   Menu = MainMenu1
