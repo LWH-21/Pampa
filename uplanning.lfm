@@ -138,4 +138,24 @@ object GPlanning: TGPlanning
       OnClick = MMonthClick
     end
   end
+  object PopM_upd: TPopupMenu
+    Left = 712
+    Top = 184
+    object Mchange: TMenuItem
+      Caption = 'Modifier'
+      OnClick = MchangeClick
+    end
+    object MDel: TMenuItem
+      Caption = 'Supprimer'
+    end
+    object Minsert: TMenuItem
+      Caption = 'Insérer une ligne'
+    end
+    object MCopy: TMenuItem
+      Caption = 'Copier'
+    end
+    object MPaste: TMenuItem
+      Caption = 'Coller'
+    end
+  end
 end

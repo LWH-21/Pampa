@@ -239,6 +239,10 @@ end;
 
 procedure TFPlanning_enter.Btn_applyClick(Sender: TObject);
 begin
+  if assigned(inter) then
+  begin
+
+  end;
   self.visible:=false;
 end;
 

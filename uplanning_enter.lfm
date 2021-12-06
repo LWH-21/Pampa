@@ -8,8 +8,8 @@ object FPlanning_enter: TFPlanning_enter
   ClientWidth = 320
   OnExit = FrameExit
   TabOrder = 0
-  DesignLeft = -1261
-  DesignTop = 367
+  DesignLeft = 792
+  DesignTop = 42
   object Panel1: TPanel
     Left = 0
     Height = 183

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn, Buttons,  Dialogs,
   dateutils,
-  DPlanning,RessourcesStrings,
+  DPlanning,UPlanning_enter,RessourcesStrings,
   Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
 
 type
@@ -27,11 +27,17 @@ type
 
   TGPlanning = class(TFrame)
       M2weeks: TMenuItem;
+      Mchange: TMenuItem;
+      MCopy: TMenuItem;
+      MDel: TMenuItem;
+      Minsert: TMenuItem;
       MMonth: TMenuItem;
+      MPaste: TMenuItem;
       MWeek: TMenuItem;
       Mtexte: TMenuItem;
       MPdf: TMenuItem;
       Mexcel: TMenuItem;
+      PopM_upd: TPopupMenu;
       PopM_export: TPopupMenu;
       PopM_freq: TPopupMenu;
       TB_date: TDateEdit;
@@ -46,6 +52,7 @@ type
       TB_refresh: TToolButton;
       TB_zoom: TTrackBar;
       procedure M2weeksClick(Sender: TObject);
+      procedure MchangeClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
       procedure MMonthClick(Sender: TObject);
@@ -73,13 +80,14 @@ type
     margin, hline, header, colwidth : integer;
     cache : TBGRABitmap;
     PB_planning :  TLWPaintBox;
+    EnterPlanning: TFPlanning_enter;
 
     procedure draw_frame(bmp : TBGRABitmap);
     procedure draw_header(bmp : TBGRABitmap);
     procedure draw_header_week(bmp : TBGRABitmap);
     procedure draw_header_2weeks(bmp : TBGRABitmap);
     procedure draw_text(bmp : TBGRABitmap);
-
+    function getSelInter() : Tintervention;
     procedure prepare_graphics();
     procedure prepare_text();
     procedure draw_graphics(bmp : TBGRABitmap);
@@ -101,6 +109,7 @@ type
     procedure load(planning_def : string);
     procedure reload;
     procedure refresh;
+    procedure refreshPlanningEnter;
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -178,7 +187,7 @@ end;
 procedure TGPlanning.PB_planningMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
-var c, l,lh,ny  : integer;
+var c, l,lh,ny,ox,oy  : integer;
     inter : TIntervention;
     selchanged : boolean;
     s : string;
@@ -186,45 +195,71 @@ var c, l,lh,ny  : integer;
 begin
    assert(colwidth>0,'Col width equals to 0');
    assert(hline>0,'Line height equals to 0');
-   selchanged:=false;
+   assert(SB_planning.max>0,'Sb_planning.max = '+inttostr(SB_planning.max));
+   assert(hline>0,'Hline = '+inttostr(hline));
+   assert(colwidth>0,'Colwidth = '+inttostr(colwidth));
+   if assigned(EnterPlanning) then
+   begin
+     EnterPlanning.visible:=false;
+   end;
+
    s:='';
-   if (x>margin) and (y>0) and (assigned(cache)) then
+   ox:=selection.x;oy:=selection.y;
+   selection.x:=-1;selection.y:=-1;
+   if (selection.Y<0) and (pl_text in FKind) and (x>margin) and (y>0) then
    begin
-        lh := h - header;
-        ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
-        ny:=ny+y-header;
-        if ((ny>0) and (ny<cache.height)) then
-        begin
-             assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
-             inter:=mat.getInterAt(x,ny);
-             if assigned(inter) then
-             begin
-                  s:=inter.getHint;
-                  if not inter.selected then
-                  begin
-                      inter.selected:=true;
-                      selchanged:=true;
-                  end;
-             end;
-        end;
+     lh := h - header;
+     l:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
+     ox:=(x-margin) div colwidth + 1 ;
+     oy:=(y - header + l) div self.hline + 1;
+     selection.x:=ox;
+     selection.y:=oy;
+     if (ox<>selection.x) or (oy<>selection.y) then selchanged:=true;
+     s:='Line '+inttostr(ox)+' column '+inttostr(oy);
    end;
-   for l:=0 to mat.linescount -1 do
+
+
+   if assigned(mat) then
    begin
-       for c:=0 to mat.colscount-1 do
-       begin
-            if assigned(mat.lines[l].colums[c]) then
-            begin
-                if (mat.lines[l].colums[c].selected) then
-                begin
-                    if (not assigned(inter)) or (inter<>mat.lines[l].colums[c]) then
+     if (x>margin) and (y>0) and (assigned(cache)) then
+     begin
+          lh := h - header;
+          ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
+          ny:=ny+y-header;
+          if ((ny>0) and (ny<cache.height)) then
+          begin
+               assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
+               if assigned(mat) then inter:=mat.getInterAt(x,ny);
+               if assigned(inter) then
+               begin
+                    s:=inter.getHint;
+                    if not inter.selected then
                     begin
-                         mat.lines[l].colums[c].selected:=false;
-                         selchanged:=true;
+                        inter.selected:=true;
+                        selchanged:=true;
                     end;
-                end;
-            end;
-       end;
+               end;
+          end;
+     end;
+     for l:=0 to mat.linescount -1 do
+     begin
+         for c:=0 to mat.colscount-1 do
+         begin
+              if assigned(mat.lines[l].colums[c]) then
+              begin
+                  if (mat.lines[l].colums[c].selected) then
+                  begin
+                      if (not assigned(inter)) or (inter<>mat.lines[l].colums[c]) then
+                      begin
+                           mat.lines[l].colums[c].selected:=false;
+                           selchanged:=true;
+                      end;
+                  end;
+              end;
+         end;
+     end;
    end;
+
    if selchanged then
    begin
         refresh();
@@ -248,6 +283,54 @@ begin
    k:=k + [pl_2weeks];
    SetKind(k);
    reload;
+end;
+
+procedure TGPlanning.MchangeClick(Sender: TObject);
+
+var inter : TIntervention;
+    r : Trect;
+
+begin
+   inter:=getSelInter();
+   if assigned(inter) then
+   begin
+         refreshPlanningEnter;
+         EnterPlanning.setInter(inter);
+         r:=inter.getBounds;
+         EnterPlanning.Top :=r.Top;
+         EnterPlanning.Left:=r.Right;
+   end;
+
+{
+(*   EnterPlanning.Left:=pb_plan1.left + limite + selection.x*wcol;
+   if EnterPlanning.Left+EnterPlanning.Width > self.width then
+   begin
+       EnterPlanning.Left:=pb_plan1.left + limite + (selection.x - 1)*wcol - EnterPlanning.width;
+   end;
+   if EnterPlanning.Left<pb_plan1.left  then EnterPlanning.Left:=pb_plan1.left;
+
+   EnterPlanning.Top:=pb_plan1.top + header + selection.Y * hline;
+   if EnterPlanning.Top + EnterPlanning.Height > self.Height then
+   begin
+        EnterPlanning.Top:=pb_plan1.top + header + (selection.Y - 1) * hline - EnterPlanning.Height;
+        if EnterPlanning.top<(pb_plan1.top - EnterPlanning.height div 2)  then EnterPlanning.top:=(pb_plan1.top - EnterPlanning.height div 2);
+   end;
+   EnterPlanning.setInter(selection.x, Selection.y, mat.lines[selection.Y - 1].colums[selection.x - 1]);
+   EnterPlanning.SetFocus;
+}
+
+   {   inter:=mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1];
+    if not assigned(inter) then
+    begin
+         inter:=TIntervention.create(EnterPlanning.col,0,0,0,w_id,mat.lines[EnterPlanning.line - 1].sy_id);
+         mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1]:=inter;
+    end;
+    if assigned(inter) then
+    begin
+         inter.h_start:=HourOf(EnterPlanning.StartTime.Time)*100 + MinuteOf(EnterPlanning.StartTime.Time);
+         inter.h_end:=HourOf(EnterPlanning.EndTime.Time)*100 + MinuteOf(EnterPlanning.EndTime.Time);
+    end;
+    pb_plan1.Refresh;    }
 end;
 
 procedure TGPlanning.MWeekClick(Sender: TObject);
@@ -891,8 +974,35 @@ begin
        TB_prev.enabled:=true;
        TB_next.enabled:=true;
      end;
-
+     if assigned(EnterPlanning) then
+     begin
+        EnterPlanning.left:=0;
+        EnterPlanning.top:=0;
+        EnterPlanning.visible:=false;
+     end;
      PB_planning.Refresh;
+end;
+
+function TGPlanning.getSelInter() : Tintervention;
+
+var l,c : integer;
+
+begin
+     result:=nil;
+     for l:=0 to mat.linescount -1 do
+     begin
+         for c:=0 to mat.colscount-1 do
+         begin
+              if assigned(mat.lines[l].colums[c]) then
+              begin
+                  if (mat.lines[l].colums[c].selected) then
+                  begin
+                      result:=mat.lines[l].colums[c];
+                      exit;
+                  end;
+              end;
+         end;
+     end;
 end;
 
 procedure TGPlanning.load(lid : longint; startdate : tdatetime);
@@ -1003,19 +1113,57 @@ begin
     PB_planning.Refresh;
 end;
 
+procedure TGPlanning.refreshPlanningEnter;
+
+begin
+   if (assigned(mat) and  assigned(enterplanning)) then
+   begin
+       enterplanning.refresh(mat.libs);
+   end;
+end;
+
 procedure TGPlanning.setEditMode;
 
 begin
    setKind([pl_edit, pl_week, pl_text]);
-   TB_date.Enabled:=false;
-   TB_prev.Enabled:=false;
-   TB_next.Enabled:=false;
+   if not assigned(EnterPlanning) then
+   begin
+        EnterPlanning:= TFPlanning_enter.Create(self);
+        EnterPlanning.parent:=self;
+        EnterPlanning.init(self);
+   end;
+   if assigned(EnterPlanning) then
+   begin
+      EnterPlanning.left:=0;
+      EnterPlanning.top:=0;
+      EnterPlanning.visible:=false;
+   end;
 end;
 
 procedure TGPlanning.SetKind(k : TPlanning_kind);
 
 begin
    Fkind:=k;
+   if assigned(EnterPlanning) then
+   begin
+      EnterPlanning.left:=0;
+      EnterPlanning.top:=0;
+      EnterPlanning.visible:=false;
+   end;
+   if (pl_edit in Fkind) then
+   begin
+      TB_date.visible:=false;
+      TB_prev.visible:=false;
+      TB_next.Visible:=false;
+      PB_planning.PopupMenu := PopM_upd;
+   end;
+   if (pl_consult in FKind) then
+   begin
+        TB_date.visible:=true;
+        TB_prev.visible:=true;
+        TB_next.Visible:=true;
+        PB_planning.PopupMenu := nil;
+   end;
    if pl_graphic in Fkind then
    begin
         Sb_planning.Max:=24;
@@ -1049,6 +1197,7 @@ end;
 destructor TGPlanning.destroy;
 
 begin
+   if assigned(EnterPlanning) then FreeAndNil(EnterPlanning);
    if assigned(mat) then freeAndNil(mat);
    if assigned(cache) then freeAndNil(cache);
    if assigned(colplan) then freeAndNil(colplan);
