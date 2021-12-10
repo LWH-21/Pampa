@@ -103,8 +103,23 @@ begin
 end;
 
 procedure TSearch.set_num_int(i: longint);
+
+var found : boolean;
+    num : longint;
+
 begin
      num_int:=i;
+     found:=false;
+     if (num_int>0) and (requete.RecordCount>1) then
+     begin
+        Requete.First;
+        while (not found) and (not Requete.EOF) do
+        begin
+          num:=Requete.FieldByName('SY_ID').AsInteger;
+          if (num=num_int) then found:=true else Requete.Next;
+        end;
+     end;
+     if not found then Requete.First;
 end;
 
 function TSearch.get_num_int: longint;

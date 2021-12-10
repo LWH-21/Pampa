@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = -1485
+  Left = 442
   Height = 613
-  Top = 233
+  Top = 42
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613

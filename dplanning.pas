@@ -185,6 +185,7 @@ begin
      dh_start:=(h_start div 100)+((h_start mod 100) / 60);
      dh_end:=(h_end div 100)+((h_end mod 100) / 60);
      bounds.left:=0;bounds.right:=0;bounds.top:=0;bounds.bottom:=0;
+     col_index:=i_day;
 end;
 
 function TIntervention.Contains(x,y : integer) : boolean;

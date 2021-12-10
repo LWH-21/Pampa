@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn, Buttons,  Dialogs,
-  dateutils,
+  dateutils, Clipbrd,
   DPlanning,UPlanning_enter,RessourcesStrings,
   Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
 
@@ -107,9 +107,11 @@ type
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure load(planning_def : string);
+    procedure modify(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
     procedure reload;
     procedure refresh;
     procedure refreshPlanningEnter;
+    function save : string;
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -292,45 +294,30 @@ var inter : TIntervention;
 
 begin
    inter:=getSelInter();
-   if assigned(inter) then
+   if (pl_text in FKind) then
    begin
-         refreshPlanningEnter;
-         EnterPlanning.setInter(inter);
-         r:=inter.getBounds;
-         EnterPlanning.Top :=r.Top;
-         EnterPlanning.Left:=r.Right;
+       refreshPlanningEnter;
+       EnterPlanning.setInter(selection.Y, selection.X,inter);
+       if assigned(inter) then
+       begin
+            r:=inter.getBounds;
+       end else
+       begin
+           r.top:=header+selection.y*hline;
+           r.right:=margin+selection.x*colwidth;
+           r.left:=r.right - colwidth;
+       end;
+       EnterPlanning.Top :=r.Top;
+       EnterPlanning.Left:=r.Right;
+       if (EnterPlanning.left+EnterPlanning.Width)>(PB_planning.Width) then
+       begin
+         EnterPlanning.left:=r.Left - EnterPlanning.Width;
+       end;
+       if ((EnterPlanning.top+Enterplanning.Height) > self.height) then
+       begin
+         EnterPlanning.top:=r.top-Enterplanning.Height;
+       end;
    end;
-
-{
-(*   EnterPlanning.Left:=pb_plan1.left + limite + selection.x*wcol;
-   if EnterPlanning.Left+EnterPlanning.Width > self.width then
-   begin
-       EnterPlanning.Left:=pb_plan1.left + limite + (selection.x - 1)*wcol - EnterPlanning.width;
-   end;
-   if EnterPlanning.Left<pb_plan1.left  then EnterPlanning.Left:=pb_plan1.left;
-
-   EnterPlanning.Top:=pb_plan1.top + header + selection.Y * hline;
-   if EnterPlanning.Top + EnterPlanning.Height > self.Height then
-   begin
-        EnterPlanning.Top:=pb_plan1.top + header + (selection.Y - 1) * hline - EnterPlanning.Height;
-        if EnterPlanning.top<(pb_plan1.top - EnterPlanning.height div 2)  then EnterPlanning.top:=(pb_plan1.top - EnterPlanning.height div 2);
-   end;
-   EnterPlanning.setInter(selection.x, Selection.y, mat.lines[selection.Y - 1].colums[selection.x - 1]);
-   EnterPlanning.SetFocus;
-}
-
-   {   inter:=mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1];
-    if not assigned(inter) then
-    begin
-         inter:=TIntervention.create(EnterPlanning.col,0,0,0,w_id,mat.lines[EnterPlanning.line - 1].sy_id);
-         mat.lines[EnterPlanning.line - 1].colums[EnterPlanning.col - 1]:=inter;
-    end;
-    if assigned(inter) then
-    begin
-         inter.h_start:=HourOf(EnterPlanning.StartTime.Time)*100 + MinuteOf(EnterPlanning.StartTime.Time);
-         inter.h_end:=HourOf(EnterPlanning.EndTime.Time)*100 + MinuteOf(EnterPlanning.EndTime.Time);
-    end;
-    pb_plan1.Refresh;    }
 end;
 
 procedure TGPlanning.MWeekClick(Sender: TObject);
@@ -1093,6 +1080,48 @@ begin
    end;
 end;
 
+procedure TGPlanning.modify(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
+
+var i : integer;
+    col,line : integer;
+    oldinter,newinter : Tintervention;
+
+begin
+     assert(length(days)=7,'Invalid parameters : days = '+days);
+     assert(num>0,'Invalid parameters : num='+inttostr(num));
+     assert(he>hs,'Invalid parameters hs='+inttostr(hs)+' he='+inttostr(he));
+     assert(assigned(mat),'Mat not assigned');
+
+     if assigned(inter) then
+     begin
+       for line:=0 to mat.linescount-1 do
+       begin
+         for col:=0 to mat.colscount-1 do
+         begin
+              if assigned(mat.lines[line].colums) then
+              begin
+                  oldinter:=mat.lines[line].colums[col];
+                  if oldinter=inter then
+                  begin
+                       freeAndNil(mat.lines[line].colums[col]);
+                  end;
+              end;
+         end;
+       end;
+     end;
+
+     for i:=1 to 7 do
+     begin
+          if days[i]<>'_' then
+          begin
+               newinter:=TIntervention.create(i,hs,he,-1,-1,num);
+               mat.add_inter(newinter);
+          end;
+     end;
+     mat.normalize;
+     refresh;
+end;
+
 procedure TGPlanning.reload;
 
 begin
@@ -1120,6 +1149,17 @@ begin
    begin
        enterplanning.refresh(mat.libs);
    end;
+end;
+
+function TGPlanning.save : string;
+
+var s : string;
+
+begin
+   s:=mat.CreateJson;
+     //query.Edit;
+     //query.fieldbyname('SY_DETAIL').AsString:=s;
+   result:=s;
 end;
 
 procedure TGPlanning.setEditMode;

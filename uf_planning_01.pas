@@ -74,11 +74,11 @@ procedure TF_planning_01.Btn_okClick(Sender: TObject);
 var s : string;
 
 begin
-  {   selquery(currentrow);
-     s:=mat.CreateJson;
+     selquery(currentrow);
+     s:=Gplan.save();
      query.Edit;
      query.fieldbyname('SY_DETAIL').AsString:=s;
-     MainData.WriteDataSet(query,'TF_planning_01');}
+     MainData.WriteDataSet(query,'TF_planning_01');
 end;
 
 procedure TF_planning_01.FormCreate(Sender: TObject);

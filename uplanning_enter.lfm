@@ -8,8 +8,8 @@ object FPlanning_enter: TFPlanning_enter
   ClientWidth = 320
   OnExit = FrameExit
   TabOrder = 0
-  DesignLeft = 792
-  DesignTop = 42
+  DesignLeft = 765
+  DesignTop = 248
   object Panel1: TPanel
     Left = 0
     Height = 183
@@ -27,8 +27,10 @@ object FPlanning_enter: TFPlanning_enter
       Top = 136
       Width = 75
       Caption = 'Appliquer'
+      Images = MainForm.Images
+      ImageIndex = 0
       OnClick = Btn_applyClick
-      TabOrder = 0
+      TabOrder = 10
     end
     object StartTime: TTimeEdit
       Left = 9
@@ -39,16 +41,16 @@ object FPlanning_enter: TFPlanning_enter
       NumGlyphs = 1
       MaxLength = 0
       OnChange = StartTimeChange
-      TabOrder = 1
+      TabOrder = 8
       Text = '12:00'
     end
     object Ckb_monday: TCheckBox
-      Left = 9
+      Left = 8
       Height = 19
       Hint = 'Lundi'
       Top = 72
       Width = 20
-      TabOrder = 2
+      TabOrder = 1
     end
     object Ckb_tuesday: TCheckBox
       Left = 33
@@ -56,23 +58,23 @@ object FPlanning_enter: TFPlanning_enter
       Hint = 'Mardi'
       Top = 72
       Width = 20
-      TabOrder = 3
+      TabOrder = 2
     end
     object Ckb_wednesday: TCheckBox
-      Left = 81
+      Left = 56
       Height = 19
       Hint = 'Mercredi'
       Top = 72
       Width = 20
-      TabOrder = 4
+      TabOrder = 3
     end
     object Ckb_thursday: TCheckBox
-      Left = 57
+      Left = 80
       Height = 19
       Hint = 'Jeudi'
       Top = 72
       Width = 20
-      TabOrder = 5
+      TabOrder = 4
     end
     object Ckb_friday: TCheckBox
       Left = 105
@@ -80,7 +82,7 @@ object FPlanning_enter: TFPlanning_enter
       Hint = 'Vendredi'
       Top = 72
       Width = 20
-      TabOrder = 6
+      TabOrder = 5
     end
     object Ckb_saturday: TCheckBox
       Left = 129
@@ -88,7 +90,7 @@ object FPlanning_enter: TFPlanning_enter
       Hint = 'Samedi'
       Top = 72
       Width = 20
-      TabOrder = 7
+      TabOrder = 6
     end
     object Ckb_sunday: TCheckBox
       Left = 153
@@ -96,7 +98,7 @@ object FPlanning_enter: TFPlanning_enter
       Hint = 'Dimanche'
       Top = 72
       Width = 20
-      TabOrder = 8
+      TabOrder = 7
     end
     object Label1: TLabel
       Left = 9
@@ -116,7 +118,7 @@ object FPlanning_enter: TFPlanning_enter
       ItemHeight = 15
       ParentShowHint = False
       Style = csDropDownList
-      TabOrder = 9
+      TabOrder = 0
     end
     object SP_add: TSpeedButton
       Left = 264
@@ -126,16 +128,27 @@ object FPlanning_enter: TFPlanning_enter
       Caption = '...'
       OnClick = SP_addClick
     end
-  end
-  object EndTime: TTimeEdit
-    Left = 121
-    Height = 23
-    Top = 104
-    Width = 103
-    ButtonWidth = 23
-    NumGlyphs = 1
-    MaxLength = 0
-    TabOrder = 1
-    Text = 'EndTime'
+    object EndTime: TTimeEdit
+      Left = 121
+      Height = 23
+      Top = 104
+      Width = 103
+      ButtonWidth = 23
+      NumGlyphs = 1
+      MaxLength = 0
+      TabOrder = 9
+      Text = 'EndTime'
+    end
+    object Btn_cancel: TBitBtn
+      Left = 88
+      Height = 30
+      Top = 136
+      Width = 75
+      Caption = 'Annuler'
+      Images = MainForm.Images
+      ImageIndex = 1
+      OnClick = Btn_cancelClick
+      TabOrder = 11
+    end
   end
 end
