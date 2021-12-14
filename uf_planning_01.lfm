@@ -6,8 +6,8 @@ inherited F_planning_01: TF_planning_01
   Caption = 'F_planning_01'
   ClientHeight = 613
   ClientWidth = 1019
-  Constraints.MinHeight = 338
-  Constraints.MinWidth = 500
+  Constraints.MinHeight = 400
+  Constraints.MinWidth = 700
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy

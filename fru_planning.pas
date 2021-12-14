@@ -5,12 +5,12 @@ unit Fru_planning;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, ExtCtrls, Graphics,
-  LCLType, EditBtn,
+  Classes, SysUtils, Forms, Controls, StdCtrls, Buttons, Graphics,
+  LCLType,
   DB,DataAccess,
   ressourcesStrings,
-  fpjson,jsonparser,
-  BGRABitmap, BGRABitmapTypes,
+  fpjson,
+  BGRABitmapTypes,
   dw_f, DWorker, Dateutils, FSearch, DPlanning, UF_planning_01, UPlanning;
 
 type
@@ -28,11 +28,7 @@ type
 
 
     procedure Bt_open_planningClick(Sender: TObject);
-    procedure CheckBox1Change(Sender: TObject);
-    procedure CheckBox1Click(Sender: TObject);
-    procedure Ed_dateChange(Sender: TObject);
     procedure FrameResize(Sender: TObject);
-    procedure GPlanResize(Sender: TObject);
     procedure planPaintBuffer(Sender: TObject);
     procedure SB_rechClick(Sender: TObject);
     procedure SB_previousClick(Sender: TObject);
@@ -205,19 +201,6 @@ begin
 
 end;
 
-procedure TFr_planning.GPlanResize(Sender: TObject);
-begin
-
-end;
-
-procedure TFr_planning.Ed_dateChange(Sender: TObject);
-
-var start : Tdatetime;
-
-begin
-
-end;
-
 procedure TFr_planning.Bt_open_planningClick(Sender: TObject);
 
 var f : TF_planning_01;
@@ -227,16 +210,7 @@ begin
   f.w_id:=self.id;
   f.DefaultMonitor:=dmActiveForm;
   f.ShowModal;
-end;
-
-procedure TFr_planning.CheckBox1Change(Sender: TObject);
-begin
-
-end;
-
-procedure TFr_planning.CheckBox1Click(Sender: TObject);
-begin
-
+  GPlan.reload;
 end;
 
 procedure TFr_planning.SB_rechClick(Sender: TObject);

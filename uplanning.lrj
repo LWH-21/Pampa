@@ -12,5 +12,10 @@
 {"hash":21638,"name":"tgplanning.mpdf.caption","sourcebytes":[80,68,70],"value":"PDF"},
 {"hash":127011813,"name":"tgplanning.mweek.caption","sourcebytes":[72,101,98,100,111,109,97,100,97,105,114,101],"value":"Hebdomadaire"},
 {"hash":6301829,"name":"tgplanning.m2weeks.caption","sourcebytes":[81,117,105,110,122,97,105,110,101],"value":"Quinzaine"},
-{"hash":63286252,"name":"tgplanning.mmonth.caption","sourcebytes":[77,101,110,115,117,101,108],"value":"Mensuel"}
+{"hash":63286252,"name":"tgplanning.mmonth.caption","sourcebytes":[77,101,110,115,117,101,108],"value":"Mensuel"},
+{"hash":95406722,"name":"tgplanning.mchange.caption","sourcebytes":[77,111,100,105,102,105,101,114],"value":"Modifier"},
+{"hash":125352194,"name":"tgplanning.mdel.caption","sourcebytes":[83,117,112,112,114,105,109,101,114],"value":"Supprimer"},
+{"hash":179534853,"name":"tgplanning.minsert.caption","sourcebytes":[73,110,115,195,169,114,101,114,32,117,110,101,32,108,105,103,110,101],"value":"Ins\u00E9rer une ligne"},
+{"hash":78016450,"name":"tgplanning.mcopy.caption","sourcebytes":[67,111,112,105,101,114],"value":"Copier"},
+{"hash":78000834,"name":"tgplanning.mpaste.caption","sourcebytes":[67,111,108,108,101,114],"value":"Coller"}
 ]}

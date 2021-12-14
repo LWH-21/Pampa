@@ -72,13 +72,16 @@ end;
 procedure TF_planning_01.Btn_okClick(Sender: TObject);
 
 var s : string;
+    st,se : tdatetime;
 
 begin
      selquery(currentrow);
-     s:=Gplan.save();
-     query.Edit;
-     query.fieldbyname('SY_DETAIL').AsString:=s;
-     MainData.WriteDataSet(query,'TF_planning_01');
+     if Gplan.save(s,st,se) then
+     begin
+          query.Edit;
+          query.fieldbyname('SY_DETAIL').AsString:=s;
+          MainData.WriteDataSet(query,'TF_planning_01');
+     end;
 end;
 
 procedure TF_planning_01.FormCreate(Sender: TObject);
@@ -417,6 +420,7 @@ procedure TF_planning_01.load_planning(pl_id : longint);
 
 var s : string;
     l : longint;
+    st,en : tdatetime;
 
 
 begin
@@ -426,8 +430,12 @@ begin
        l:=query.Fields[0].AsInteger;
        if l=pl_id then
        begin
+         s:=query.Fields[3].AsString;
+         st:=IsoStrToDate(s);
+         s:=query.Fields[4].AsString;
+         en:=IsoStrToDate(s);
          s:=query.Fields[5].AsString;
-         GPlan.load(s);
+         GPlan.load(s,st,en);
          exit;
        end;
        query.Next;

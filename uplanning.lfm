@@ -108,6 +108,48 @@ object GPlanning: TGPlanning
       TabOrder = 1
     end
   end
+  object Start_planning: TDateEdit
+    Left = 64
+    Height = 23
+    Top = 88
+    Width = 103
+    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+    DateOrder = doNone
+    ButtonWidth = 23
+    NumGlyphs = 1
+    MaxLength = 0
+    TabOrder = 2
+    Text = 'Start_planning'
+  end
+  object End_planning: TDateEdit
+    Left = 64
+    Height = 23
+    Top = 116
+    Width = 103
+    CalendarDisplaySettings = [dsShowHeadings, dsShowDayNames]
+    DateOrder = doNone
+    ButtonWidth = 23
+    NumGlyphs = 1
+    MaxLength = 0
+    TabOrder = 3
+    Text = 'End_planning'
+  end
+  object Label_start: TLabel
+    Left = 16
+    Height = 15
+    Top = 96
+    Width = 15
+    Caption = 'Du'
+    ParentColor = False
+  end
+  object Label_end: TLabel
+    Left = 24
+    Height = 15
+    Top = 120
+    Width = 15
+    Caption = 'Au'
+    ParentColor = False
+  end
   object PopM_export: TPopupMenu
     Left = 712
     Top = 56

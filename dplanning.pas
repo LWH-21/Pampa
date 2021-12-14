@@ -39,6 +39,7 @@ type TIntervention = Class
           function getDecimalHEnd : real;
           function getHint : string;
           procedure setBounds(r : trect);
+          function test : boolean;
      end;
 
 Type
@@ -242,6 +243,14 @@ procedure TIntervention.setBounds(r : trect);
 
 begin
   bounds:=r;
+end;
+
+function TIntervention.test : boolean;
+
+begin
+  result:=true;
+  if h_start>=h_end then result:=false;
+  if (week_day<1) or (week_day>7) then result:=false;
 end;
 
 procedure Tplanning.add_json_planning(s : string; dstart,dend : tdatetime; p_id, w_id : longint; result : TInterventions);
@@ -545,13 +554,14 @@ begin
                    inter:=lines[l].colums[c];
                    if assigned(inter) then
                    begin
-                     objcol:=TJSONObject.create();
-
-                     objcol.add('DAY',inttostr(inter.week_day));
-                     objcol.add('START',inttostr(inter.h_start));
-                     objcol.add('END',inttostr(inter.h_end));
-                   //  if inter.freq<>1 then objcol.add('FREQ',inttostr(inter.freq));
-                     objline.Arrays['INTERV'].add(objcol);
+                     if inter.test() then
+                     begin
+                          objcol:=TJSONObject.create();
+                          objcol.add('DAY',inttostr(inter.week_day));
+                          objcol.add('START',inttostr(inter.h_start));
+                          objcol.add('END',inttostr(inter.h_end));
+                          objline.Arrays['INTERV'].add(objcol);
+                     end;
                    end;
             end;
           end;

@@ -5,7 +5,7 @@ unit UPlanning;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn, Buttons,  Dialogs,
+  Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn,  Dialogs,
   dateutils, Clipbrd,
   DPlanning,UPlanning_enter,RessourcesStrings,
   Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
@@ -26,6 +26,9 @@ type
   TPlanning_kind= set of Planning_kind;
 
   TGPlanning = class(TFrame)
+      Label_start: TLabel;
+      Label_end: TLabel;
+      Start_planning: TDateEdit;
       M2weeks: TMenuItem;
       Mchange: TMenuItem;
       MCopy: TMenuItem;
@@ -40,6 +43,7 @@ type
       PopM_upd: TPopupMenu;
       PopM_export: TPopupMenu;
       PopM_freq: TPopupMenu;
+      End_planning: TDateEdit;
       TB_date: TDateEdit;
       PToolbar: TToolBar;
       TB_prev: TToolButton;
@@ -106,12 +110,12 @@ type
     function getHint(pt : Tpoint) : string;
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
-    procedure load(planning_def : string);
+    procedure load(planning_def : string;s,e : tdatetime);
     procedure modify(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
     procedure reload;
     procedure refresh;
     procedure refreshPlanningEnter;
-    function save : string;
+    function save(var s : string; var sd,ed : tdatetime) : boolean;
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -156,6 +160,10 @@ begin
    hline:=30;
    selection.x:=-1;
    selection.y:=-1;
+   start_planning.visible:=false;
+   end_planning.visible:=false;
+   Label_start.visible:=false;
+   label_end.visible:=false;
    setKind(Fkind);
 end;
 
@@ -293,6 +301,7 @@ var inter : TIntervention;
     r : Trect;
 
 begin
+   if not assigned(mat) then exit;
    inter:=getSelInter();
    if (pl_text in FKind) then
    begin
@@ -955,8 +964,26 @@ begin
        TB_date.enabled:=false;
        TB_prev.enabled:=false;
        TB_next.enabled:=false;
+       start_planning.visible:=true;
+       start_planning.left:=margin - start_planning.width - 5 ;
+       start_planning.top:=PB_planning.Top + 2;
+       end_planning.visible:=true;
+       end_planning.left:=start_planning.left;end_planning.top:=start_planning.top+start_planning.height+1;
+       Label_start.visible:=true;
+       Label_start.Left:=start_planning.left-50;
+       label_end.visible:=true;
+       Label_end.left:=label_start.left;
+       Label_start.top:=start_planning.top;
+       Label_start.BringToFront;
+       label_end.Top:=end_planning.top;
+       Label_end.BringToFront;
+       header:=start_planning.height*2+5;
      end else
      begin
+       start_planning.visible:=false;
+       end_planning.visible:=false;
+       Label_start.visible:=false;
+       label_end.visible:=false;
        TB_date.enabled:=true;
        TB_prev.enabled:=true;
        TB_next.enabled:=true;
@@ -975,6 +1002,7 @@ function TGPlanning.getSelInter() : Tintervention;
 var l,c : integer;
 
 begin
+     if (not assigned(mat)) then exit;
      result:=nil;
      for l:=0 to mat.linescount -1 do
      begin
@@ -1043,7 +1071,7 @@ begin
      PB_planning.Refresh;
 end;
 
-procedure TGPlanning.load(planning_def : string);
+procedure TGPlanning.load(planning_def : string;s,e : tdatetime);
 
 begin
      if assigned(mat) then freeandnil(mat);
@@ -1052,6 +1080,8 @@ begin
      mat:=TLPlanning.create();
      assert(assigned(mat),'Mat not assigned');
      mat.load(planning_def);
+     Start_planning.Date:=s;
+     End_planning.Date:=e;
      if pl_graphic in Fkind then prepare_graphics else
      if pl_text in FKind then prepare_text;
      PB_planning.Refresh;
@@ -1151,15 +1181,13 @@ begin
    end;
 end;
 
-function TGPlanning.save : string;
-
-var s : string;
+function TGPlanning.save(var s : string; var sd,ed : tdatetime) : boolean;
 
 begin
    s:=mat.CreateJson;
-     //query.Edit;
-     //query.fieldbyname('SY_DETAIL').AsString:=s;
-   result:=s;
+   sd:=Start_planning.Date;
+   ed:=End_planning.Date;
+   result:=true;
 end;
 
 procedure TGPlanning.setEditMode;
@@ -1184,6 +1212,7 @@ procedure TGPlanning.SetKind(k : TPlanning_kind);
 
 begin
    Fkind:=k;
+   header:=40;
    if assigned(EnterPlanning) then
    begin
       EnterPlanning.left:=0;
@@ -1196,6 +1225,20 @@ begin
       TB_prev.visible:=false;
       TB_next.Visible:=false;
       PB_planning.PopupMenu := PopM_upd;
+      start_planning.visible:=true;
+      start_planning.left:=margin - start_planning.width - 5 ;
+      start_planning.top:=PB_planning.Top + 2;
+      end_planning.visible:=true;
+      end_planning.left:=start_planning.left;end_planning.top:=start_planning.top+start_planning.height+1;
+      label_start.Top:=start_planning.top;
+      Label_start.BringToFront;
+      label_end.Top:=end_planning.top;
+      Label_end.BringToFront;
+      header:=start_planning.height*2+5;
+   end else
+   begin
+        start_planning.visible:=false;
+        end_planning.visible:=false;
    end;
    if (pl_consult in FKind) then
    begin
