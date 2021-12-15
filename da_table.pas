@@ -35,7 +35,7 @@ type
     function Delete(R: TDataSet; var id: longint): TDbErrcode;
     function getcrc(R: TDataSet): longint;
     function getCurrentId  : longint;
-    function getNextId : integer;
+    function getNextId : longint;
     procedure init(D: TMainData);
     function Insert(R: TDataSet): TDbErrcode;
     function Modified(R : TDataSet) : boolean;
@@ -460,7 +460,7 @@ begin
    end;
 end;
 
-function TDA_table.getNextId : integer;
+function TDA_table.getNextId : longint;
 
 var queryid : TDataSet;
     SQueryId : String;

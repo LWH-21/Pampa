@@ -74,7 +74,16 @@ inherited F_planning_01: TF_planning_01
     TabOrder = 3
     OnSelection = ListSelection
   end
-  object Planning_menu: TPopupMenu[4]
+  object Btn_ok1: TBitBtn[4]
+    Left = 104
+    Height = 30
+    Top = 576
+    Width = 75
+    Caption = 'Btn1'
+    OnClick = Btn_ok1Click
+    TabOrder = 4
+  end
+  object Planning_menu: TPopupMenu[5]
     Left = 184
     Top = 496
     object Mchange: TMenuItem
