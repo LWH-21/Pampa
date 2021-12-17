@@ -7,8 +7,8 @@ object GPlanning: TGPlanning
   ClientWidth = 840
   OnResize = FrameResize
   TabOrder = 0
-  DesignLeft = 781
-  DesignTop = 314
+  DesignLeft = 805
+  DesignTop = 477
   object SB_planning: TScrollBar
     Left = 640
     Height = 121

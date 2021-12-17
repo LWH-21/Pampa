@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = 442
+  Left = 636
   Height = 613
-  Top = 42
+  Top = 138
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613
@@ -19,7 +19,7 @@ inherited F_planning_01: TF_planning_01
     Height = 30
     Top = 576
     Width = 75
-    Caption = 'Btn1'
+    Caption = 'Ok'
     OnClick = Btn_okClick
     TabOrder = 0
   end
@@ -74,13 +74,13 @@ inherited F_planning_01: TF_planning_01
     TabOrder = 3
     OnSelection = ListSelection
   end
-  object Btn_ok1: TBitBtn[4]
+  object Btn_insert: TBitBtn[4]
     Left = 104
     Height = 30
     Top = 576
     Width = 75
-    Caption = 'Btn1'
-    OnClick = Btn_ok1Click
+    Caption = 'Ajouter'
+    OnClick = Btn_insertClick
     TabOrder = 4
   end
   object Planning_menu: TPopupMenu[5]
@@ -95,7 +95,6 @@ inherited F_planning_01: TF_planning_01
     end
     object Minsert: TMenuItem
       Caption = 'Insérer une ligne'
-      OnClick = MinsertClick
     end
     object MCopy: TMenuItem
       Caption = 'Copier'

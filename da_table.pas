@@ -37,10 +37,10 @@ type
     function getCurrentId  : longint;
     function getNextId : longint;
     procedure init(D: TMainData);
-    function Insert(R: TDataSet): TDbErrcode;
+    function Insert(var R: TDataSet): TDbErrcode;
     function Modified(R : TDataSet) : boolean;
     function normalize ( s : string) : string;
-    procedure Read(R: TDataSet; id: longint);
+    procedure Read(var R: TDataSet; id: longint);
     procedure search(crit : string; R : TDataset);virtual ; abstract;
     procedure setCrc(R : TDataSet); virtual;
     function setDefault(R : TDataSet) : boolean; virtual;
@@ -255,7 +255,7 @@ begin
 //  RechQuery.Transaction := Data.Transaction;
 end;
 
-procedure TDA_table.Read(R: Tdataset; id: longint);(* ********************** *)
+procedure TDA_table.Read(var R: Tdataset; id: longint);(* ********************** *)
 
 var
   sselect: string;
@@ -272,6 +272,7 @@ var
   upd : TZUpdateSQL;
 
 begin
+  if not assigned(R) then R:=MainData.getDataSet(R,false);
   assert(assigned(R), 'Requête non assignée');
   assert(table > '', 'Table non renseignée');
   if not MainData.isConnected then exit;
@@ -647,6 +648,7 @@ var squerycrc : string;
     F : TField;
     s_id : longint;
     old_crc, new_crc : longint;
+    v : variant;
 
 begin
   assert(assigned(R),'Dataset not assigned');
@@ -668,7 +670,12 @@ begin
        if datacrc.RecordCount>0 then
        begin
             new_crc:=datacrc.FieldByName('SY_CRC').AsInteger;
-            old_crc:=R.FieldByName('SY_CRC').OldValue;
+            old_crc:=new_crc;
+            try
+              if not VarIsNull(R.FieldByName('SY_CRC').OldValue) then old_crc:=R.FieldByName('SY_CRC').OldValue;
+            except
+              old_crc:=new_crc;
+            end;
             if new_crc<>old_crc then result:=false;
        end else
        begin
@@ -679,7 +686,7 @@ begin
   end;
 end;
 
-function TDA_table.Insert(R: TDataSet): TDbErrcode;
+function TDA_table.Insert(var R: TDataSet): TDbErrcode;
 
 var
   cd: TColumnDesc;
@@ -689,6 +696,7 @@ var
   f: real;
 
 begin
+  if not assigned(R) then R:=MainData.getDataSet(R,false);
   assert(assigned(R), 'Query not assigned');
   assert((R is TSQLQuery) or (R is TZQuery),'Invalid data set type');
  // assert(assigned(R.Transaction), 'Transaction not assigned');
@@ -848,6 +856,7 @@ begin
   result:=false;
   try
     F:=R.Fields.FindField('SY_ID');
+    F.AsLongint:=1;
     if assigned(F) then
     begin
          l_id:=getNextId();

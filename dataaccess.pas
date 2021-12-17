@@ -64,6 +64,7 @@ type
     function isSyntaxFile(f : shortstring):boolean;
     function IsNullOrEmpty(s : string) : boolean;
     function isConnected : boolean;
+    function getDataSet(var R: Tdataset; readonly : boolean) : Tdataset;
     function getSyntax(topic : string; def : string) : string;
     function getTimestamp : shortstring;
     function getQuery(topic : string; def : string = '') : string;
@@ -547,6 +548,34 @@ begin
   result:=FORMATDATETIME(GetSyntax('ROWVERSION','YYYY-MM-DD HH:MM:SS.ZZZ'),now);
 end;
 
+function TMainData.getDataSet(var R: Tdataset; readonly : boolean) : Tdataset;
+
+begin
+  try
+    if MainData.cmode='ZEO' then
+    begin
+      if readonly then
+      begin
+        R:=TZReadOnlyQuery.create(Mainform);
+        TZReadOnlyQuery(R).connection:=Maindata.ZConnection;
+      end else
+      begin
+        R:=TZQuery.create(Mainform);
+        TZQuery(R).connection:=Maindata.ZConnection;
+    end;
+    end else
+    begin
+      R:=TSQLQuery.create(Mainform);
+      TSQLQuery(R).DataBase:=MainData.Database;
+      TSQLQuery(R).transaction:=MainData.tran;
+      TSQLQuery(R).Options:=[sqoKeepOpenOnCommit];
+    end;
+  except
+      on e : Exception do Error (e, dber_sql,'TmainData.GetDataSet ');
+  end;
+  result:=R;
+end;
+
 function TMainData.getSyntax(topic : string; def : string) : string;
 
 var Node : TDomNode;
@@ -710,6 +739,10 @@ begin
              t:=tablesdesc.add;
              ASSERT(assigned(t),'Erreur ajout élément');
              t.table_name:=(Requete.Fields[0].asString).ToUpper;
+             IF t.table_name='PLANNING' then
+             begin
+               sql:='';
+             end;
              t.col_name:=(Requete.Fields[1].asString).ToUpper;
              t.external_name:=Requete.Fields[2].asString;
              code:=Requete.Fields[3].AsString+'N';
@@ -1018,26 +1051,7 @@ begin
   result:=true;
   try
      try
-      if not assigned(R) then
-      begin
-         if MainData.cmode='ZEO' then
-         begin
-              if readonly then
-              begin
-                R:=TZReadOnlyQuery.create(Mainform);
-                TZReadOnlyQuery(R).connection:=Maindata.ZConnection;
-              end else
-              begin
-                   R:=TZQuery.create(Mainform);
-                   TZQuery(R).connection:=Maindata.ZConnection;
-              end;
-         end else
-         begin
-              R:=TSQLQuery.create(Mainform);
-              TSQLQuery(R).DataBase:=MainData.Database;
-              TSQLQuery(R).transaction:=MainData.tran;
-         end;
-      end;
+      if not assigned(R) then getDataSet(R,readonly);
      except
          on e : Exception do Error (e, dber_sql,'TmainData.ReadDataSet '+sql);
      end;

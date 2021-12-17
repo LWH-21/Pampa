@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,DateUtils,
   DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, Menus, ListFilterEdit, W_A, DB,
-  memds, DataAccess, DPlanning, UPlanning, UPlanning_enter;
+  memds, DataAccess, DPlanning, DA_table,UPlanning, UPlanning_enter;
 
 type
 
@@ -15,7 +15,7 @@ type
 
   TF_planning_01 = class(TW_A)
     Btn_ok: TBitBtn;
-    Btn_ok1: TBitBtn;
+    Btn_insert: TBitBtn;
     Ed_lib: TEdit;
     Ed_code: TEdit;
     Mchange: TMenuItem;
@@ -25,9 +25,8 @@ type
     MCopy: TMenuItem;
     Planning_menu: TPopupMenu;
     List: TStringGrid;
-    procedure Btn_ok1Click(Sender: TObject);
+    procedure Btn_insertClick(Sender: TObject);
     procedure Btn_okClick(Sender: TObject);
-    procedure DBGrid1CellClick(Column: TColumn);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -35,8 +34,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure ListSelection(Sender: TObject; aCol, aRow: Integer);
     procedure MchangeClick(Sender: TObject);
-    procedure MinsertClick(Sender: TObject);
-    procedure pb_plan1Click(Sender: TObject);
     procedure pb_plan1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure pb_plan1Paint(Sender: TObject);
@@ -47,12 +44,8 @@ type
    currentrow : integer;
   public
     w_id : longint;
-    procedure draw_planning_1;
     procedure load;
     procedure load_planning(pl_id : longint);
-    procedure modify;
-    procedure scrollbar_show;
-    procedure selquery(r : longint);
   end;
 
 implementation
@@ -66,46 +59,57 @@ begin
   CloseAction:=caFree;
 end;
 
-procedure TF_planning_01.DBGrid1CellClick(Column: TColumn);
-begin
-
-end;
-
 procedure TF_planning_01.Btn_okClick(Sender: TObject);
 
 var s : string;
     st,se : tdatetime;
+    w,p : longint;
+    q : Tdataset;
 
 begin
-     selquery(currentrow);
-     if Gplan.save(s,st,se) then
+     q:=nil;
+     if Gplan.save(s,w,p,st,se) then
      begin
-          query.Edit;
-          query.fieldbyname('SY_DETAIL').AsString:=s;
-          query.fieldbyname('SY_START').AsString:=Planning.ToIsoDate(st);
-          query.fieldbyname('SY_END').AsString:=Planning.ToIsoDate(se);
-          MainData.WriteDataSet(query,'TF_planning_01');
+          if p>0 then
+          begin
+               planning.Read(q,p);
+               q.Edit;
+               q.fieldbyname('SY_DETAIL').AsString:=s;
+               q.fieldbyname('SY_START').AsString:=Planning.ToIsoDate(st);
+               q.fieldbyname('SY_END').AsString:=Planning.ToIsoDate(se);
+               planning.Write(q,p);
+          end else
+          begin
+            planning.Insert(q);
+            //query.Edit;
+            //
+//            query.fieldbyname('SY_ID').asInteger:=max;
+            q.fieldbyname('SY_WID').asInteger:=w;
+            q.fieldbyname('SY_DETAIL').AsString:=s;
+            q.fieldbyname('SY_START').AsString:=Planning.ToIsoDate(st);
+            q.fieldbyname('SY_END').AsString:=Planning.ToIsoDate(se);
+            planning.Write(q,p,um_create);
+          end;
+     end;
+     if assigned(q) then
+     begin
+          q.close;
+          q.free;
      end;
 end;
 
-procedure TF_planning_01.Btn_ok1Click(Sender: TObject);
+procedure TF_planning_01.Btn_insertClick(Sender: TObject);
 
-var max : longint;
-    dt : tdatetime;
+var dt : tdatetime;
     s : string;
 
 begin
-  max:=Planning.getNextId;
   query.Active:=true;
   query.edit;
   query.Insert;
   dt:=now();
-  s:=Planning.ToIsoDate(dt);
-  query.fields[0].AsInteger:=max;
-  query.fields[1].asInteger:=w_id;
-  query.fields[3].asString:=s;
-  query.fields[4].asString:=s;
-  List.InsertRowWithValues(1,[inttostr(max),s,s,'']);
+  s:=formatdate(dt);
+  List.InsertRowWithValues(1,['New',s,'???','']);
   List.Row:=1;
   ListSelection(self,1,1);
 end;
@@ -149,22 +153,17 @@ end;
 procedure TF_planning_01.ListSelection(Sender: TObject; aCol, aRow: Integer);
 
 var s : shortstring;
-    s1 : string;
     l : longint;
 
 begin
   if aRow>0 then
   begin
        s:=List.Cells[0,aRow];
-       if trystrtoint(s,l) then
+       if not trystrtoint(s,l) then l:=-1;
+       if currentrow<>l then
        begin
-           if currentrow<>l then
-           begin
-               currentrow:=l;
-               selquery(l);
-               s1:=List.Cells[0,aRow];
-               if TryStrToInt(s1,l) then load_planning(l);
-           end;
+          currentrow:=l;
+          load_planning(l);
        end;
   end;
 end;
@@ -189,26 +188,6 @@ begin
     EnterPlanning.SetFocus;          *)
 end;
 
-procedure TF_planning_01.MinsertClick(Sender: TObject);
-
-
-
-begin
-
-end;
-
-procedure TF_planning_01.modify;
-
-
-begin
-
-end;
-
-procedure TF_planning_01.pb_plan1Click(Sender: TObject);
-begin
-
-end;
-
 procedure TF_planning_01.pb_plan1MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
@@ -231,17 +210,12 @@ begin
  // pb_plan1.Refresh;
 end;
 
-procedure TF_planning_01.draw_planning_1;
-
-begin
-end;
-
 procedure TF_planning_01.load;
 
 var R : TDataSet;
     sql,s : string;
     l : longint;
-    start_date,end_date : shortstring;
+    start_date,end_date : tdatetime;
 
 begin
   Ed_code.Clear;
@@ -269,11 +243,11 @@ begin
   while not query.EOF do
   begin
     l:=Query.Fields[0].AsInteger;
-    start_date:=query.Fields[3].AsString;
-    end_date:=query.Fields[4].AsString;
+    start_date:=IsoStrToDate(query.Fields[3].AsString);
+    end_date:=IsoStrToDate(query.Fields[4].AsString);
 
     s:=query.Fields[5].AsString;
-    List.InsertRowWithValues(1,[inttostr(l),start_date,end_date,s]);
+    List.InsertRowWithValues(1,[inttostr(l),formatdate(start_date),formatdate(end_date),resumeplanning(s)]);
     query.Next;
   end;
   List.Row:=1;
@@ -287,58 +261,21 @@ var s : string;
 
 
 begin
-  query.First;
-  while not query.eof do
+  if pl_id>0 then planning.Read(query,pl_id);
+  if (pl_id>0) and (query.RecordCount=1) then
   begin
-       l:=query.Fields[0].AsInteger;
-       if l=pl_id then
-       begin
-         s:=query.Fields[3].AsString;
-         st:=IsoStrToDate(s);
-         s:=query.Fields[4].AsString;
-         en:=IsoStrToDate(s);
-         s:=query.Fields[5].AsString;
-         GPlan.load(s,st,en);
-         exit;
-       end;
-       query.Next;
+    s:=query.Fields[3].AsString;
+    st:=IsoStrToDate(s);
+    s:=query.Fields[4].AsString;
+    en:=IsoStrToDate(s);
+    s:=query.Fields[5].AsString;
+    GPlan.load(s,w_id,pl_id,st,en);
+  end else
+  begin
+    st:=now();
+    en:=encodedate(2499,12,31);
+    GPlan.load('',w_id,pl_id,st,en);
   end;
-end;
-
-procedure TF_planning_01.scrollbar_show;
-
-var h : integer;
-
-begin
-  {   h:=pb_plan1.Height;
-     if nblines>((h-header) div hline) then
-     begin
-          Scroll_planning_1.Enabled:=true;
-          Scroll_planning_1.Max:=nblines;
-     end else
-     begin
-          Scroll_planning_1.Max:=0;
-          Scroll_planning_1.enabled:=false;
-     end;   }
-end;
-
-procedure TF_planning_01.selquery(r : longint);
-
-var found : boolean;
-    l : longint;
-
-begin
-     assert(assigned(query),'Dataset not assigned');
-     assert(r>0,'Invalid parameter');
-     query.First;
-     found:=false;
-     while (not found) and (not query.eof) do
-     begin
-       l:=query.Fields[0].AsInteger;
-       found:=(r = l);
-       if not found then query.next;
-     end;
-     assert(l=r,'Record not found');
 end;
 
 end.

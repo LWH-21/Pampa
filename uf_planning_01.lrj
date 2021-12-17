@@ -1,11 +1,11 @@
 {"version":1,"strings":[
 {"hash":144964129,"name":"tf_planning_01.caption","sourcebytes":[70,95,112,108,97,110,110,105,110,103,95,48,49],"value":"F_planning_01"},
-{"hash":301841,"name":"tf_planning_01.btn_ok.caption","sourcebytes":[66,116,110,49],"value":"Btn1"},
+{"hash":1371,"name":"tf_planning_01.btn_ok.caption","sourcebytes":[79,107],"value":"Ok"},
 {"hash":1780,"name":"tf_planning_01.list.columns[0].title.caption","sourcebytes":[105,100],"value":"id"},
 {"hash":84801988,"name":"tf_planning_01.list.columns[1].title.caption","sourcebytes":[68,195,169,98,117,116],"value":"D\u00E9but"},
 {"hash":19710,"name":"tf_planning_01.list.columns[2].title.caption","sourcebytes":[70,105,110],"value":"Fin"},
 {"hash":78424060,"name":"tf_planning_01.list.columns[3].title.caption","sourcebytes":[68,101,116,97,105,108],"value":"Detail"},
-{"hash":301841,"name":"tf_planning_01.btn_ok1.caption","sourcebytes":[66,116,110,49],"value":"Btn1"},
+{"hash":135711362,"name":"tf_planning_01.btn_insert.caption","sourcebytes":[65,106,111,117,116,101,114],"value":"Ajouter"},
 {"hash":95406722,"name":"tf_planning_01.mchange.caption","sourcebytes":[77,111,100,105,102,105,101,114],"value":"Modifier"},
 {"hash":125352194,"name":"tf_planning_01.mdel.caption","sourcebytes":[83,117,112,112,114,105,109,101,114],"value":"Supprimer"},
 {"hash":179534853,"name":"tf_planning_01.minsert.caption","sourcebytes":[73,110,115,195,169,114,101,114,32,117,110,101,32,108,105,103,110,101],"value":"Ins\u00E9rer une ligne"},

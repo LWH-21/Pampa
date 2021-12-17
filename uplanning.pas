@@ -110,12 +110,12 @@ type
     function getHint(pt : Tpoint) : string;
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
-    procedure load(planning_def : string;s,e : tdatetime);
+    procedure load(planning_def : string;wid,pid : longint; s,e : tdatetime);
     procedure modify(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
     procedure reload;
     procedure refresh;
     procedure refreshPlanningEnter;
-    function save(var s : string; var sd,ed : tdatetime) : boolean;
+    function save(var s : string; var w_id : longint; var p_id : longint; var sd,ed : tdatetime) : boolean;
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -1071,7 +1071,7 @@ begin
      PB_planning.Refresh;
 end;
 
-procedure TGPlanning.load(planning_def : string;s,e : tdatetime);
+procedure TGPlanning.load(planning_def : string;wid,pid : longint;s,e : tdatetime);
 
 begin
      if assigned(mat) then freeandnil(mat);
@@ -1079,9 +1079,10 @@ begin
      selection.y:=-1;
      mat:=TLPlanning.create();
      assert(assigned(mat),'Mat not assigned');
-     mat.load(planning_def);
+     mat.load(planning_def,wid,pid);
+     Start_planning.clear;
      Start_planning.Date:=s;
-     End_planning.Date:=e;
+     if yearof(e)<2499 then End_planning.Date:=e else End_planning.Clear;
      if pl_graphic in Fkind then prepare_graphics else
      if pl_text in FKind then prepare_text;
      PB_planning.Refresh;
@@ -1181,12 +1182,21 @@ begin
    end;
 end;
 
-function TGPlanning.save(var s : string; var sd,ed : tdatetime) : boolean;
+function TGPlanning.save(var s : string; var w_id : longint; var p_id : longint; var sd,ed : tdatetime) : boolean;
 
 begin
    s:=mat.CreateJson;
    sd:=Start_planning.Date;
    ed:=End_planning.Date;
+   if comparedate(sd,ed)>=0 then
+   begin
+     if yearof(ed)<=1900 then
+     begin
+          ed:=EncodeDate(2499,12,31);
+     end;
+   end;
+   w_id := mat.getWorkerId();
+   p_id:=mat.getPlanningId();
    result:=true;
 end;
 

@@ -61,6 +61,8 @@ Type Tlibs =  array of record
 Type TLPlanning = class
      private
           src : char; // C=collection, J=json
+          p_id : longint; // Plannind ID
+          w_id : longint; // Worker ID
 
      public
           start_date : tdatetime;
@@ -76,10 +78,12 @@ Type TLPlanning = class
           function add_line : integer;
           function CreateJson : string;
           function getColor(l: integer) : TBGRAPixel;
+          function getPlanningId(): longint;
           function getInterAt(x,y : integer) : TIntervention;
+          function getWorkerId() : longint;
           function isLineEmpty(l : integer) : boolean;
           procedure load(l : TInterventions);
-          procedure load(s : string);
+          procedure load(s : string; w, p : longint);
           function loadID(s_id : longint) : integer;
           procedure normalize;
           procedure reset;
@@ -103,6 +107,8 @@ type
   end;
 
 function IsoStrToDate(s : shortstring) : TdateTime;
+function formatdate(dt : tdatetime) : shortstring;
+function resumeplanning(s : string) : string;
 
 var
   Planning: TPlanning;
@@ -154,6 +160,52 @@ begin
        if TryStrToInt(copy(s,1,4),y) and tryStrToInt(copy(s,5,2),m) and TryStrToInt(copy(s,7,2),d) then
          result:=EncodeDate(y,m,d);
   end;
+end;
+
+function formatdate(dt : tdatetime) : shortstring;
+
+begin
+  if yearof(dt)>=2499 then result:='???' else  result:=datetostr(dt);
+end;
+
+function resumeplanning(s : string) : string;
+
+var json : TJSONData;
+    Data, Data1,Data2: TJSONData;
+    jo1 : TJSONData;
+    i,j,i_day,i_start,i_end : integer;
+
+begin
+    result:='';
+     json:=GetJson(s);
+     IF assigned(json) then
+     begin
+       data:=Json.findPath('PLANNING');
+       if assigned(data) and (data.JSONType=jtarray) then
+       begin
+            for i:=0 to Data.Count-1 do
+            begin
+                 jo1:=TJSONArray(Data).Objects[i];
+                 Data1:=jo1.FindPath('INTERV');
+                 if (assigned(Data1)) and (data1.JSONType=jtarray) then
+                 begin
+                      for j:=0 to Data1.Count-1 do
+                      begin
+                           i_day:=-1;i_start:=0;i_end:=0;
+                           jo1:=TJSONArray(Data1).Objects[j];
+                           Data2:=jo1.FindPath('DAY');
+                           if assigned(data2) then i_day:=Data2.AsInteger;
+                           Data2:=jo1.FindPath('START');
+                           if assigned(data2) then i_start:=Data2.AsInteger;
+                           Data2:=jo1.FindPath('END');
+                           if assigned(data2) then i_end:=Data2.AsInteger;
+                           result:=result+inttostr(i_day)+' '+inttostr(i_start)+' '+inttostr(i_end)+'; ';
+                      end;
+                 end;
+            end;
+       end;
+       freeAndNil(json);
+     end;
 end;
 
 
@@ -586,6 +638,12 @@ begin
      end;
 end;
 
+function TLPlanning.getPlanningId(): longint;
+
+begin
+     result:=self.p_id;
+end;
+
 function TLPlanning.getInterAt(x,y : integer) : TIntervention;
 
 var i, j : integer;
@@ -607,6 +665,12 @@ begin
                end;
           end;
      end;
+end;
+
+function TLPlanning.getWorkerId() : longint;
+
+begin
+     result:=self.w_id;
 end;
 
 function TLPlanning.isLineEmpty(l : integer) : boolean;
@@ -699,7 +763,7 @@ begin
      end; *)
 end;
 
-procedure TLPlanning.load(s : String);
+procedure TLPlanning.load(s : String; w, p : longint);
 
 var json : TJSONData;
     Data, Data1,Data2: TJSONData;
@@ -722,6 +786,8 @@ var json : TJSONData;
 
 begin
      reset();
+     self.w_id:=w;
+     self.p_id:=p;
      src:='C';
      if s<=' ' then exit;
      json:=GetJson(s);
