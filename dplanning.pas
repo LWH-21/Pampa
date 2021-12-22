@@ -45,6 +45,11 @@ type TIntervention = Class
 Type
   TInterventions = specialize  TObjectList<TIntervention>;
 
+  TInterComparer = class (specialize TComparer <TIntervention>)
+                    function Compare(constref Left, Right: TIntervention): Integer;
+                   end;
+
+
 Type   TLine = record
                     sy_id : longint;
                     index : integer;
@@ -78,6 +83,7 @@ Type TLPlanning = class
           function add_line : integer;
           function CreateJson : string;
           function getColor(l: integer) : TBGRAPixel;
+          function getInterventions : TInterventions;
           function getPlanningId(): longint;
           function getInterAt(x,y : integer) : TIntervention;
           function getWorkerId() : longint;
@@ -148,6 +154,8 @@ Const
        '#4390DF', '#59CDE2', '#7AD61D', '#FFC194', '#F472D0', '#00CCFF', '#45FFFD', '#78AA1C', '#DA5A53'
         ) ;
 
+
+
 function IsoStrToDate(s : shortstring) : TdateTime;
 
 var y,m,d : integer;
@@ -205,6 +213,27 @@ begin
             end;
        end;
        freeAndNil(json);
+     end;
+end;
+
+function TIntercomparer.Compare(constref left,right : TIntervention) : integer;
+
+begin
+     result:=comparedate(left.dt, right.dt);
+     if result=0 then
+     begin
+       if left.h_start<right.h_start then result:=-1 else
+         if left.h_start>right.h_start then result:=1;
+     end;
+     if result=0 then
+     begin
+       if left.h_end<right.h_end then result:=-1 else
+         if left.h_end>right.h_end then result:=1;
+     end;
+     if result=0 then
+     begin
+       if left.c_id<right.c_id then result:=-1 else
+         if left.c_id>right.c_id then result:=1;
      end;
 end;
 
@@ -636,6 +665,26 @@ begin
           assert( (lines[l].index>=0) and (lines[l].index<length(libs)),'Invalid index');
           result := libs[lines[l].index].color;
      end;
+end;
+
+function TLPlanning.getInterventions : TInterventions;
+
+var l,c : integer;
+  //  comp : TInterComparer;
+
+begin
+     result:=TInterventions.Create;
+     for l:=0 to linescount-1 do
+     begin
+            for c:=0 to colscount-1 do
+            begin
+                   if assigned(lines[l].colums[c]) then
+                   result.add(lines[l].colums[c]);
+            end;
+     end;
+    (* comp:=TInterComparer.Create;
+     result.sort(comp);
+     freeAndNil(comp);   *)
 end;
 
 function TLPlanning.getPlanningId(): longint;

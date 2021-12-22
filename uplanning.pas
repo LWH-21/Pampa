@@ -58,6 +58,7 @@ type
       procedure M2weeksClick(Sender: TObject);
       procedure MchangeClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
+      procedure MtexteClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
       procedure MMonthClick(Sender: TObject);
       procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
@@ -66,6 +67,7 @@ type
         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
       procedure SB_planningChange(Sender: TObject);
       procedure TB_dateChange(Sender: TObject);
+      procedure TB_exportClick(Sender: TObject);
       procedure TB_graphClick(Sender: TObject);
       procedure TB_nextClick(Sender: TObject);
       procedure TB_prevClick(Sender: TObject);
@@ -122,7 +124,7 @@ type
 
 implementation
 
-uses Main;
+uses Main, PL_export;
 
 {$R *.lfm}
 
@@ -282,6 +284,11 @@ begin
 
 end;
 
+procedure TGPlanning.MtexteClick(Sender: TObject);
+begin
+   export_planning(mat,FKind);
+end;
+
 procedure TGPlanning.M2weeksClick(Sender: TObject);
 
 var k : TPlanning_kind;
@@ -399,6 +406,11 @@ begin
      begin
          load(id,d);
      end;
+end;
+
+procedure TGPlanning.TB_exportClick(Sender: TObject);
+begin
+   export_planning(mat,FKind);
 end;
 
 procedure TGPlanning.TB_graphClick(Sender: TObject);

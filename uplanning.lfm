@@ -66,8 +66,8 @@ object GPlanning: TGPlanning
       Left = 335
       Top = 2
       Caption = 'Export'
-      DropdownMenu = PopM_export
       ImageIndex = 2
+      OnClick = TB_exportClick
     end
     object ToolButton2: TToolButton
       Left = 327
@@ -159,6 +159,7 @@ object GPlanning: TGPlanning
     end
     object Mtexte: TMenuItem
       Caption = 'Texte'
+      OnClick = MtexteClick
     end
     object MPdf: TMenuItem
       Caption = 'PDF'
