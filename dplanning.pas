@@ -43,10 +43,10 @@ type TIntervention = Class
      end;
 
 Type
-  TInterventions = specialize  TObjectList<TIntervention>;
+  TInterventions = specialize  TList<TIntervention>;
 
   TInterComparer = class (specialize TComparer <TIntervention>)
-                    function Compare(constref Left, Right: TIntervention): Integer;
+                    function Compare(constref Left, Right: TIntervention): Integer;override;
                    end;
 
 
@@ -219,7 +219,7 @@ end;
 function TIntercomparer.Compare(constref left,right : TIntervention) : integer;
 
 begin
-     result:=comparedate(left.dt, right.dt);
+    result:=comparedate(left.dt, right.dt);
      if result=0 then
      begin
        if left.h_start<right.h_start then result:=-1 else
@@ -236,7 +236,6 @@ begin
          if left.c_id>right.c_id then result:=1;
      end;
 end;
-
 
 constructor TIntervention.create (d : tdatetime;  hs,he : integer; p,w,c : longint);
 
@@ -670,7 +669,7 @@ end;
 function TLPlanning.getInterventions : TInterventions;
 
 var l,c : integer;
-  //  comp : TInterComparer;
+    comp : TInterComparer;
 
 begin
      result:=TInterventions.Create;
@@ -682,9 +681,9 @@ begin
                    result.add(lines[l].colums[c]);
             end;
      end;
-    (* comp:=TInterComparer.Create;
+     comp:=TInterComparer.Create;
      result.sort(comp);
-     freeAndNil(comp);   *)
+     freeAndNil(comp);
 end;
 
 function TLPlanning.getPlanningId(): longint;
@@ -1077,6 +1076,8 @@ begin
   //   end;
      inherited;
 end;
+
+
 
 end.
 

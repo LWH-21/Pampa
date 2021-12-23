@@ -24,6 +24,7 @@ var MyWorkBook : TsWorkBook;
     s : string;
     dt : tdatetime;
     BgColor : TsColor;
+    border : TsCellBorders;
 
 begin
   if fileexists(fname) then
@@ -37,26 +38,50 @@ begin
   Myworkbook:=TsWorkBook.Create;
   MyWorkSheet:=MyWorkBook.AddWorksheet('Planning');
   dt:=mat.start_date;
+  MyWorksheet.WriteColWidth(1, 10, suChars);
+  MyWorksheet.WriteColWidth(2, 40, suChars);
   for l:=0 to mat.linescount - 1 do
   begin
-       s:=mat.libs[mat.lines[l].index].code;
-       MyWorkSheet.WriteText(l+2,1,s);
-       s:=mat.libs[mat.lines[l].index].caption;
        BgColor:=mat.libs[mat.lines[l].index].color.ToColor;
-       MyWorkSheet.WriteText(l+2,2,s);
-       MyWorkSheet.WriteBorders(l+2,2,[cbNorth, cbWest, cbEast, cbSouth]);
+       border:=[ cbWest, cbEast];    //[cbNorth, cbWest, cbEast, cbSouth]
+       if l=0 then border:=border+[cbNorth] else
+       if (mat.lines[l].index<>mat.lines[l-1].index) then border:=border+[cbNorth];
+       if l=mat.linescount-1 then border:=border+[cbSouth] else
+       if (mat.lines[l].index<>mat.lines[l+1].index) then border:=border+[cbSouth];
+       if (l=0) or (mat.lines[l].index<>mat.lines[l-1].index) then
+       begin
+              s:=mat.libs[mat.lines[l].index].code;
+              MyWorkSheet.WriteText(l+2,1,s);
+              s:=mat.libs[mat.lines[l].index].caption;
+              MyWorkSheet.WriteText(l+2,2,s);
+       end;
+       MyWorkSheet.WriteBorders(l+2,1,border);
+       MyWorkSheet.WriteBorders(l+2,2,border);
        for c:=0 to mat.colscount-1 do
        begin
+            MyWorksheet.WriteHorAlignment(l+2,3+(c*2), haCenter);
+            MyWorksheet.WriteHorAlignment(l+2,4+(c*2), haCenter);
+            MyWorkSheet.WriteBorders(l+2,3+(c*2),[cbNorth, cbWest, cbSouth]);
+            MyWorkSheet.WriteBorders(l+2,4+(c*2),[cbNorth, cbEast, cbSouth]);
             if (l=0) then
             begin
-              MyWorkSheet.WriteDateTime(l+1,c+3,incday(dt,c),nfShortDate);
+              MyWorkSheet.WriteDateTime(l+1,3+(c*2),incday(dt,c),nfShortDate);
+              MyWorkSheet.WriteBorders(l+1,3+(c*2),[cbNorth, cbWest, cbEast, cbSouth]);
+              MyWorkSheet.WriteBorders(l+1,4+(c*2),[cbNorth, cbWest, cbEast, cbSouth]);
+              MyWorksheet.MergeCells(l+1, 3+(c*2), l+1, 4+(c*2));
+              MyWorksheet.WriteHorAlignment(l+1,3+(c*2), haCenter);
+              MyWorksheet.WriteColWidth(3+(c*2), 7, suChars);
+              MyWorksheet.WriteColWidth(4+(c*2), 7, suChars);
             end;
             inter:=mat.lines[l].colums[c];
             if assigned(inter) then
             begin
-                 s:=inter.gethstart+' - '+inter.gethend;
-                 MyWorkSheet.WriteBackground(l+2,c+3,fsSolidFill,scTransparent,BgColor);
-                 MyWorkSheet.WriteText(l+2,c+3,s);
+                 s:=inter.gethstart;
+                 MyWorkSheet.WriteBackground(l+2,3+(c*2),fsSolidFill,scTransparent,BgColor);
+                 MyWorkSheet.WriteText(l+2,3+(c*2),s);
+                 s:=inter.gethend;
+                 MyWorkSheet.WriteBackground(l+2,4+(c*2),fsSolidFill,scTransparent,BgColor);
+                 MyWorkSheet.WriteText(l+2,4+(c*2),s);
             end;
        end;
   end;
@@ -141,16 +166,29 @@ begin
      s:=lineEnding;
      strm.write(s[1],length(s));
 
-     s:=StringOfChar('-',59)+LineEnding;
+     s:=StringOfChar('-',62)+LineEnding;
      strm.write(s[1],length(s));
 
      lst:=mat.getInterventions;
-
+     l:=0;
      while lst.Count>0 do
      begin
           inter:=lst.ExtractIndex(0);
-          s:=formatdate(inter.dt)+space(20);
-          s:=s.Substring(0,12);
+          s:='';
+          if (l>0) and (comparedate(dt,inter.dt)<>0) then
+          begin
+            s:=StringOfChar('-',62)+LineEnding;
+            strm.write(s[1],length(s));
+            s:=formatdate(dt)+space(12);
+          end;
+          if (l=0) then s:=formatdate(dt);
+          s:=s+space(12);
+          inc(l);
+          dt:=inter.dt;
+
+          s:=s.Substring(0,12)+' | ';
+          s:=s+' '+inter.gethstart+' - '+inter.gethend+space(3)+space(32);
+          s:=s.substring(0,32)+'|';
           s1:='';
           for c:=0 to length(mat.lines)-1 do
           begin
@@ -160,12 +198,16 @@ begin
                  break;
                end;
           end;
-          s:=s+s1+space(20);
-          s:=s.substring(0,40)+'|';
-          s:=s+' '+inter.gethstart+' - '+inter.gethend+space(3)+'|';
+          s:=s+' '+s1+space(61);
+          s:=s.substring(0,61)+'|';
+
           s:=s+lineEnding;
           strm.write(s[1],length(s));
      end;
+
+     s:=StringOfChar('-',62)+LineEnding;
+     strm.write(s[1],length(s));
+
      lst.DeleteRange(0,lst.Count);
      lst.Clear;
      lst.free;
