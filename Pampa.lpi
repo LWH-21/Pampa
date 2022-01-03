@@ -71,7 +71,7 @@
         <PackageName Value="LCL"/>
       </Item10>
     </RequiredPackages>
-    <Units Count="24">
+    <Units Count="25">
       <Unit0>
         <Filename Value="Pampa.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -250,6 +250,11 @@
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="UPlanning_enter"/>
       </Unit23>
+      <Unit24>
+        <Filename Value="pl_export.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="PL_export"/>
+      </Unit24>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

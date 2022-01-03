@@ -27,6 +27,7 @@ type
     List: TStringGrid;
     procedure Btn_insertClick(Sender: TObject);
     procedure Btn_okClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -96,6 +97,11 @@ begin
           q.close;
           q.free;
      end;
+end;
+
+procedure TF_planning_01.FormActivate(Sender: TObject);
+begin
+  inherited;
 end;
 
 procedure TF_planning_01.Btn_insertClick(Sender: TObject);
@@ -235,7 +241,7 @@ begin
        end;
        R.close;
   end;
-  sql:=MainData.getQuery('QPL02','SELECT SY_ID, SY_WID, SY_FORMAT, SY_START, SY_END, SY_DETAIL FROM PLANNING WHERE SY_WID=%w');
+  sql:=MainData.getQuery('QPL02','SELECT SY_ID, SY_WID, SY_START, SY_END FROM PLANNING WHERE SY_WID=%w ORDER BY 3,4');
   sql:=sql.Replace('%w',inttostr(w_id));
   Maindata.readDataSet(query,sql,true);
   List.Clean;
@@ -243,11 +249,11 @@ begin
   while not query.EOF do
   begin
     l:=Query.Fields[0].AsInteger;
-    start_date:=IsoStrToDate(query.Fields[3].AsString);
-    end_date:=IsoStrToDate(query.Fields[4].AsString);
+    start_date:=IsoStrToDate(query.Fields[2].AsString);
+    end_date:=IsoStrToDate(query.Fields[3].AsString);
 
-    s:=query.Fields[5].AsString;
-    List.InsertRowWithValues(1,[inttostr(l),formatdate(start_date),formatdate(end_date),resumeplanning(s)]);
+   // s:=query.Fields[5].AsString;
+    List.InsertRowWithValues(1,[inttostr(l),formatdate(start_date),formatdate(end_date),'']);
     query.Next;
   end;
   List.Row:=1;
@@ -255,12 +261,14 @@ end;
 
 procedure TF_planning_01.load_planning(pl_id : longint);
 
-var s : string;
+var s,sql : string;
     l : longint;
     st,en : tdatetime;
+    R : TDataSet;
 
 
 begin
+  R:=nil;
   if pl_id>0 then planning.Read(query,pl_id);
   if (pl_id>0) and (query.RecordCount=1) then
   begin
@@ -268,8 +276,16 @@ begin
     st:=IsoStrToDate(s);
     s:=query.Fields[4].AsString;
     en:=IsoStrToDate(s);
-    s:=query.Fields[5].AsString;
-    GPlan.load(s,w_id,pl_id,st,en);
+    sql:='SELECT SY_DETAIL FROM DPLANNING WHERE PL_ID=%id';
+    sql:=sql.Replace('%id',inttostr(pl_id));
+    Maindata.readDataSet(R,sql,true);
+    WHILE NOT R.EOF DO
+    BEGIN
+       s:=R.Fields[0].AsString;
+       R.next;
+    END;
+    R.close;
+ //   GPlan.load(s,w_id,pl_id,st,en);
   end else
   begin
     st:=now();

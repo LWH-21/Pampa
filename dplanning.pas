@@ -109,7 +109,7 @@ type
        function loadW(sy_worker : longint; start, endDate : tdatetime) : TInterventions;
 
        function ToIsoDate (dt : TDateTime) : shortstring;
-
+      // function Write(R: TDataSet; var id: longint; mode : Tupdate_mode = um_read): TDbErrcode;override;
   end;
 
 function IsoStrToDate(s : shortstring) : TdateTime;
@@ -464,7 +464,7 @@ var Query : TdataSet;
     sql,s : string;
     s1 : shortstring;
     i,dw, pdw : integer;
-    W_id, f_id, p_id : longint;
+    W_id, p_id,c_id : longint;
     dstart, dend,dtemp : tdatetime;
     inter : Tintervention;
 
@@ -472,7 +472,7 @@ begin
   refdate:=start;
   Query:=nil;
   result:=nil;
-  sql:=Maindata.getQuery('QPL01','SELECT SY_ID, SY_WID, SY_FORMAT, SY_START, SY_END, SY_DETAIL FROM PLANNING WHERE SY_WID=%w AND SY_START<=''%end'' AND SY_END>=''%start''');
+  sql:=Maindata.getQuery('QPL01','SELECT P.SY_ID, P.SY_WID, D.C_ID, P.SY_START, P.SY_END, D.SY_DETAIL FROM PLANNING P INNER JOIN DPLANNING D ON D.PL_ID=P.SY_ID WHERE P.SY_WID=%w AND P.SY_START<=''%end'' AND P.SY_END>=''%start''');
   sql:=sql.Replace('%w',inttostr(sy_worker));
   sql:=sql.Replace('%start',ToIsoDate(start));
   sql:=sql.Replace('%end',ToIsoDate(endDate));
@@ -482,7 +482,7 @@ begin
   BEGIN
     p_id:=query.fields[0].AsInteger;
     w_id:=query.fields[1].AsInteger;
-    f_id:=query.fields[2].AsInteger;
+    c_id:=query.fields[2].AsInteger;
     s:=query.fields[3].AsString;
     dstart:=IsostrToDate(s);
     if CompareDateTime(start,dstart)>0 then dstart:=start;
@@ -490,10 +490,8 @@ begin
     dend:=IsoStrToDate(s);
     if CompareDatetime(enddate,dend)<0 then dend:=enddate;
     s:=query.fields[5].AsString;
-    if f_id=0 then   // Json Format
-    begin
-         add_json_planning(s,dstart,dend,p_id,w_id,result);
-    end;
+    add_json_planning(s,dstart,dend,p_id,w_id,result);
+
    (* i:=1;
     while i<s.Length do
     begin
