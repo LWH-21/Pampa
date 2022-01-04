@@ -7,6 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn,  Dialogs,
   dateutils, Clipbrd,
+  DB,DataAccess,
   DPlanning,UPlanning_enter,RessourcesStrings,
   Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
 
@@ -113,11 +114,12 @@ type
     procedure load(lid : longint; startdate : tdatetime);
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure load(planning_def : string;wid,pid : longint; s,e : tdatetime);
+    procedure load(pl_id : longint);
     procedure modify(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
     procedure reload;
     procedure refresh;
     procedure refreshPlanningEnter;
-    function save(var s : string; var w_id : longint; var p_id : longint; var sd,ed : tdatetime) : boolean;
+    function save() : boolean;
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -1100,6 +1102,46 @@ begin
      PB_planning.Refresh;
 end;
 
+procedure TGPlanning.load(pl_id : longint);
+
+var R : TDataSet;
+    wid : longint;
+    sql,s : string;
+    st,en : tdatetime;
+
+begin
+     assert(pl_id>0,'Invalid plannind ID');
+     R:=nil;
+     if assigned(mat) then freeandnil(mat);
+     mat:=TLPlanning.create();
+     assert(assigned(mat),'Mat not assigned');
+     sql:=MainData.getQuery('QPL03','SELECT  SY_WID, C_ID, SY_START, SY_END, SY_DETAIL FROM PLANNING P INNER JOIN DPLANNING D ON P.SY_ID = D.PL_ID WHERE P.SY_ID=%id');
+     assert(length(sql)>1,'Invalid SQL ');
+     sql:=sql.Replace('%id',inttostr(pl_id));
+     Maindata.readDataSet(R,sql,true);
+     IF R.RecordCount>0 then
+     begin
+       wid:=R.fields[0].asInteger;
+       s:=R.Fields[2].AsString;
+       st:=IsoStrToDate(s);
+       s:=R.Fields[3].AsString;
+       en:=IsoStrToDate(s);
+       WHILE NOT R.EOF DO
+       BEGIN
+            s:=R.Fields[4].AsString;
+            mat.load(s,wid,pl_id);
+            R.next;
+       END;
+       Start_planning.clear;
+       Start_planning.Date:=st;
+       if yearof(en)<2499 then End_planning.Date:=en else End_planning.Clear;
+       if pl_graphic in Fkind then prepare_graphics else
+       if pl_text in FKind then prepare_text;
+     end;
+     PB_planning.Refresh;
+     R.close;
+end;
+
 procedure TGPlanning.PB_planningPaint(Sender: TObject);
 
 var bmp: TBGRABitmap;
@@ -1194,22 +1236,10 @@ begin
    end;
 end;
 
-function TGPlanning.save(var s : string; var w_id : longint; var p_id : longint; var sd,ed : tdatetime) : boolean;
+function TGPlanning.save : boolean;
 
 begin
-   s:=mat.CreateJson;
-   sd:=Start_planning.Date;
-   ed:=End_planning.Date;
-   if comparedate(sd,ed)>=0 then
-   begin
-     if yearof(ed)<=1900 then
-     begin
-          ed:=EncodeDate(2499,12,31);
-     end;
-   end;
-   w_id := mat.getWorkerId();
-   p_id:=mat.getPlanningId();
-   result:=true;
+   result:=Planning.write(mat);
 end;
 
 procedure TGPlanning.setEditMode;

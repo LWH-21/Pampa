@@ -69,7 +69,8 @@ var s : string;
 
 begin
      q:=nil;
-     if Gplan.save(s,w,p,st,se) then
+     Gplan.save();
+   (*  if Gplan.save(s,w,p,st,se) then
      begin
           if p>0 then
           begin
@@ -96,7 +97,7 @@ begin
      begin
           q.close;
           q.free;
-     end;
+     end; *)
 end;
 
 procedure TF_planning_01.FormActivate(Sender: TObject);
@@ -261,31 +262,13 @@ end;
 
 procedure TF_planning_01.load_planning(pl_id : longint);
 
-var s,sql : string;
-    l : longint;
-    st,en : tdatetime;
-    R : TDataSet;
+var st,en : tdatetime;
 
 
 begin
-  R:=nil;
-  if pl_id>0 then planning.Read(query,pl_id);
-  if (pl_id>0) and (query.RecordCount=1) then
+  if (pl_id>0) then
   begin
-    s:=query.Fields[3].AsString;
-    st:=IsoStrToDate(s);
-    s:=query.Fields[4].AsString;
-    en:=IsoStrToDate(s);
-    sql:='SELECT SY_DETAIL FROM DPLANNING WHERE PL_ID=%id';
-    sql:=sql.Replace('%id',inttostr(pl_id));
-    Maindata.readDataSet(R,sql,true);
-    WHILE NOT R.EOF DO
-    BEGIN
-       s:=R.Fields[0].AsString;
-       R.next;
-    END;
-    R.close;
- //   GPlan.load(s,w_id,pl_id,st,en);
+       Gplan.load(pl_id);
   end else
   begin
     st:=now();

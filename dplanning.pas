@@ -84,6 +84,8 @@ Type TLPlanning = class
           function CreateJson : string;
           function getColor(l: integer) : TBGRAPixel;
           function getInterventions : TInterventions;
+          function getEnd : integer;
+          function getStart : integer;
           function getPlanningId(): longint;
           function getInterAt(x,y : integer) : TIntervention;
           function getWorkerId() : longint;
@@ -109,7 +111,7 @@ type
        function loadW(sy_worker : longint; start, endDate : tdatetime) : TInterventions;
 
        function ToIsoDate (dt : TDateTime) : shortstring;
-      // function Write(R: TDataSet; var id: longint; mode : Tupdate_mode = um_read): TDbErrcode;override;
+       function Write(mat : TLPlanning ): boolean;
   end;
 
 function IsoStrToDate(s : shortstring) : TdateTime;
@@ -125,7 +127,7 @@ const
 
 implementation
 
-uses UException;
+uses Main, UException;
 
 {$R *.lfm}
 
@@ -448,7 +450,36 @@ begin
   end;
 end;
 
+function TPlanning.Write(mat : TLPlanning ): boolean;
 
+var script : string;
+    wid, id : longint;
+    sql,s : string;
+
+begin
+  result:=true;
+  script:='';
+  wid:=mat.getWorkerId();
+  id:=mat.getPlanningId();
+  if id<0 then
+  begin
+       id:=getNextId();
+  end;
+  sql:='INSERT OR REPLACE INTO PLANNING(SY_ID, SY_WID, SY_START, SY_END, SY_LASTUSER, SY_ROWVERSION, SY_CRC) VALUES (%id, %wid, ''%start'', ''%end'',''%user'',''%ts'',''%crc'')';
+  sql:=sql.Replace('%id',inttostr(id));
+  sql:=sql.Replace('%wid',inttostr(mat.w_id));
+  s:=intTostr(mat.getStart());
+  sql:=sql.Replace('%start',s);
+  s:=intTostr(mat.getEnd());
+  sql:=sql.Replace('%end',s);
+  s:=Mainform.username;
+  sql:=sql.Replace('%user',s);
+  s:=DateToISO8601(now);
+  sql:=sql.Replace('%ts',s);
+  s:='';
+  sql:=sql.Replace('%crc',s);
+
+end;
 
 procedure TPlanning.init(D:TMainData);
 begin
@@ -684,6 +715,23 @@ begin
      freeAndNil(comp);
 end;
 
+function TLPlanning.getEnd : integer;
+
+begin
+     result:=Yearof(self.end_date)*10000+
+     MonthOf(self.end_date)*100+
+     DayOf(self.end_date);
+     if result<='18990101' then result:='24991231';
+end;
+
+function TLPlanning.getStart : integer;
+
+begin
+     result:=Yearof(start_date)*10000+
+     MonthOf(start_date)*100+
+     DayOf(start_date);
+end;
+
 function TLPlanning.getPlanningId(): longint;
 
 begin
@@ -831,7 +879,6 @@ var json : TJSONData;
     end;
 
 begin
-     reset();
      self.w_id:=w;
      self.p_id:=p;
      src:='C';
