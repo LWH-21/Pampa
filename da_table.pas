@@ -57,7 +57,7 @@ type
 
   end;
 
-function crc32(crc: cardinal; buf: Pbyte; len: cardinal): longint;
+function crc32(crc: cardinal; buf: string): longint;
 
 implementation
 
@@ -120,41 +120,26 @@ const
     $5d681b02, $2a6f2b94, $b40bbe37, $c30c8ea1, $5a05df1b,
     $2d02ef8d);
 
-function crc32(crc: cardinal; buf: Pbyte; len: cardinal): longint;
+function crc32(crc: cardinal; buf: String): longint;
 
 var
   r: cardinal;
+  len : integer;
+  i : cardinal;
+
 
 begin
-  if buf = nil then
-    exit(0);
+  buf:=Trim(buf);
+  len:=length(buf);
   try
   crc := crc xor $FFFFFFFF;
-  while (len >= 8) do
-  begin
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
-    Dec(len, 8);
-  end;
 
   while (len > 0) do
   begin
-    crc := crc32_table[(crc xor buf^) and $ff] xor (crc shr 8);
-    Inc(buf);
+    i:=ord(buf[len]);
+    i:=crc xor i;
+    i:=i and $FF;
+    crc := crc32_table[i] xor (crc shr 8);
     Dec(len);
   end;
   r := crc xor $FFFFFFFF;
@@ -213,7 +198,6 @@ var
   c: longint;
   nom, ret: string;
   cd: TColumnDesc;
-  a: PByte;
   n: string;
 
 begin
@@ -238,9 +222,7 @@ begin
         end;
       end;
       ret := ret + '     ';
-      a := @ret[1];
-      i := length(ret) - 2;
-      c := crc32(0, a, i);
+      c := crc32(0, ret);
     except
       on E: Exception do Error(E, dber_sql, 'TDA_table.getcrc '+table);
     end;

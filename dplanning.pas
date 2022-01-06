@@ -81,7 +81,7 @@ Type TLPlanning = class
           constructor create(s,e : tdatetime);
           procedure add_inter(inter : TIntervention);
           function add_line : integer;
-          function CreateJson : string;
+          function CreateJson(id : longint = 0) : string;
           function getColor(l: integer) : TBGRAPixel;
           function getInterventions : TInterventions;
           function getEnd : integer;
@@ -453,8 +453,9 @@ end;
 function TPlanning.Write(mat : TLPlanning ): boolean;
 
 var script : string;
-    wid, id : longint;
+    wid, id,crc : longint;
     sql,s : string;
+    i : integer;
 
 begin
   result:=true;
@@ -476,9 +477,32 @@ begin
   sql:=sql.Replace('%user',s);
   s:=DateToISO8601(now);
   sql:=sql.Replace('%ts',s);
-  s:='';
-  sql:=sql.Replace('%crc',s);
+  s:=mat.CreateJson;
+  crc:=crc32(0,s+inttostr(mat.getEnd())+inttostr(mat.getStart()));
+  sql:=sql.Replace('%crc',inttostr(crc));
+  sql:=sql+';'+LineEnding;;
+  sql:=sql+'UPDATE DPLANNING SET SY_DETAIL='''' WHERE PL_ID=%id';
+  sql:=sql.Replace('%id',inttostr(id));
+  sql:=sql+';'+LineEnding;
 
+  for i:=0 to length(mat.libs)-1 do
+  begin
+       if mat.libs[i].ID>0 then
+       begin
+         s:=mat.CreateJson(mat.libs[i].id);
+         sql:=sql+'INSERT OR REPLACE INTO DPLANNING(PL_ID, C_ID, SY_DETAIL) VALUES (%id, %cid, ''%dt'')';
+         sql:=sql.Replace('%id',inttostr(id));
+         sql:=sql.Replace('%cid',inttostr(mat.libs[i].id));
+         sql:=sql.Replace('%dt',s);
+         sql:=sql+';'+LineEnding;
+       end;
+  end;
+
+  sql:=sql+'DELETE FROM DPLANNING WHERE PL_ID=%id AND SY_DETAIL<='' ''';
+  sql:=sql.Replace('%id',inttostr(id));
+  sql:=sql+';'+LineEnding;
+  Clipboard.AsText:=sql;
+  Maindata.doScript(sql);
 end;
 
 procedure TPlanning.init(D:TMainData);
@@ -637,7 +661,7 @@ begin
      end;
 end;
 
-function TLPlanning.CreateJson : string;
+function TLPlanning.CreateJson(id : longint = 0) : string;
 
 var jsonobj,lst,objline,objcol : TJSONObject;
     l, c : integer;
@@ -649,14 +673,14 @@ begin
      jsonobj.add ('PLANNING',TJSONArray.Create);
      for l:=0 to linescount-1 do
      begin
-          if (lines[l].SY_ID<>old) and (lines[l].SY_ID>0) then
+          if (lines[l].SY_ID<>old) and (lines[l].SY_ID>0) and ((id=0) or (lines[l].SY_ID=id)) then
           begin
             old:=lines[l].SY_ID;
             objline:=TJSONObject.Create(['CID',inttostr(old)]);
             objline.add ('INTERV',TJSONArray.Create);
             jsonobj.Arrays['PLANNING'].add(objline);
           end;
-          if (lines[l].SY_ID>0) and (assigned(objline)) then
+          if (lines[l].SY_ID>0) and ((id=0) or (lines[l].SY_ID=id)) and (assigned(objline)) then
           begin
             for c:=0 to colscount -1 do
             begin
@@ -721,7 +745,7 @@ begin
      result:=Yearof(self.end_date)*10000+
      MonthOf(self.end_date)*100+
      DayOf(self.end_date);
-     if result<='18990101' then result:='24991231';
+     if result<=19500101 then result:=24991231;
 end;
 
 function TLPlanning.getStart : integer;
