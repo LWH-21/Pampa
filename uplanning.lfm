@@ -118,6 +118,7 @@ object GPlanning: TGPlanning
     ButtonWidth = 23
     NumGlyphs = 1
     MaxLength = 0
+    OnChange = Start_planningChange
     TabOrder = 2
     Text = 'Start_planning'
   end
@@ -131,6 +132,7 @@ object GPlanning: TGPlanning
     ButtonWidth = 23
     NumGlyphs = 1
     MaxLength = 0
+    OnChange = End_planningChange
     TabOrder = 3
     Text = 'End_planning'
   end

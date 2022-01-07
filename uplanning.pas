@@ -56,6 +56,7 @@ type
       TB_freq: TToolButton;
       TB_refresh: TToolButton;
       TB_zoom: TTrackBar;
+      procedure End_planningChange(Sender: TObject);
       procedure M2weeksClick(Sender: TObject);
       procedure MchangeClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
@@ -67,6 +68,7 @@ type
       procedure PB_planningMouseWheel(Sender: TObject; Shift: TShiftState;
         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
       procedure SB_planningChange(Sender: TObject);
+      procedure Start_planningChange(Sender: TObject);
       procedure TB_dateChange(Sender: TObject);
       procedure TB_exportClick(Sender: TObject);
       procedure TB_graphClick(Sender: TObject);
@@ -304,6 +306,11 @@ begin
    reload;
 end;
 
+procedure TGPlanning.End_planningChange(Sender: TObject);
+begin
+  if assigned(mat) then mat.end_date:=End_planning.Date;
+end;
+
 procedure TGPlanning.MchangeClick(Sender: TObject);
 
 var inter : TIntervention;
@@ -392,6 +399,11 @@ end;
 procedure TGPlanning.SB_planningChange(Sender: TObject);
 begin
    PB_planning.Refresh;
+end;
+
+procedure TGPlanning.Start_planningChange(Sender: TObject);
+begin
+  if assigned(mat) then mat.start_date:=Start_planning.Date;
 end;
 
 procedure TGPlanning.TB_dateChange(Sender: TObject);
@@ -1130,6 +1142,8 @@ begin
        BEGIN
             s:=R.Fields[4].AsString;
             mat.load(s,wid,pl_id);
+            mat.start_date:=st;
+            mat.end_date:=en;
             R.next;
        END;
        Start_planning.clear;
@@ -1239,6 +1253,8 @@ end;
 function TGPlanning.save : boolean;
 
 begin
+   mat.start_date:=Start_planning.Date;
+   mat.end_date:=End_planning.Date;
    result:=Planning.write(mat);
 end;
 

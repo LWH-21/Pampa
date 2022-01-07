@@ -5,7 +5,7 @@ unit DPlanning;
 interface
 
 uses
-  Classes, Types, SysUtils, DateUtils,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
+  Classes, Types, SysUtils, DateUtils,Math,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
   Generics.Collections,Generics.Defaults,
   fpjson,jsonparser,Graphics,BGRABitmap, BGRABitmapTypes,
   RessourcesStrings,clipbrd;
@@ -84,8 +84,8 @@ Type TLPlanning = class
           function CreateJson(id : longint = 0) : string;
           function getColor(l: integer) : TBGRAPixel;
           function getInterventions : TInterventions;
-          function getEnd : integer;
-          function getStart : integer;
+          function getEnd : TDateTime;
+          function getStart : TDateTime;
           function getPlanningId(): longint;
           function getInterAt(x,y : integer) : TIntervention;
           function getWorkerId() : longint;
@@ -117,6 +117,8 @@ type
 function IsoStrToDate(s : shortstring) : TdateTime;
 function formatdate(dt : tdatetime) : shortstring;
 function resumeplanning(s : string) : string;
+function ToIntDate (d : tdatetime) : integer;
+function IsUnassigned(ADate: TDateTime): boolean;
 
 var
   Planning: TPlanning;
@@ -172,10 +174,15 @@ begin
   end;
 end;
 
+function IsUnassigned(ADate: TDateTime): boolean;
+begin
+  result := ADate = 0;
+end;
+
 function formatdate(dt : tdatetime) : shortstring;
 
 begin
-  if yearof(dt)>=2499 then result:='???' else  result:=datetostr(dt);
+  if (isZero(dt)) or (YearOf(dt)>=2499) then result:='???' else  result:=datetostr(dt);
 end;
 
 function resumeplanning(s : string) : string;
@@ -216,6 +223,14 @@ begin
        end;
        freeAndNil(json);
      end;
+end;
+
+function ToIntDate (d : tdatetime) : integer;
+
+begin
+     result:=Yearof(d)*10000+
+     MonthOf(d)*100+
+     DayOf(d);
 end;
 
 function TIntercomparer.Compare(constref left,right : TIntervention) : integer;
@@ -453,6 +468,7 @@ end;
 function TPlanning.Write(mat : TLPlanning ): boolean;
 
 var script : string;
+    dstart,dend : tdatetime;
     wid, id,crc : longint;
     sql,s : string;
     i : integer;
@@ -466,19 +482,31 @@ begin
   begin
        id:=getNextId();
   end;
-  sql:='INSERT OR REPLACE INTO PLANNING(SY_ID, SY_WID, SY_START, SY_END, SY_LASTUSER, SY_ROWVERSION, SY_CRC) VALUES (%id, %wid, ''%start'', ''%end'',''%user'',''%ts'',''%crc'')';
+
+  dstart:=mat.getStart;
+  dend:=mat.getEnd;
+
+  sql:='';
+  sql:=sql+'UPDATE PLANNING SET SY_END=''%newend'' WHERE SY_ID<>%id AND SY_WID=%wid AND SY_END >= ''%start'' AND SY_END <= ''%end'' ';
   sql:=sql.Replace('%id',inttostr(id));
-  sql:=sql.Replace('%wid',inttostr(mat.w_id));
-  s:=intTostr(mat.getStart());
+  sql:=sql.Replace('%wid',inttostr(wid));
+  sql:=sql.Replace('%start',IntToStr(ToIntDate(dstart)));
+  sql:=sql.Replace('%end',IntToStr(ToIntDate(dend)));
+  sql:=sql.Replace('%newend',IntToStr(ToIntDate(IncDay(dend,-1))));
+
+  sql:=sql+'INSERT OR REPLACE INTO PLANNING(SY_ID, SY_WID, SY_START, SY_END, SY_LASTUSER, SY_ROWVERSION, SY_CRC) VALUES (%id, %wid, ''%start'', ''%end'',''%user'',''%ts'',''%crc'')';
+  sql:=sql.Replace('%id',inttostr(id));
+  sql:=sql.Replace('%wid',inttostr(wid));
+  s:=intTostr(ToIntDate(dstart));
   sql:=sql.Replace('%start',s);
-  s:=intTostr(mat.getEnd());
+  s:=intTostr(ToIntDate(Dend));
   sql:=sql.Replace('%end',s);
   s:=Mainform.username;
   sql:=sql.Replace('%user',s);
   s:=DateToISO8601(now);
   sql:=sql.Replace('%ts',s);
   s:=mat.CreateJson;
-  crc:=crc32(0,s+inttostr(mat.getEnd())+inttostr(mat.getStart()));
+  crc:=crc32(0,s+DateToStr(dstart)+DateToStr(Dend));
   sql:=sql.Replace('%crc',inttostr(crc));
   sql:=sql+';'+LineEnding;;
   sql:=sql+'UPDATE DPLANNING SET SY_DETAIL='''' WHERE PL_ID=%id';
@@ -502,7 +530,7 @@ begin
   sql:=sql.Replace('%id',inttostr(id));
   sql:=sql+';'+LineEnding;
   Clipboard.AsText:=sql;
-  Maindata.doScript(sql);
+  //Maindata.doScript(sql);
 end;
 
 procedure TPlanning.init(D:TMainData);
@@ -739,21 +767,21 @@ begin
      freeAndNil(comp);
 end;
 
-function TLPlanning.getEnd : integer;
+function TLPlanning.getEnd : TDateTime;
 
 begin
-     result:=Yearof(self.end_date)*10000+
-     MonthOf(self.end_date)*100+
-     DayOf(self.end_date);
-     if result<=19500101 then result:=24991231;
+     result:=end_date;
+     if (yearof(end_date)<1950) then
+     begin
+       end_date:=EncodeDateTime(2499,12,31,0,0,0,0);
+       result:=end_date;
+     end;
 end;
 
-function TLPlanning.getStart : integer;
+function TLPlanning.getStart : TDateTime;
 
 begin
-     result:=Yearof(start_date)*10000+
-     MonthOf(start_date)*100+
-     DayOf(start_date);
+     result:=start_date;
 end;
 
 function TLPlanning.getPlanningId(): longint;
