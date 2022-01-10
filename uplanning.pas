@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls,LMessages, StdCtrls, EditBtn,  Dialogs,
   dateutils, Clipbrd,
-  DB,DataAccess,
+  DB,DataAccess,DA_table,
   DPlanning,UPlanning_enter,RessourcesStrings,
   Graphics, ComCtrls, Menus,BGRABitmap, BGRABitmapTypes, Types;
 
@@ -78,6 +78,11 @@ type
       procedure TB_zoomChange(Sender: TObject);
 
     private
+
+    old_start_date : tdatetime;
+    old_end_date   : tdatetime;
+    old_crc : cardinal;
+
     id : longint;
     colplan : TInterventions;
     start : tdatetime;
@@ -95,6 +100,7 @@ type
     procedure draw_header(bmp : TBGRABitmap);
     procedure draw_header_week(bmp : TBGRABitmap);
     procedure draw_header_2weeks(bmp : TBGRABitmap);
+    procedure draw_header_month(bmp : TBGRABitmap);
     procedure draw_text(bmp : TBGRABitmap);
     function getSelInter() : Tintervention;
     procedure prepare_graphics();
@@ -704,6 +710,17 @@ begin
      bmp.RectangleAntialias(0,0,w-1,header,BGRABlack,1,Bgra($e6,$e6,$e6));
      bmp.DrawLineAntialias(margin,0,margin,h,BGRABlack,2);
      x:=margin;
+
+     FColNumber:=7;
+     if pl_month in FKind then
+     begin
+       if assigned(mat) then FColNumber:=DaysInAMonth(YearOf(mat.start_date),MonthOf(mat.start_date))
+       else FColNumber:=31;
+     end else
+     if pl_week in FKind then FColNumber:=7 else
+     if pl_2weeks in FKind then FcolNumber:=14;
+     colwidth:=(PB_planning.Width - margin) div FColNumber;
+
      for i:=1 to FColNumber - 1 do
      begin
           x:=x+colWidth;
@@ -711,7 +728,8 @@ begin
           bmp.DrawLineAntialias(x,header+1,x,h,BGRABlack,1);
      end;
      if pl_week in FKind then draw_header_week(bmp) else
-     if pl_2weeks in FKind then draw_header_2weeks(bmp);
+     if pl_2weeks in FKind then draw_header_2weeks(bmp) else
+     if pl_month in FKind then  draw_header_month(bmp);
 end;
 
 procedure TGPlanning.draw_header_2weeks(bmp : TBGRABitmap);
@@ -742,8 +760,8 @@ begin
             if (c=1) then r.right:=w - 1;
             r.top:=1;
             r.bottom:=(header div 2);
-            bmp.RectangleAntialias(r.left,r.Top,r.right,r.bottom,BGRABlack,1,Bgra($e6,$e6,$e6));
-            s:=inttostr(WeekOfTheYear(d));
+            bmp.RectangleAntialias(r.left,r.Top,r.right,r.bottom,BGRABlack,2,Bgra($e6,$e6,$e6));
+            s:=Format('%.2d',[WeekOfTheYear(d)]);
             bmp.TextRect(r,r.left,r.top,s,ts,VGABlue);
             d:=incday(d,7);
        end;
@@ -765,6 +783,78 @@ begin
          d:=incday(d,1);
        end;
      end;
+end;
+
+procedure TGPlanning.draw_header_month(bmp : TBGRABitmap);
+
+var d : tdatetime;
+    dow : integer;
+    c,n : integer;
+    ts : TTextStyle;
+    s : string;
+    r : trect;
+    lineheight : integer;
+
+begin
+    assert(pl_month in FKind,'pl_mobth not in FKind');
+    if assigned(mat) then assert(YearOf(mat.start_date)>1900,'Invalid date');
+    bmp.FontHeight:=10;
+    bmp.FontName:='Arial';
+    bmp.FontQuality:=fqFineAntialiasing;
+    bmp.FontStyle:=[fsBold];
+    lineheight:=bmp.FontPixelMetric.Lineheight;
+    ts.Clipping:=true;
+    ts.Alignment:=taCenter;
+    if assigned(mat) then
+    begin
+      d:=mat.start_date;
+    end else
+    begin
+      d:=today();
+    end;
+
+    dow:=dayOfTheWeek(d);
+    c:=1;
+    r.left:=margin;
+    r.top:=1;
+    r.bottom:=r.top+lineheight;
+    while (c<=FColNumber) do
+    begin
+         n:=8 - dow;
+         r.right:=r.left + colwidth*n;
+         if c>=FcolNumber then
+         begin
+           r.right:=PB_planning.Width;
+         end;
+         bmp.RectangleAntialias(r.left,r.Top,r.right,r.bottom,BGRABlack,2,Bgra($e6,$e6,$e6));
+         if n>1 then
+         begin
+              s:=Format('%.2d',[WeekOfTheYear(d)]);
+              bmp.TextRect(r,r.left,r.top,s,ts,VGABlue);
+         end;
+         c:=c+n;
+         d:=incday(d,n);
+         dow:=1;
+         r.left:=r.right;
+    end;
+
+    r.left:=margin;
+    dow:=dayOfTheWeek(d);
+    for c:=1 to FColNumber do
+    begin
+      r.right:=r.left+colwidth;
+      (*r.top:=0;r.bottom:=lineheight;
+      if c=7 then bmp.TextRect(r,r.left,r.top,s,ts,VGABlue)
+      else bmp.TextRect(r,r.left,r.top,s,ts,VGARed);*)
+      s:=inttostr(c);
+      r.Bottom:=header;
+      r.top:=R.bottom-lineheight;
+      if (dow=7) then bmp.TextRect(r,r.left,r.top,s,ts,VGARed)   else
+      bmp.TextRect(r,r.left,r.top,s,ts,VGABlue);
+      inc(dow);
+      if dow>7 then dow:=1;
+      r.Left:=r.right;
+  end;
 end;
 
 procedure TGPlanning.draw_header_week(bmp : TBGRABitmap);
@@ -1138,6 +1228,10 @@ begin
        st:=IsoStrToDate(s);
        s:=R.Fields[3].AsString;
        en:=IsoStrToDate(s);
+
+       old_start_date:=st;
+       old_end_date:=en;
+
        WHILE NOT R.EOF DO
        BEGIN
             s:=R.Fields[4].AsString;
@@ -1152,6 +1246,9 @@ begin
        if pl_graphic in Fkind then prepare_graphics else
        if pl_text in FKind then prepare_text;
      end;
+     s:=mat.CreateJson;
+     old_crc:=crc32(0,s+DateToStr(old_start_date)+DateToStr(old_end_date));
+
      PB_planning.Refresh;
      R.close;
 end;
@@ -1255,7 +1352,7 @@ function TGPlanning.save : boolean;
 begin
    mat.start_date:=Start_planning.Date;
    mat.end_date:=End_planning.Date;
-   result:=Planning.write(mat);
+   result:=Planning.write(mat,old_start_date, old_end_date, old_crc);
 end;
 
 procedure TGPlanning.setEditMode;

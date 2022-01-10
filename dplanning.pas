@@ -7,7 +7,7 @@ interface
 uses
   Classes, Types, SysUtils, DateUtils,Math,DataAccess, SQLDB, BufDataset, DB, Variants,Da_table,
   Generics.Collections,Generics.Defaults,
-  fpjson,jsonparser,Graphics,BGRABitmap, BGRABitmapTypes,
+  fpjson,jsonparser,Graphics,BGRABitmap, BGRABitmapTypes,Dialogs,
   RessourcesStrings,clipbrd;
 
 
@@ -111,7 +111,7 @@ type
        function loadW(sy_worker : longint; start, endDate : tdatetime) : TInterventions;
 
        function ToIsoDate (dt : TDateTime) : shortstring;
-       function Write(mat : TLPlanning ): boolean;
+       function Write(mat : TLPlanning; old_start_date, old_end_date : Tdatetime; oldcrc : cardinal ): boolean;
   end;
 
 function IsoStrToDate(s : shortstring) : TdateTime;
@@ -465,7 +465,7 @@ begin
   end;
 end;
 
-function TPlanning.Write(mat : TLPlanning ): boolean;
+function TPlanning.Write(mat : TLPlanning; old_start_date, old_end_date : Tdatetime; oldcrc : cardinal): boolean;
 
 var script : string;
     dstart,dend : tdatetime;
@@ -485,30 +485,34 @@ begin
 
   dstart:=mat.getStart;
   dend:=mat.getEnd;
-
-  sql:='';
-  sql:=sql+'UPDATE PLANNING SET SY_END=''%newend'' WHERE SY_ID<>%id AND SY_WID=%wid AND SY_END >= ''%start'' AND SY_END <= ''%end'' ';
-  sql:=sql.Replace('%id',inttostr(id));
-  sql:=sql.Replace('%wid',inttostr(wid));
-  sql:=sql.Replace('%start',IntToStr(ToIntDate(dstart)));
-  sql:=sql.Replace('%end',IntToStr(ToIntDate(dend)));
-  sql:=sql.Replace('%newend',IntToStr(ToIntDate(IncDay(dend,-1))));
-
-  sql:=sql+'INSERT OR REPLACE INTO PLANNING(SY_ID, SY_WID, SY_START, SY_END, SY_LASTUSER, SY_ROWVERSION, SY_CRC) VALUES (%id, %wid, ''%start'', ''%end'',''%user'',''%ts'',''%crc'')';
-  sql:=sql.Replace('%id',inttostr(id));
-  sql:=sql.Replace('%wid',inttostr(wid));
-  s:=intTostr(ToIntDate(dstart));
-  sql:=sql.Replace('%start',s);
-  s:=intTostr(ToIntDate(Dend));
-  sql:=sql.Replace('%end',s);
-  s:=Mainform.username;
-  sql:=sql.Replace('%user',s);
-  s:=DateToISO8601(now);
-  sql:=sql.Replace('%ts',s);
   s:=mat.CreateJson;
   crc:=crc32(0,s+DateToStr(dstart)+DateToStr(Dend));
-  sql:=sql.Replace('%crc',inttostr(crc));
-  sql:=sql+';'+LineEnding;;
+
+  sql:='';
+  if (dstart<>old_start_date) or (dend<>old_end_date) then
+  begin
+    sql:=sql+'UPDATE PLANNING SET SY_END=''%newend'' WHERE SY_ID<>%id AND SY_WID=%wid AND SY_END >= ''%start'' AND SY_END <= ''%end'' ';
+    sql:=sql.Replace('%id',inttostr(id));
+    sql:=sql.Replace('%wid',inttostr(wid));
+    sql:=sql.Replace('%start',IntToStr(ToIntDate(dstart)));
+    sql:=sql.Replace('%end',IntToStr(ToIntDate(dend)));
+    sql:=sql.Replace('%newend',IntToStr(ToIntDate(IncDay(dend,-1))));
+
+    sql:=sql+'INSERT OR REPLACE INTO PLANNING(SY_ID, SY_WID, SY_START, SY_END, SY_LASTUSER, SY_ROWVERSION, SY_CRC) VALUES (%id, %wid, ''%start'', ''%end'',''%user'',''%ts'',''%crc'')';
+    sql:=sql.Replace('%id',inttostr(id));
+    sql:=sql.Replace('%wid',inttostr(wid));
+    s:=intTostr(ToIntDate(dstart));
+    sql:=sql.Replace('%start',s);
+    s:=intTostr(ToIntDate(Dend));
+    sql:=sql.Replace('%end',s);
+    s:=Mainform.username;
+    sql:=sql.Replace('%user',s);
+    s:=DateToISO8601(now);
+    sql:=sql.Replace('%ts',s);
+
+    sql:=sql.Replace('%crc',inttostr(crc));
+    sql:=sql+';'+LineEnding;;
+  end;
   sql:=sql+'UPDATE DPLANNING SET SY_DETAIL='''' WHERE PL_ID=%id';
   sql:=sql.Replace('%id',inttostr(id));
   sql:=sql+';'+LineEnding;
@@ -530,7 +534,11 @@ begin
   sql:=sql.Replace('%id',inttostr(id));
   sql:=sql+';'+LineEnding;
   Clipboard.AsText:=sql;
-  //Maindata.doScript(sql);
+  if crc<>oldcrc then
+  begin
+     showmessage(inttostr(oldcrc)+' '+inttostr(crc));
+     Maindata.doScript(sql);
+  end;
 end;
 
 procedure TPlanning.init(D:TMainData);

@@ -36,7 +36,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   { you can add units after this }
   SysUtils, // une unité ajoutée pour PathDelim
   gettext, translations, datetimectrls, dworker, Ucfg_table_det, DCustomer,
-  DPlanning, LWTabPage, UPlanning_enter, UPlanning;
+  DPlanning;
 
 {$R *.res}
 
@@ -78,7 +78,7 @@ begin
   {$endIf}
   RequireDerivedFormResource := True;
   LCLTranslate;
-  Application.Scaled := True;
+  Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TMainData, MainData);
   Application.CreateForm(TWorker, Worker);

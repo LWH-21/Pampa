@@ -1,16 +1,16 @@
 inherited Fr_Person: TFr_Person
   Height = 663
-  Width = 1566
+  Width = 1072
   ClientHeight = 663
-  ClientWidth = 1566
+  ClientWidth = 1072
   OnResize = FormResize
-  DesignLeft = -1555
-  DesignTop = 245
+  DesignLeft = 487
+  DesignTop = 274
   object PageControl1: TPageControl[0]
     Left = 0
     Height = 623
     Top = 40
-    Width = 1566
+    Width = 1072
     Align = alBottom
     Anchors = [akTop, akLeft, akRight, akBottom]
     PopupMenu = PopupMenu1
@@ -36,7 +36,6 @@ inherited Fr_Person: TFr_Person
     DataField = 'SY_CODE'
     DataSource = Source
     ReadOnly = True
-    CharCase = ecNormal
     MaxLength = 0
     TabOrder = 1
     OnChange = DBCodeChange
@@ -45,12 +44,12 @@ inherited Fr_Person: TFr_Person
     Left = 180
     Height = 30
     Top = 8
-    Width = 1373
+    Width = 879
     Anchors = [akTop, akLeft, akRight]
     BevelInner = bvLowered
     BevelOuter = bvLowered
     ClientHeight = 30
-    ClientWidth = 1373
+    ClientWidth = 879
     TabOrder = 3
     object DBidentite: TDBText
       Left = 7
@@ -59,7 +58,6 @@ inherited Fr_Person: TFr_Person
       Width = 55
       DataField = 'SY_LASTNAME'
       DataSource = Source
-      ParentColor = False
     end
   end
   object Source: TDataSource[4]

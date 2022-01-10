@@ -265,7 +265,7 @@ begin
   MyItem.Action := ActionList1.ActionByName('Act_towindow');
   MyItem.Name := 'MFenetre';
   tabcontrol.PopupMenu.Items.Add(MyItem);
-
+   formactivate(self);
 
 end;
 

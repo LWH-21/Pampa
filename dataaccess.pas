@@ -11,7 +11,9 @@ uses
   {$IFDEF WINDOWS}
   win32proc,
   {$ENDIF}
-  dos, Generics.Collections, Clipbrd, Controls, Forms, Zconnection, ZDataset,ZSqlUpdate,
+  dos,
+  Generics.Collections,
+  Clipbrd, Controls, Forms, Zconnection, ZDataset,ZSqlUpdate,
   ZSqlProcessor, ZPgEventAlerter, ZSqlMonitor, ZSqlMetadata, ZConnectionGroup,
   ZGroupedConnection, ZIBEventAlerter, fpjson, jsonparser;
 
