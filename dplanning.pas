@@ -11,11 +11,14 @@ uses
   RessourcesStrings,clipbrd;
 
 
+Type TLPlanning = class;
+
 type TIntervention = Class
      private
           dh_start : real;
           dh_end : real;
           bounds : Trect;
+          mat : TLPlanning;
      public
           dt : TdateTime;
           selected : boolean;
@@ -39,6 +42,7 @@ type TIntervention = Class
           function getDecimalHEnd : real;
           function getHint : string;
           procedure setBounds(r : trect);
+          procedure setMat(m : TLPlanning);
           function test : boolean;
      end;
 
@@ -83,6 +87,7 @@ Type TLPlanning = class
           function add_line : integer;
           function CreateJson(id : longint = 0) : string;
           function getColor(l: integer) : TBGRAPixel;
+          function getCustomerLib(c : longint) : String;
           function getInterventions : TInterventions;
           function getEnd : TDateTime;
           function getStart : TDateTime;
@@ -332,14 +337,21 @@ end;
 function TIntervention.getHint : string;
 
 begin
-  result:= datetostr(dt)+' ('+cdays[week_day]+')'+LineEnding;
+  result:= datetostr(dt)+' ('+cdays[week_day]+' '+rs_week+' '+inttostr(weekof(dt))+')'+LineEnding;
   result:=result+gethstart+'-'+gethend+' '+LineEnding;
+  result:=result+mat.getCustomerLib(c_id);
 end;
 
 procedure TIntervention.setBounds(r : trect);
 
 begin
   bounds:=r;
+end;
+
+procedure TIntervention.setMat(m : TLPlanning);
+
+begin
+  mat:=m;
 end;
 
 function TIntervention.test : boolean;
@@ -654,6 +666,7 @@ var
 begin
      nline:=0; found:=false;
      ncol:=inter.col_index - 1;
+     inter.setMat(self);
      while not found do
      begin
        if lines[nline].SY_ID<=0 then
@@ -752,6 +765,24 @@ begin
      begin
           assert( (lines[l].index>=0) and (lines[l].index<length(libs)),'Invalid index');
           result := libs[lines[l].index].color;
+     end;
+end;
+
+function TLPlanning.getCustomerLib(c : longint) : String;
+
+var i,l : integer;
+
+begin
+     result:='';
+     assert(c>0,'Invalid customer ID');
+     l:=length(libs) -1;
+     for i:=0 to l do
+     begin
+            if libs[i].id=c then
+            begin
+              result:=libs[i].code+' '+libs[i].caption;
+              break;
+            end;
      end;
 end;
 

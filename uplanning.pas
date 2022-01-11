@@ -704,12 +704,17 @@ end;
 procedure TGPlanning.draw_header(bmp : TBGRABitmap);
 
 var i,x : integer;
+    ts : TTextStyle;
+    r : trect;
+    s : string;
 
 
 begin
      bmp.RectangleAntialias(0,0,w-1,header,BGRABlack,1,Bgra($e6,$e6,$e6));
      bmp.DrawLineAntialias(margin,0,margin,h,BGRABlack,2);
      x:=margin;
+     ts.Clipping:=true;
+     ts.Alignment:=taLeftJustify;
 
      FColNumber:=7;
      if pl_month in FKind then
@@ -726,6 +731,20 @@ begin
           x:=x+colWidth;
           bmp.DrawLineAntialias(x,0,x,header,BGRABlack,2);
           bmp.DrawLineAntialias(x,header+1,x,h,BGRABlack,1);
+     end;
+
+     if assigned(mat) then
+     begin
+       r.left:=5;r.right:=margin - 5;
+       r.top:=5;r.bottom:=20;
+       bmp.FontHeight:=12;
+       bmp.FontName:='Arial';
+       bmp.FontQuality:=fqFineAntialiasing;
+       bmp.FontStyle:=[fsBold];
+       s:=format(rs_period,[datetostr(mat.start_date),datetostr(mat.end_date)]);
+       if pl_week in FKind then s:=s+' ('+rs_week+' '+inttostr(weekof(mat.start_date))+')';
+       if pl_month in Fkind then s:=s+' ('+rs_month[monthOf(mat.start_date)]+')';
+       bmp.TextRect(r,r.left,r.top,s,ts,VGABlue);
      end;
      if pl_week in FKind then draw_header_week(bmp) else
      if pl_2weeks in FKind then draw_header_2weeks(bmp) else
