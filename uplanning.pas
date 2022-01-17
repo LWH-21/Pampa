@@ -23,12 +23,15 @@ type
 
   { TGPlanning }
 
-  Planning_kind=(pl_week,pl_2weeks, pl_month, pl_graphic, pl_text, pl_edit, pl_consult);
+  Planning_kind=(pl_week,pl_2weeks, pl_month, pl_graphic, pl_text, pl_edit, pl_consult, pl_worker, pl_customer);
   TPlanning_kind= set of Planning_kind;
 
   TGPlanning = class(TFrame)
       Label_start: TLabel;
       Label_end: TLabel;
+      MWorker: TMenuItem;
+      Mexcept: TMenuItem;
+      MCustomer: TMenuItem;
       Start_planning: TDateEdit;
       M2weeks: TMenuItem;
       Mchange: TMenuItem;
@@ -41,7 +44,7 @@ type
       Mtexte: TMenuItem;
       MPdf: TMenuItem;
       Mexcel: TMenuItem;
-      PopM_upd: TPopupMenu;
+      PopM_planning: TPopupMenu;
       PopM_export: TPopupMenu;
       PopM_freq: TPopupMenu;
       End_planning: TDateEdit;
@@ -59,6 +62,7 @@ type
       procedure End_planningChange(Sender: TObject);
       procedure M2weeksClick(Sender: TObject);
       procedure MchangeClick(Sender: TObject);
+      procedure MPlanningClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
       procedure MtexteClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
@@ -67,6 +71,7 @@ type
         Shift: TShiftState; X, Y: Integer);
       procedure PB_planningMouseWheel(Sender: TObject; Shift: TShiftState;
         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+      procedure PopM_planningPopup(Sender: TObject);
       procedure SB_planningChange(Sender: TObject);
       procedure Start_planningChange(Sender: TObject);
       procedure TB_dateChange(Sender: TObject);
@@ -127,7 +132,7 @@ type
     procedure reload;
     procedure refresh;
     procedure refreshPlanningEnter;
-    function save() : boolean;
+    function save : boolean;
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -162,9 +167,10 @@ begin
    PB_planning.Parent:=self;
    PB_planning.onMouseDown:=@PB_planningMouseDown;
    PB_planning.OnMouseWheel:=@PB_planningMouseWheel;
+
    PB_planning.OnPaint:=@PB_planningPaint;
    PB_planning.ShowHint:=true;
-   FKind:=[pl_week, pl_text, pl_consult];
+   FKind:=[pl_week, pl_text, pl_consult, pl_worker];
    start:=StartOfTheWeek(Today());
    TB_date.Date:=start;
    margin:=SB_planning.Width div 4;
@@ -228,16 +234,21 @@ begin
    s:='';
    ox:=selection.x;oy:=selection.y;
    selection.x:=-1;selection.y:=-1;
-   if (selection.Y<0) and (pl_text in FKind) and (x>margin) and (y>0) then
+   if (selection.Y<0) and (pl_text in FKind) and (y>0) then
    begin
      lh := h - header;
      l:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
-     ox:=(x-margin) div colwidth + 1 ;
      oy:=(y - header + l) div self.hline + 1;
-     selection.x:=ox;
+     if (x>margin) then
+     begin
+          ox:=(x-margin) div colwidth + 1 ;
+          selection.x:=ox;
+     end else
+     begin
+       selection.x:=0;
+     end;
      selection.y:=oy;
      if (ox<>selection.x) or (oy<>selection.y) then selchanged:=true;
-     s:='Line '+inttostr(ox)+' column '+inttostr(oy);
    end;
 
 
@@ -351,6 +362,11 @@ begin
    end;
 end;
 
+procedure TGPlanning.MPlanningClick(Sender: TObject);
+begin
+
+end;
+
 procedure TGPlanning.MWeekClick(Sender: TObject);
 
 var k : TPlanning_kind;
@@ -400,6 +416,48 @@ begin
             end;
        end;
      end;
+end;
+
+procedure TGPlanning.PopM_planningPopup(Sender: TObject);
+
+var l : integer;
+
+begin
+   Mchange.visible:=false;
+   Mdel.visible:=false;
+   MInsert.visible:=false;
+   MCopy.visible:=false;
+   MPaste.visible:=false;
+   MExcept.visible:=false;
+   MCustomer.visible:=false;
+   MWorker.visible:=false;
+   if assigned(mat) then
+   begin
+     l:=selection.y-1;
+     if (pl_edit in Fkind)  then
+     begin
+             Mchange.visible:=true;
+             Mdel.visible:=true;
+             MInsert.visible:=true;
+             MCopy.visible:=true;
+             MPaste.visible:=true;
+     end;
+     if  pl_consult in FKind then
+     begin
+       if (selection.x=0) then
+       begin
+         if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) then
+         begin
+                  if (pl_worker in FKind) then MCustomer.visible:=true
+                  else Mworker.visible:=true;
+         end;
+       end else
+       begin
+            MExcept.visible:=true;
+            if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) and assigned(mat.lines[l].colums[selection.x-1]) then Mchange.visible:=true;
+       end;
+     end;
+   end;
 end;
 
 procedure TGPlanning.SB_planningChange(Sender: TObject);
@@ -733,7 +791,7 @@ begin
           bmp.DrawLineAntialias(x,header+1,x,h,BGRABlack,1);
      end;
 
-     if assigned(mat) then
+     if assigned(mat) and not (pl_edit in FKind) then
      begin
        r.left:=5;r.right:=margin - 5;
        r.top:=5;r.bottom:=20;
@@ -926,6 +984,7 @@ var nb,x,i : integer;
     TS: TTextStyle;
     c : integer;
     s : string;
+    selrect : Trect;
     bkcolor : TBGRAPixel;
 
 begin
@@ -979,6 +1038,7 @@ begin
                end;
                rect.left:=5;rect.right:=margin;
 
+               mat.lines[linenum].bounds:=rect;
                if (linenum=0) or (mat.lines[linenum].sy_id<>mat.lines[linenum-1].sy_id) then
                begin
                     ts.Alignment:=taLeftJustify;
@@ -1008,14 +1068,16 @@ begin
                     end;
                     if (linenum=selection.Y -1) and (c=selection.x - 1) then
                     begin
-                         cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                         selrect:=rect;
+                         //cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                     end;
                end;
                if (linenum=selection.Y -1) and (selection.x =0 ) then
                begin
                    rect.Left:=1;
                    rect.right:=margin;
-                   cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                   selrect:=rect;
+                   //cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                end;
 
           end else
@@ -1027,13 +1089,15 @@ begin
                  begin
                    rect.Left:=margin + (selection.x - 1)*colwidth;
                    rect.Width:=colwidth;
-                   cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                   selrect:=rect;
+                   //cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                  end else
                  if (selection.x=0) then
                  begin
                    rect.Left:=1;
                    rect.right:=margin;
-                   cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                   selrect:=rect;
+                   //cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                  end;
             end;
           end;
@@ -1041,6 +1105,25 @@ begin
           inc(linenum);
           rect.top := rect.bottom;
      end;
+     if (selection.x>=0) and (selection.y>=0) then
+     begin
+          if (selection.x=0) and assigned(mat) and (selection.y>=0) then
+          begin
+               i:=selection.y-1;
+               while (i<length(mat.lines)-1) and (mat.lines[i].sy_id=mat.lines[i+1].sy_id) do
+               begin
+                    inc(i);
+                    selrect:=mat.lines[i].bounds;
+               end;
+               while (i>0) and (i<length(mat.lines)-1) and (mat.lines[i].sy_id=mat.lines[i-1].sy_id) do
+               begin
+                    dec(i);
+                    selrect.top:=mat.lines[i].bounds.top;
+               end;
+          end;
+          cache.RectangleAntialias(selrect.Left,selrect.Top,selrect.Right,selrect.bottom,BGRA($21,$73,$46),3);
+     end;
+
 end;
 
 procedure TGPlanning.draw_text(bmp : TBGRABitmap);
@@ -1366,6 +1449,7 @@ begin
    end;
 end;
 
+
 function TGPlanning.save : boolean;
 
 begin
@@ -1377,7 +1461,7 @@ end;
 procedure TGPlanning.setEditMode;
 
 begin
-   setKind([pl_edit, pl_week, pl_text]);
+   setKind([pl_edit, pl_week, pl_text,pl_worker]);
    if not assigned(EnterPlanning) then
    begin
         EnterPlanning:= TFPlanning_enter.Create(self);
@@ -1403,12 +1487,14 @@ begin
       EnterPlanning.top:=0;
       EnterPlanning.visible:=false;
    end;
+   PB_planning.PopupMenu := PopM_planning;
+   if  not (pl_customer in FKind) then FKind:=Fkind+[pl_worker];
    if (pl_edit in Fkind) then
    begin
       TB_date.visible:=false;
       TB_prev.visible:=false;
       TB_next.Visible:=false;
-      PB_planning.PopupMenu := PopM_upd;
+      TB_refresh.visible:=false;
       start_planning.visible:=true;
       start_planning.left:=margin - start_planning.width - 5 ;
       start_planning.top:=PB_planning.Top + 2;
@@ -1419,17 +1505,33 @@ begin
       label_end.Top:=end_planning.top;
       Label_end.BringToFront;
       header:=start_planning.height*2+5;
+      Mchange.visible:=true;
+      Mdel.visible:=true;
+      MInsert.visible:=true;
+      MCopy.visible:=true;
+      MPaste.visible:=true;
+      MExcept.visible:=false;
+      MCustomer.visible:=false;
+      MWorker.visible:=false;
    end else
    begin
         start_planning.visible:=false;
         end_planning.visible:=false;
+        TB_refresh.visible:=true;
+        Mchange.visible:=false;
+        Mdel.visible:=false;
+        MInsert.visible:=false;
+        MCopy.visible:=false;
+        MPaste.visible:=false;
+        MExcept.visible:=true;
+        MCustomer.visible:=true;
+        MWorker.visible:=true;
    end;
    if (pl_consult in FKind) then
    begin
         TB_date.visible:=true;
         TB_prev.visible:=true;
         TB_next.Visible:=true;
-        PB_planning.PopupMenu := nil;
    end;
    if pl_graphic in Fkind then
    begin

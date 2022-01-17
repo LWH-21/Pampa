@@ -183,7 +183,8 @@ object GPlanning: TGPlanning
       OnClick = MMonthClick
     end
   end
-  object PopM_upd: TPopupMenu
+  object PopM_planning: TPopupMenu
+    OnPopup = PopM_planningPopup
     Left = 712
     Top = 184
     object Mchange: TMenuItem
@@ -201,6 +202,15 @@ object GPlanning: TGPlanning
     end
     object MPaste: TMenuItem
       Caption = 'Coller'
+    end
+    object Mexcept: TMenuItem
+      Caption = 'Modification exceptionnelle'
+    end
+    object MCustomer: TMenuItem
+      Caption = 'Planning du bénéficiaire'
+    end
+    object MWorker: TMenuItem
+      Caption = 'Plannning de l''intervenant'
     end
   end
 end

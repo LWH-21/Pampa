@@ -57,6 +57,8 @@ Type
 Type   TLine = record
                     sy_id : longint;
                     index : integer;
+                    bounds : Trect;
+                    selected : boolean;
                     colums : array of TIntervention;
               end;
 
