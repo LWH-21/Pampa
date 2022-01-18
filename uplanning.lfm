@@ -5,6 +5,7 @@ object GPlanning: TGPlanning
   Width = 840
   ClientHeight = 411
   ClientWidth = 840
+  LCLVersion = '2.0.10.0'
   OnResize = FrameResize
   TabOrder = 0
   DesignLeft = 805
@@ -71,14 +72,14 @@ object GPlanning: TGPlanning
     end
     object ToolButton2: TToolButton
       Left = 327
-      Height = 22
+      Height = 8
       Top = 2
       Caption = 'ToolButton2'
       Style = tbsSeparator
     end
     object ToolButton1: TToolButton
       Left = 147
-      Height = 22
+      Height = 8
       Top = 2
       Caption = 'ToolButton1'
       Style = tbsSeparator
@@ -208,9 +209,11 @@ object GPlanning: TGPlanning
     end
     object MCustomer: TMenuItem
       Caption = 'Planning du bénéficiaire'
+      OnClick = MCustomerClick
     end
     object MWorker: TMenuItem
       Caption = 'Plannning de l''intervenant'
+      OnClick = MWorkerClick
     end
   end
 end

@@ -62,11 +62,13 @@ type
       procedure End_planningChange(Sender: TObject);
       procedure M2weeksClick(Sender: TObject);
       procedure MchangeClick(Sender: TObject);
+      procedure MCustomerClick(Sender: TObject);
       procedure MPlanningClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
       procedure MtexteClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
       procedure MMonthClick(Sender: TObject);
+      procedure MWorkerClick(Sender: TObject);
       procedure PB_planningMouseDown(Sender: TObject; Button: TMouseButton;
         Shift: TShiftState; X, Y: Integer);
       procedure PB_planningMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -128,6 +130,7 @@ type
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure load(planning_def : string;wid,pid : longint; s,e : tdatetime);
     procedure load(pl_id : longint);
+
     procedure modify(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
     procedure reload;
     procedure refresh;
@@ -362,6 +365,26 @@ begin
    end;
 end;
 
+procedure TGPlanning.MCustomerClick(Sender: TObject);
+
+var l : integer;
+
+begin
+     if (selection.x=0) then
+     begin
+       l:=selection.y-1;
+       if (l<=length(mat.lines)) and (mat.lines[l].sy_id>0) then
+       begin
+            if (pl_worker in FKind) then
+            begin
+              FKind:=FKind - [pl_worker]+[pl_customer];
+              setKind(Fkind);
+              load( mat.lines[l].sy_id,self.start);
+            end;
+       end;
+     end;
+end;
+
 procedure TGPlanning.MPlanningClick(Sender: TObject);
 begin
 
@@ -391,6 +414,26 @@ begin
    k:=k + [pl_month];
    SetKind(k);
    reload;
+end;
+
+procedure TGPlanning.MWorkerClick(Sender: TObject);
+
+var l : integer;
+
+begin
+     if (selection.x=0) then
+     begin
+       l:=selection.y-1;
+       if (l<=length(mat.lines)) and (mat.lines[l].sy_id>0) then
+       begin
+            if (pl_customer in FKind) then
+            begin
+              FKind:=FKind + [pl_worker]-[pl_customer];
+              setKind(Fkind);
+              load( mat.lines[l].sy_id,self.start);
+            end;
+       end;
+     end;
 end;
 
 
@@ -1269,7 +1312,8 @@ begin
           start:=StartOfTheMonth(start);
           enddate:=EndOfTheMonth(start);
      end;
-     colplan:=Planning.loadW(id,start, enddate);
+     if (pl_customer in FKind) then colplan:=Planning.loadC(id,start, enddate)
+     else colplan:=Planning.loadW(id,start, enddate);
      load(colplan,start,endDate);
 end;
 
@@ -1282,6 +1326,7 @@ begin
      selection.y:=-1;
      mat:=TLPlanning.create(startdate,enddate);
      assert(assigned(mat),'Mat not assigned');
+     if pl_customer in Fkind then mat.setMode('C');
      mat.load(col);
      TB_date.Date:=startdate;
      if pl_graphic in Fkind then prepare_graphics else

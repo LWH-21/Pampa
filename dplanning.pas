@@ -74,6 +74,7 @@ Type TLPlanning = class
           src : char; // C=collection, J=json
           p_id : longint; // Plannind ID
           w_id : longint; // Worker ID
+          mode : char; // W=Worker, C=Customer
 
      public
           start_date : tdatetime;
@@ -103,6 +104,7 @@ Type TLPlanning = class
           procedure normalize;
           procedure reset;
           procedure setBounds(line,col : integer;r : trect);
+          procedure setMode(m : char);
           destructor destroy();override;
      end;
 
@@ -115,6 +117,7 @@ type
        procedure add_json_planning(s : string; dstart,dend : tdatetime; p_id, w_id : longint; result : TInterventions);
   public
        procedure init (D : TMainData);
+       function loadC(sy_customer : longint; start, endDate : tdatetime) : TInterventions;
        function loadW(sy_worker : longint; start, endDate : tdatetime) : TInterventions;
 
        function ToIsoDate (dt : TDateTime) : shortstring;
@@ -563,6 +566,44 @@ begin
   checkcrc:=true;
 end;
 
+function TPlanning.loadC(sy_customer : longint; start, endDate : tdatetime) : TInterventions;
+
+ var Query : TdataSet;
+     sql,s : string;
+     s1 : shortstring;
+     i,dw, pdw : integer;
+     W_id, p_id,c_id : longint;
+     dstart, dend,dtemp : tdatetime;
+     inter : Tintervention;
+
+begin
+ refdate:=start;
+ Query:=nil;
+ result:=nil;
+ //sql:=Maindata.getQuery('QPL01','SELECT P.SY_ID, P.SY_WID, D.C_ID, P.SY_START, P.SY_END, D.SY_DETAIL FROM PLANNING P INNER JOIN DPLANNING D ON D.PL_ID=P.SY_ID WHERE P.SY_WID=%w AND P.SY_START<=''%end'' AND P.SY_END>=''%start''');
+ sql:= 'SELECT P.SY_ID, P.SY_WID, D.C_ID, P.SY_START, P.SY_END, D.SY_DETAIL FROM PLANNING P INNER JOIN DPLANNING D ON D.PL_ID=P.SY_ID WHERE D.C_ID=%c AND P.SY_START<=''%end'' AND P.SY_END>=''%start''';
+ sql:=sql.Replace('%c',inttostr(sy_customer));
+ sql:=sql.Replace('%start',ToIsoDate(start));
+ sql:=sql.Replace('%end',ToIsoDate(endDate));
+ MainData.readDataSet(Query,sql,true);
+ if query.RecordCount>0 then result:=TInterventions.Create();
+ WHILE (NOT query.EOF) DO
+ BEGIN
+   p_id:=query.fields[0].AsInteger;
+   w_id:=query.fields[1].AsInteger;
+   c_id:=query.fields[2].AsInteger;
+   s:=query.fields[3].AsString;
+   dstart:=IsostrToDate(s);
+   if CompareDateTime(start,dstart)>0 then dstart:=start;
+   s:=query.fields[4].AsString;
+   dend:=IsoStrToDate(s);
+   if CompareDatetime(enddate,dend)<0 then dend:=enddate;
+   s:=query.fields[5].AsString;
+   add_json_planning(s,dstart,dend,p_id,w_id,result);
+   query.Next;
+ END;
+end;
+
 function TPlanning.loadW(sy_worker : longint; start, enddate : tdatetime) : TInterventions;
 
 var Query : TdataSet;
@@ -634,6 +675,7 @@ var i : integer;
 begin
   colscount:=7;
   linescount:=20;
+  mode:='W';
   start_date:=today();
   setlength(lines,linescount);
   for i:=0 to linescount-1 do
@@ -650,6 +692,7 @@ var i : integer;
 begin
   start_date:=s;
   end_date:=e;
+  mode:='W';
   colscount:=DaysBetween(start_date,end_date)+1;
   for i:=1 to 2 do
   begin
@@ -662,22 +705,26 @@ procedure TLPlanning.add_inter(inter : TIntervention);
 var
      nline,col,ncol : integer;
      i,j : integer;
+     id : longint;
      found : boolean;
      num_index : integer;
 
 begin
+     assert(assigned(inter),'Inter not assigned');
+     assert((mode='W') or (mode='C'),'Mode <> W and mode <> C');
      nline:=0; found:=false;
      ncol:=inter.col_index - 1;
      inter.setMat(self);
      while not found do
      begin
+       if mode='C' then id:=inter.w_id else id:=inter.c_id;
        if lines[nline].SY_ID<=0 then
        begin
-            num_index:=loadID(inter.c_id);
-            lines[nline].sy_id:=inter.c_id;
+            num_index:=loadID(id);
+            lines[nline].sy_id:=id;
             lines[nline].index:=num_index;
        end;
-       if lines[nline].SY_ID=inter.c_id then
+       if lines[nline].SY_ID=id then
        begin
             if not assigned(lines[nline].colums[ncol]) then
             begin
@@ -940,14 +987,6 @@ begin
        end;
        normalize;
      end;
-(*     if assigned(l) then
-     begin
-          for inter in l do
-          begin
-               add_inter(inter);
-          end;
-          normalize;
-     end; *)
 end;
 
 procedure TLPlanning.load(s : String; w, p : longint);
@@ -1060,6 +1099,8 @@ begin
              i:=j + 1;
          end;
          query:=nil;
+         if mode='C' then sql:='SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM WORKER WHERE SY_ID=%id'
+         else
          sql:=MainData.getQuery('Q0014','SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM CUSTOMER WHERE SY_ID=%id');
          sql:=sql.Replace('%id',inttostr(s_id));
          Maindata.readDataSet(query,sql,true);
@@ -1195,6 +1236,12 @@ begin
      begin
           lines[line].colums[col].setBounds(r);
      end;
+end;
+
+procedure TLPlanning.setMode(m : char);
+
+begin
+     if m='C' then mode:='C' else mode:='W';
 end;
 
 destructor TLPlanning.destroy();
