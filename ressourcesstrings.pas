@@ -5,7 +5,7 @@ unit RessourcesStrings;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,LMessages;
 
 
 resourcestring
@@ -68,6 +68,8 @@ resourcestring
 
 const
   rs_month : array[1..12] of string = (rs_month01,rs_month02,rs_month03,rs_month04,rs_month05,rs_month06,rs_month07,rs_month08,rs_month09,rs_month10,rs_month11,rs_month12);
+
+  LM_PLANNING_DEST_CHANGE = LM_USER + 1;
 
 implementation
 

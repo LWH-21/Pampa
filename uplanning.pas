@@ -368,6 +368,7 @@ end;
 procedure TGPlanning.MCustomerClick(Sender: TObject);
 
 var l : integer;
+    uid : longint;
 
 begin
      if (selection.x=0) then
@@ -377,9 +378,15 @@ begin
        begin
             if (pl_worker in FKind) then
             begin
-              FKind:=FKind - [pl_worker]+[pl_customer];
-              setKind(Fkind);
-              load( mat.lines[l].sy_id,self.start);
+              uid:=mat.lines[l].sy_id;
+              if uid>0 then
+              begin
+                FKind:=FKind - [pl_worker]+[pl_customer];
+                setKind(Fkind);
+                load( uid,self.start);
+                if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
+                   parent.Perform(LM_PLANNING_DEST_CHANGE, 2,uid );
+              end;
             end;
        end;
      end;
@@ -419,6 +426,7 @@ end;
 procedure TGPlanning.MWorkerClick(Sender: TObject);
 
 var l : integer;
+    uid : longint;
 
 begin
      if (selection.x=0) then
@@ -428,9 +436,15 @@ begin
        begin
             if (pl_customer in FKind) then
             begin
-              FKind:=FKind + [pl_worker]-[pl_customer];
-              setKind(Fkind);
-              load( mat.lines[l].sy_id,self.start);
+              uid:=mat.lines[l].sy_id;
+              if uid>0 then
+              begin
+                FKind:=FKind + [pl_worker]-[pl_customer];
+                setKind(Fkind);
+                load( uid,self.start);
+                if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
+                   parent.Perform(LM_PLANNING_DEST_CHANGE, 1,uid );
+              end;
             end;
        end;
      end;
