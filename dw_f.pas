@@ -10,6 +10,7 @@ uses
 
 type
   TW_F = class(TFrame)
+
   private
 
   protected

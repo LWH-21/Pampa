@@ -5,7 +5,8 @@ unit UTW_Tab;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, Buttons,W_A,dw_f;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, Buttons,W_A,dw_f,
+  LMessages, RessourcesStrings;
 
 type
 
@@ -18,6 +19,7 @@ type
     TB_return: TToolButton;
     TB_Close: TToolButton;
     TB_stayontop: TToolButton;
+    procedure Captionchange(var Msg: TLMessage); message LM_CAPTION_CHANGE;
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure TB_CloseClick(Sender: TObject);
@@ -80,6 +82,12 @@ begin
   begin
       //MainForm.notify(Frame,[Main.no_close]);
   end;
+end;
+
+procedure TW_Tab.Captionchange(var Msg: TLMessage);
+
+begin
+  if assigned(frame) then caption:=frame.caption;
 end;
 
 procedure TW_Tab.FormClose(Sender: TObject; var CloseAction: TCloseAction);

@@ -126,7 +126,10 @@ type
   public
     constructor create(aowner: TComponent);override;
     function getHint(pt : Tpoint) : string;
-    procedure load(lid : longint; startdate : tdatetime);
+    function getCurrent(m : char) : longint;
+    function getInfos : string;
+    function getStartDate : tdatetime;
+    procedure load(lid : longint; startdate : tdatetime; m : char = '_'; period : char = '_'; display : char='_');
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure load(planning_def : string;wid,pid : longint; s,e : tdatetime);
     procedure load(pl_id : longint);
@@ -214,6 +217,36 @@ begin
          end;
      end;
 end;
+
+function TGPlanning.getCurrent(m : char) : longint;
+
+begin
+   assert(false,'not implemented');
+   result:=-1;
+end;
+
+function TGPlanning.getInfos : string;
+
+begin
+   if pl_customer in FKind then result:='C' else result:='W';
+   result:=result+'-';
+   if pl_month in Fkind then result:=result+'M' else
+   if pl_2weeks in Fkind then result:=result+'2' else
+   result:=result+'W';
+   if pl_graphic in Fkind then result:=result+'G' else
+   result:=result+'T';
+   result:=result+'-';
+   result:=result+FormatDateTime('YYYYMMDD',getStartDate);
+end;
+
+function TGPlanning.getStartDate : tdatetime;
+
+begin
+   result:=self.start;
+   if assigned(self.mat) then result:=mat.start_date;
+end;
+
+
 
 procedure TGPlanning.PB_planningMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1206,8 +1239,6 @@ end;
 
 procedure TGPlanning.FrameResize(Sender: TObject);
 
-var n : integer;
-
 begin
      Assert(FColNumber>0,'Colnumber = 0');
      SB_planning.Top:=PToolbar.Height + 1;
@@ -1295,15 +1326,41 @@ begin
      end;
 end;
 
-procedure TGPlanning.load(lid : longint; startdate : tdatetime);
+procedure TGPlanning.load(lid : longint; startdate : tdatetime; m : char = '_'; period : char = '_'; display : char='_');
 
 var endDate : tdatetime;
+    k : TPlanning_kind;
 
 begin
      id:=lid;
      self.start:=startdate;
      if assigned(colplan) then freeAndNil(colplan);
      endDate:=start;
+
+     k:=[pl_consult];
+     if m='_' then
+     begin
+          if pl_customer in Fkind then k:=k+[pl_customer] else
+          k:=k+[pl_worker];
+     end else if m='C' then k:=k+[pl_customer] else k:=k+[pl_worker];
+
+     if period='_' then
+     begin
+          if pl_month in Fkind then k:=k+[pl_month] else
+          if pl_2weeks in Fkind then k:=k+[pl_2weeks] else
+          k:=k+[pl_week];
+     end else if period='2' then k:=k+[pl_2weeks] else
+     if period='M' then k:=k+[pl_month] else k:=k+[pl_week];
+
+     if display='_' then
+     begin
+          if pl_graphic in Fkind then k:=k+[pl_graphic] else
+          k:=k+[pl_text];
+     end else if display='G' then k:=k+[pl_graphic] else k:=k+[pl_text];
+
+     setKind(k);
+
+
      if pl_week in Fkind then
      begin
           assert(not (pl_2weeks in Fkind),'Error type planning');

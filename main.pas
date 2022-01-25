@@ -6,6 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ExtCtrls,StrUtils,
+  LMessages,
   ComCtrls, Buttons, ActnList,LWTabPage,
   Generics.Collections,
   W_A, dw_f, Dataaccess,
@@ -140,6 +141,7 @@ type
     procedure Act_planningExecute(Sender: TObject);
     procedure Act_refreshExecute(Sender: TObject);
     procedure Arr_TileHorizontalExecute(Sender: TObject);
+
     procedure FormActivate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormShow(Sender: TObject);
@@ -803,6 +805,7 @@ begin
   OpenFrame(Fplanning,'N');
 end;
 
+
 procedure TMainForm.MDisplayClick(Sender: TObject);
 begin
 
@@ -827,8 +830,9 @@ var  find : boolean;
 
 begin
    find:=false;
+   showmessage('revoir la vérification de fenêtre existante ');
    // todo a revoir
- {  for f in FenList do
+ (*  for f in FenList do
    begin
      if f.getcode=code then
      begin
@@ -845,7 +849,7 @@ begin
            F.parent.Top:=self.top+50;
          end;
      end;
-   end;}
+   end;   *)
 
    if not find then
    begin

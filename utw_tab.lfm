@@ -1,7 +1,7 @@
 inherited W_Tab: TW_Tab
-  Left = 147
+  Left = 218
   Height = 691
-  Top = 214
+  Top = 191
   Width = 1566
   Caption = 'W_Tab'
   ClientHeight = 691

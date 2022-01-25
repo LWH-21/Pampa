@@ -6,7 +6,7 @@ interface
 
   uses
     Classes, SysUtils, Forms, Controls, Dialogs, ExtCtrls, ComCtrls,
-    StdCtrls,LCLIntf,
+    StdCtrls,LCLIntf,LMessages,ressourcesstrings,
     Graphics,BGRABitmap, BGRABitmapTypes;
 
   type
@@ -40,6 +40,7 @@ interface
        property OnChange : TNotifyEvent read FOnPageChanged write FOnPageChanged;
        property PageCount : integer READ FPageCount;
        property ActivePage : TFrame READ FActivePage WRITE SetActivePage ;
+       procedure Captionchange(var Msg: TLMessage); message LM_CAPTION_CHANGE;
        constructor create(Aowner : TComponent); override;
 
 
@@ -118,6 +119,16 @@ begin
        SetActivePageIndex(FPageCount);
        refresh;
      end;
+end;
+
+procedure TLWPageControl.Captionchange(var Msg: TLMessage);
+
+var i : integer;
+
+begin
+ i:=FActivePageIndex - 1;
+ Pages[i].caption:=Pages[i].frame.Caption;
+ refresh;
 end;
 
 procedure TLWPageControl.CloseTab(index : integer);

@@ -104,11 +104,13 @@ end;
 procedure TFr_Person.BsearchClick(Sender: TObject);
 
 var ts : TTabSheet;
-     tab : TLWPageControl;
+    tab : TLWPageControl;
+    oldcaption : string;
 
 begin
   if not CanClose then
     exit;
+  oldcaption:=caption;
   updatemode:=um_read;
   case Search(id) of
     mrOk:
@@ -179,6 +181,10 @@ begin
         exit;
       end;
     end;
+  end;
+  if assigned(parent) and (oldcaption<>caption) then
+  begin
+       parent.Perform(LM_CAPTION_CHANGE, 0,0 );
   end;
 end;
 
@@ -477,10 +483,6 @@ begin
     end;
   except
     on e : exception do Error(e, dber_system,'TFr_Person.open SY_ID='+inttostr(id));
-  end;
-  if parent is TWincontrol then
-  begin
-    TWincontrol(parent).Caption := Caption;
   end;
 end;
 
