@@ -59,6 +59,8 @@ interface
 
 implementation
 
+uses dw_f;
+
 function Darker(MyColor:TColor; Percent : byte) : Tcolor;
 var r,g,b:Byte;
 begin
@@ -148,7 +150,7 @@ begin
           FPageCount:=FPageCount - 1;
           setLength(pages,PageCount);
           if FActivePageIndex>FPageCount then ActivePageIndex:=FPageCount;
-          setActivePageIndex(ActivePageIndex);
+          setActivePageIndex(FActivePageIndex);
           refresh;
      end;
 end;

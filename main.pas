@@ -827,19 +827,31 @@ procedure TMainForm.OpenWindow(code : shortstring;json : string='');
 var  find : boolean;
      f : TW_F;
      id : longint;
+     empty : TW_F;
+     c : string;
 
 begin
    find:=false;
-   showmessage('revoir la vérification de fenêtre existante ');
-   // todo a revoir
- (*  for f in FenList do
+   empty:=nil;
+   c:='';
+   for f in FenList do
    begin
+     c:=c+f.getcode+'; ';
+   end;
+   // todo a revoir
+   for f in FenList do
+   begin
+     c:=f.getcode;
+     if (copy(code,1,3)=copy(c,1,3)) and (c='PLNW|0000') then
+     begin
+          empty:=f;
+     end else
      if f.getcode=code then
      begin
          find:=true;
-         if f.Parent is TTabSheet then
+         if f.Parent is TLWPageControl then
          begin
-            tabcontrol.ActivePage:=TTabSheet(f.parent);
+            tabcontrol.ActivePage:=TFrame(f);
          end else
          if f.Parent is TForm then
          begin
@@ -849,7 +861,13 @@ begin
            F.parent.Top:=self.top+50;
          end;
      end;
-   end;   *)
+   end;
+
+   if assigned(empty) then
+   begin
+          tabcontrol.CloseTab(empty);
+          empty.close;
+   end;
 
    if not find then
    begin
@@ -870,6 +888,7 @@ begin
        end;
      end;
    end;
+
 end;
 
 procedure TMainForm.MhistoClick(Sender: TObject);

@@ -275,7 +275,8 @@ begin
   if mode <> 'C' then
     mode := 'W';
   Result := 'PLN' + mode;
-  Result := Result + '|' + intToHex(id, 4);
+  if id>0 then  Result := Result + '|' + intToHex(id, 4) else
+  result:=result+'|0000';
   assert(length(Result) = 9, 'Invalid code string');
 end;
 
