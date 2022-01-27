@@ -499,11 +499,15 @@ procedure TMainForm.FormActivate(Sender: TObject);
 
 
 var Fplanning : TFr_planning;
+    c : shortstring;
+    j : string;
+    defwindow : boolean;
 
 begin
   if (not activated) and (not IdleTimer.Enabled) and (not Timer1.Enabled) and (not MainData.isConnected) then
   begin
     activated:=true;
+    defwindow:=false;
     Application.ProcessMessages;
     try
        MainData.Logon;
@@ -523,10 +527,22 @@ begin
     // Fenetre planning par défaut
     if MainData.isConnected then
     begin
-      tabcontrol.Visible:=true;
-      Fplanning := TFr_planning.Create(self);
-      FPlanning.Caption:=rs_planning;
-      OpenFrame(Fplanning,'N');
+       tabcontrol.Visible:=true;
+      if assigned(histomanager) then
+      begin
+        histomanager.getLastWindow(c,j);
+        if (c>' ') and (j>' ') then
+        begin
+             OpenWindow(c,j);
+             defwindow:=true;
+        end;
+      end;
+      if not defwindow then
+      begin
+            Fplanning := TFr_planning.Create(self);
+            FPlanning.Caption:=rs_planning;
+            OpenFrame(Fplanning,'N');
+      end;
     end;
 
     //IdleTimer

@@ -42,6 +42,7 @@ Type
         constructor create;
         procedure AddHisto(win : TW_F; id : longint; actions : shortstring);
         function getCaption(s : string) : shortstring;
+        procedure getLastWindow(var code : shortstring; var j : string);
         procedure getMenuInfo(n : integer; var code, c : shortstring; var id : longint; var j : string);
         procedure save;
         procedure UpdateMainMenu;
@@ -321,6 +322,35 @@ begin
     data:=fjson.findPath('histo.caption');
     if assigned(data) then result:=data.AsString;
     freeAndNil(fjson);
+end;
+
+procedure THistoManager.getLastWindow(var code : shortstring; var j : string);
+
+var sql : string;
+    Q : Tdataset;
+    num : integer;
+
+begin
+     Q:=nil;
+     sql:=Maindata.getQuery('Q0016','SELECT CODE, JSON FROM LWH_HISTO WHERE USERNAME=''%u'' ORDER BY DT DESC, TIM DESC, CODE ASC LIMIT 1');
+     sql:=sql.Replace('%u',Mainform.username);
+     MainData.readDataSet(Q,sql,true);
+     if Q.RecordCount=0 then
+     begin
+          sql:=Maindata.getQuery('Q0016','SELECT CODE, JSON FROM LWH_HISTO WHERE USERNAME=''%u'' ORDER BY DT DESC, TIM DESC, CODE ASC LIMIT 1');
+          sql:=sql.Replace('%u',Mainform.username);
+          MainData.readDataSet(Q,sql,true);
+     end;
+     num:=0;
+     WHILE (NOT query.EOF) and (num<1) DO
+     BEGIN
+          code:=trim(Q.FieldByName('CODE').asString);
+          j:=Q.FieldByName('JSON').AsString;
+          inc(num);
+          Q.Next;
+     END;
+     Q.Close;
+     freeandNil(Q);
 end;
 
 procedure THistoManager.getMenuInfo(n : integer; var code, c : shortstring; var id : longint; var j : string);
