@@ -89,6 +89,7 @@ Type TLPlanning = class
           procedure add_inter(inter : TIntervention);
           function add_line : integer;
           function CreateJson(id : longint = 0) : string;
+          procedure deselectLines;
           function getColor(l: integer) : TBGRAPixel;
           function getCustomerLib(c : longint) : String;
           function getInterventions : TInterventions;
@@ -103,6 +104,7 @@ Type TLPlanning = class
           function loadID(s_id : longint) : integer;
           procedure normalize;
           procedure reset;
+          function SelLineAt(x,y : integer) : boolean;
           procedure setBounds(line,col : integer;r : trect);
           procedure setMode(m : char);
           destructor destroy();override;
@@ -804,6 +806,17 @@ begin
      jsonobj.Free;
 end;
 
+procedure TLPlanning.deselectLines;
+
+var l : integer;
+
+begin
+  for l:=0 to linescount-1 do
+  begin
+         lines[l].selected:=false;
+  end;
+end;
+
 function TLPlanning.getColor(l : integer) : TBGRAPixel;
 
 begin
@@ -1222,6 +1235,28 @@ begin
               end;
 
           end;
+     end;
+end;
+
+function TLPlanning.SelLineAt(x,y : integer) : boolean;
+
+var i,j : integer;
+    id : longint;
+    pt : tpoint;
+
+begin
+     result:=true;
+     pt.x:=x;pt.y:=y;
+     for i:=0 to linescount-1 do
+     begin
+       if lines[i].bounds.Contains(pt) then id:=lines[i].sy_id;
+     end;
+     for i:=0 to linescount-1 do
+     begin
+       if id=lines[i].sy_id then
+       begin
+            lines[i].selected:=true;
+       end else lines[i].selected:=false;
      end;
 end;
 

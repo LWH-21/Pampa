@@ -110,6 +110,7 @@ type
     procedure draw_header_month(bmp : TBGRABitmap);
     procedure draw_text(bmp : TBGRABitmap);
     function getSelInter() : Tintervention;
+    procedure redraw_dest(c : TBGRABitmap; r : trect);
     procedure prepare_graphics();
     procedure prepare_text();
     procedure draw_graphics(bmp : TBGRABitmap);
@@ -292,12 +293,13 @@ begin
    begin
      if (x>margin) and (y>0) and (assigned(cache)) then
      begin
+          mat.deselectLines;
           lh := h - header;
           ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
           ny:=ny+y-header;
           if ((ny>0) and (ny<cache.height)) then
           begin
-               assert(ny <= cache.height,'Error calculing coordinates y: '+inttostr(y));
+               assert(ny <= cache.height,'1 Error calculing coordinates y: '+inttostr(y));
                if assigned(mat) then inter:=mat.getInterAt(x,ny);
                if assigned(inter) then
                begin
@@ -309,6 +311,17 @@ begin
                     end;
                end;
           end;
+     end else
+     if (y>0) and assigned(cache) then
+     begin
+       lh := h - header;
+       ny:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
+       ny:=ny+y-header;
+       if ((ny>0) and (ny<cache.height)) then
+       begin
+            assert(ny <= cache.height,'2 Error calculing coordinates y: '+inttostr(y));
+            if assigned(mat) then selchanged:= mat.SelLineAt(x,ny);
+       end;
      end;
      for l:=0 to mat.linescount -1 do
      begin
@@ -404,25 +417,32 @@ var l : integer;
     uid : longint;
 
 begin
-     if (selection.x=0) then
+     uid:=-1;
+     if not (pl_worker in FKind) then exit;
+     if pl_graphic in Fkind then
      begin
-       l:=selection.y-1;
-       if (l<=length(mat.lines)) and (mat.lines[l].sy_id>0) then
-       begin
-            if (pl_worker in FKind) then
-            begin
-              uid:=mat.lines[l].sy_id;
-              if uid>0 then
+          for l:=0 to mat.linescount-1 do
+          begin
+              if mat.lines[l].selected then
               begin
-                FKind:=FKind - [pl_worker]+[pl_customer];
-                setKind(Fkind);
-                load( uid,self.start);
-                if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
-                   parent.Perform(LM_PLANNING_DEST_CHANGE, 2,uid );
+                uid:=mat.lines[l].sy_id;
+                break;
               end;
-            end;
-       end;
+          end;
      end;
+     if pl_text in Fkind then
+     begin
+          l:=selection.y-1;
+          if (l<=length(mat.lines)) and (mat.lines[l].sy_id>0) then uid:=mat.lines[l].sy_id;
+     end;
+    if uid>0 then
+    begin
+      FKind:=FKind - [pl_worker]+[pl_customer];
+      setKind(Fkind);
+      load( uid,self.start);
+      if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
+         parent.Perform(LM_PLANNING_DEST_CHANGE, 2,uid );
+    end;
 end;
 
 procedure TGPlanning.MPlanningClick(Sender: TObject);
@@ -462,25 +482,33 @@ var l : integer;
     uid : longint;
 
 begin
-     if (selection.x=0) then
-     begin
-       l:=selection.y-1;
-       if (l<=length(mat.lines)) and (mat.lines[l].sy_id>0) then
-       begin
-            if (pl_customer in FKind) then
-            begin
-              uid:=mat.lines[l].sy_id;
-              if uid>0 then
-              begin
-                FKind:=FKind + [pl_worker]-[pl_customer];
-                setKind(Fkind);
-                load( uid,self.start);
-                if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
-                   parent.Perform(LM_PLANNING_DEST_CHANGE, 1,uid );
-              end;
-            end;
-       end;
-     end;
+    uid:=-1;
+    if not (pl_customer in FKind) then exit;
+    if not (assigned(mat)) then exit;
+    if pl_graphic in Fkind then
+    begin
+         for l:=0 to mat.linescount-1 do
+         begin
+             if mat.lines[l].selected then
+             begin
+               uid:=mat.lines[l].sy_id;
+               break;
+             end;
+         end;
+    end;
+    if pl_text in Fkind then
+    begin
+         l:=selection.y-1;
+         if (l<=length(mat.lines)) and (mat.lines[l].sy_id>0) then uid:=mat.lines[l].sy_id;
+    end;
+   if uid>0 then
+   begin
+     FKind:=FKind + [pl_worker]-[pl_customer];
+     setKind(Fkind);
+     load( uid,self.start);
+     if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
+        parent.Perform(LM_PLANNING_DEST_CHANGE, 1,uid );
+   end;
 end;
 
 
@@ -511,6 +539,7 @@ end;
 procedure TGPlanning.PopM_planningPopup(Sender: TObject);
 
 var l : integer;
+    c : integer;
 
 begin
    Mchange.visible:=false;
@@ -532,19 +561,53 @@ begin
              MCopy.visible:=true;
              MPaste.visible:=true;
      end;
-     if  pl_consult in FKind then
+     if  (pl_consult in FKind) then
      begin
-       if (selection.x=0) then
+       if  (pl_text in FKind) then
        begin
-         if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) then
+         if (selection.x=0) then
          begin
-                  if (pl_worker in FKind) then MCustomer.visible:=true
-                  else Mworker.visible:=true;
+           if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) then
+           begin
+                    if (pl_worker in FKind) then MCustomer.visible:=true
+                    else Mworker.visible:=true;
+           end;
+         end else
+         begin
+              MExcept.visible:=true;
+              if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) and assigned(mat.lines[l].colums[selection.x-1]) then Mchange.visible:=true;
          end;
        end else
+       if (pl_graphic in Fkind) then
        begin
-            MExcept.visible:=true;
-            if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) and assigned(mat.lines[l].colums[selection.x-1]) then Mchange.visible:=true;
+              for l:=0 to mat.linescount -1 do
+              begin
+                  if mat.lines[l].selected then
+                  begin
+                       if (pl_worker in FKind) then MCustomer.visible:=true
+                       else Mworker.visible:=true;
+                       break;
+                  end;
+                  for c:=0 to mat.colscount-1 do
+                  begin
+                       if assigned(mat.lines[l].colums[c]) then
+                       begin
+                           if (mat.lines[l].colums[c].selected) then
+                           begin
+                                if c>0 then
+                                begin
+                                  Mchange.visible:=true;
+                                  MExcept.visible:=true;
+                                  break;
+                                end else
+                                begin
+                                     if (pl_worker in FKind) then MCustomer.visible:=true
+                                     else Mworker.visible:=true;
+                                end;
+                           end;
+                       end;
+                  end;
+              end;
        end;
      end;
    end;
@@ -660,6 +723,75 @@ procedure TGPlanning.draw_frame(bmp : TBGRABitmap);
 
 begin
    bmp.RectangleAntialias(0,0,w-1,h,BGRABlack,1,BGRAWhite);
+end;
+
+procedure TGPlanning.redraw_dest(c : TBGRABitmap; r : trect);
+
+var nb_dest : integer;
+    j, nline, carwidth : integer;
+    textrect,rect : trect;
+    s : string;
+
+begin
+  c.FillRect(r,BGRAWhite,dmset,65535);
+  c.FontHeight:=14;
+  nb_dest:=0;
+  for j:=0 to length(mat.libs)-1 do
+  begin
+    if mat.libs[j].id>0 then inc(nb_dest);
+  end;
+
+  if nb_dest<=0 then exit;
+  j:=1;
+  if nb_dest<12 then
+  begin
+        j:=2;
+        rect.top := 12*hline - (nb_dest div 2)*hline*j;
+  end else
+  if nb_dest<20 then
+  begin
+       j:=1;
+       rect.top := 12*hline - (nb_dest div 2)*hline;
+  end;
+  carwidth:=10;
+
+  if rect.Top>r.top then
+  begin
+    rect.top := r.top+5;
+  end else
+  if (rect.top -10 + (hline*j)* nb_dest)<r.bottom then
+  begin
+    rect.top := r.bottom - (hline*j* nb_dest) - 10;
+  end;
+  rect.left:=5;rect.right:=margin - carwidth - 20;
+  for nline:=0 to mat.linescount-1 do
+  begin
+       if (nline=0) or ( mat.lines[nline].sy_id<>mat.lines[nline-1].sy_id) then
+       begin
+                  if mat.lines[nline].sy_id>0 then
+                  begin
+                      rect.bottom:=rect.top + hline*j;
+                      s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
+                      cache.RectangleAntialias(rect.left,rect.top+2,rect.right,rect.bottom-2,BGRABlack,1,BGRAWhite);
+                      textrect:=rect;
+                      mat.lines[nline].bounds:=rect;
+                      if mat.lines[nline].selected then
+                      begin
+                           textrect.Inflate(0,0,-13,0);
+                           cache.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,BGRA($21,$73,$46),3);
+                      end;
+                      textrect:=rect;
+                      textrect.Inflate(-5,-5,-10,-5);
+                      cache.TextRect(textrect, s,taLeftJustify,tlTop,BGRABlack);
+
+                      textrect:=rect;
+                      textrect.Inflate(-(rect.width - 10),-2,0,-2);
+                      cache.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,mat.libs[mat.lines[nline].index].color,1,mat.libs[mat.lines[nline].index].color);
+
+                  end;
+                 rect.top:=rect.Top+hline*j;
+             end;
+       end;
 end;
 
 procedure TGPlanning.prepare_graphics();
@@ -800,8 +932,6 @@ begin
             rect.top := 12*hline - (nb_dest div 2)*hline;
        end;
 
-
-
        rect.left:=5;rect.right:=margin - carwidth - 20;
        for nline:=0 to mat.linescount-1 do
        begin
@@ -813,11 +943,20 @@ begin
                       s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
                       cache.RectangleAntialias(rect.left,rect.top+2,rect.right,rect.bottom-2,BGRABlack,1,BGRAWhite);
                       textrect:=rect;
+                      mat.lines[nline].bounds:=rect;
+                      if mat.lines[nline].selected then
+                      begin
+                           textrect.Inflate(0,0,-13,0);
+                           cache.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,BGRA($21,$73,$46),3);
+                      end;
+                      textrect:=rect;
                       textrect.Inflate(-5,-5,-10,-5);
                       cache.TextRect(textrect, s,taLeftJustify,tlTop,BGRABlack);
+
                       textrect:=rect;
                       textrect.Inflate(-(rect.width - 10),-2,0,-2);
                       cache.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,mat.libs[mat.lines[nline].index].color,1,mat.libs[mat.lines[nline].index].color);
+
                   end;
                  rect.top:=rect.Top+hline*j;
              end;
@@ -829,7 +968,7 @@ end;
 
 procedure TGPlanning.draw_graphics(bmp : TBGRABitmap);
 
-var rect  : Trect;
+var rect, rect1  : Trect;
     i,lh : integer;
 
 begin
@@ -845,7 +984,12 @@ begin
      rect.Top :=i ;
      rect.Bottom:=rect.top+lh;
 
+     rect1:=rect;
+     rect1.Right := margin;
+
      assert(not rect.isEmpty,'Destination rectangle is empty');
+     redraw_dest(cache,rect1);
+
      bmp.PutImagePart(1,header+1,cache,rect,dmSet);
 end;
 
@@ -1653,11 +1797,13 @@ begin
    begin
         Sb_planning.Max:=24;
         Sb_planning.Position:=12;
+        TB_graph.Down:=true;
    end else
    begin
      Sb_planning.min:=0;
      Sb_planning.Max:=10;
      Sb_planning.Position:=0;
+     TB_graph.Down:=false;
    end;
    FColNumber:=7;
    if pl_week in Fkind then begin

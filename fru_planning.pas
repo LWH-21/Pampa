@@ -156,7 +156,6 @@ begin
     end;
   end;
   setid(p_id);
-  startdate := StartOfTheWeek(startdate);
   remplir_planning;
 end;
 
