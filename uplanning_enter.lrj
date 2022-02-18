@@ -11,5 +11,6 @@
 {"hash":143764,"name":"tfplanning_enter.label1.caption","sourcebytes":[76,32,32,32,32,32,77,32,32,32,32,32,32,77,32,32,32,32,32,74,32,32,32,32,32,32,86,32,32,32,32,32,83,32,32,32,32,32,32,68],"value":"L     M      M     J      V     S      D"},
 {"hash":12558,"name":"tfplanning_enter.sp_add.caption","sourcebytes":[46,46,46],"value":"..."},
 {"hash":206155893,"name":"tfplanning_enter.endtime.text","sourcebytes":[69,110,100,84,105,109,101],"value":"EndTime"},
-{"hash":139838082,"name":"tfplanning_enter.btn_cancel.caption","sourcebytes":[65,110,110,117,108,101,114],"value":"Annuler"}
+{"hash":139838082,"name":"tfplanning_enter.btn_cancel.caption","sourcebytes":[65,110,110,117,108,101,114],"value":"Annuler"},
+{"hash":125352194,"name":"tfplanning_enter.btn_del.caption","sourcebytes":[83,117,112,112,114,105,109,101,114],"value":"Supprimer"}
 ]}

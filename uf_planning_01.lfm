@@ -1,7 +1,7 @@
 inherited F_planning_01: TF_planning_01
-  Left = 636
+  Left = 450
   Height = 613
-  Top = 138
+  Top = 50
   Width = 1019
   Caption = 'F_planning_01'
   ClientHeight = 613
@@ -76,32 +76,24 @@ inherited F_planning_01: TF_planning_01
     OnSelection = ListSelection
   end
   object Btn_insert: TBitBtn[4]
-    Left = 104
+    Left = 96
     Height = 30
     Top = 576
     Width = 75
     Caption = 'Ajouter'
     OnClick = Btn_insertClick
+    PopupMenu = Planning_menu
     TabOrder = 4
   end
   object Planning_menu: TPopupMenu[5]
     Left = 184
     Top = 496
-    object Mchange: TMenuItem
-      Caption = 'Modifier'
-      OnClick = MchangeClick
-    end
-    object MDel: TMenuItem
-      Caption = 'Supprimer'
-    end
-    object Minsert: TMenuItem
-      Caption = 'Insérer une ligne'
+    object MNewEmpty: TMenuItem
+      Caption = 'Ajouter un planning vierge'
+      OnClick = MNewEmptyClick
     end
     object MCopy: TMenuItem
-      Caption = 'Copier'
-    end
-    object MPaste: TMenuItem
-      Caption = 'Coller'
+      Caption = 'Dupliquer le planning'
     end
   end
 end

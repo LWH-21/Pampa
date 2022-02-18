@@ -19,6 +19,7 @@ type TIntervention = Class
           dh_end : real;
           bounds : Trect;
           mat : TLPlanning;
+
      public
           dt : TdateTime;
           selected : boolean;
@@ -41,6 +42,7 @@ type TIntervention = Class
           function getDecimalHstart : real;
           function getDecimalHEnd : real;
           function getHint : string;
+          function getWorkerId : longint;
           procedure setBounds(r : trect);
           procedure setMat(m : TLPlanning);
           function test : boolean;
@@ -75,6 +77,7 @@ Type TLPlanning = class
           p_id : longint; // Plannind ID
           w_id : longint; // Worker ID
           mode : char; // W=Worker, C=Customer
+          modified : boolean;
 
      public
           start_date : tdatetime;
@@ -89,6 +92,7 @@ Type TLPlanning = class
           procedure add_inter(inter : TIntervention);
           function add_line : integer;
           function CreateJson(id : longint = 0) : string;
+          procedure delete(inter : TIntervention);
           procedure deselectLines;
           function getColor(l: integer) : TBGRAPixel;
           function getCustomerLib(c : longint) : String;
@@ -99,6 +103,7 @@ Type TLPlanning = class
           function getInterAt(x,y : integer) : TIntervention;
           function getWorkerId() : longint;
           function isLineEmpty(l : integer) : boolean;
+          function isModified : boolean;
           procedure load(l : TInterventions);
           procedure load(s : string; w, p : longint);
           function loadID(s_id : longint) : integer;
@@ -107,6 +112,7 @@ Type TLPlanning = class
           function SelLineAt(x,y : integer) : boolean;
           procedure setBounds(line,col : integer;r : trect);
           procedure setMode(m : char);
+          procedure setModified(m : boolean);
           destructor destroy();override;
      end;
 
@@ -349,6 +355,12 @@ begin
   result:=result+mat.getCustomerLib(c_id);
 end;
 
+function TIntervention.getWorkerId() : longint;
+
+begin
+  result:=self.w_id;
+end;
+
 procedure TIntervention.setBounds(r : trect);
 
 begin
@@ -516,6 +528,7 @@ begin
     sql:=sql.Replace('%start',IntToStr(ToIntDate(dstart)));
     sql:=sql.Replace('%end',IntToStr(ToIntDate(dend)));
     sql:=sql.Replace('%newend',IntToStr(ToIntDate(IncDay(dend,-1))));
+    sql:=sql+';'+LineEnding;
 
     sql:=sql+'INSERT OR REPLACE INTO PLANNING(SY_ID, SY_WID, SY_START, SY_END, SY_LASTUSER, SY_ROWVERSION, SY_CRC) VALUES (%id, %wid, ''%start'', ''%end'',''%user'',''%ts'',''%crc'')';
     sql:=sql.Replace('%id',inttostr(id));
@@ -528,9 +541,9 @@ begin
     sql:=sql.Replace('%user',s);
     s:=DateToISO8601(now);
     sql:=sql.Replace('%ts',s);
-
     sql:=sql.Replace('%crc',inttostr(crc));
-    sql:=sql+';'+LineEnding;;
+    sql:=sql+';'+LineEnding;
+
   end;
   sql:=sql+'UPDATE DPLANNING SET SY_DETAIL='''' WHERE PL_ID=%id';
   sql:=sql.Replace('%id',inttostr(id));
@@ -684,6 +697,7 @@ begin
   begin
        setLength(lines[i].colums,colscount);
   end;
+  modified:=false;
   setLength(libs,10);
 end;
 
@@ -700,6 +714,7 @@ begin
   begin
        add_line;
   end;
+  modified:=false;
   setLength(libs,10);
 end;
 
@@ -804,6 +819,25 @@ begin
      //Clipboard.AsText:=result;
 
      jsonobj.Free;
+end;
+
+procedure TLPlanning.delete(inter : TIntervention);
+
+var l,c : integer;
+
+begin
+  if not assigned(inter) then exit;
+  for l:=0 to linescount-1 do
+  begin
+       for c:=0 to colscount-1 do
+       begin
+            if lines[l].colums[c]=inter then
+            begin
+                freeandnil(lines[l].colums[c]);
+                modified:=true;
+            end;
+       end;
+  end;
 end;
 
 procedure TLPlanning.deselectLines;
@@ -935,6 +969,12 @@ begin
  // assert((not result) and (i=colscount),'Error searching in line');
 end;
 
+function TLPlanning.isModified : boolean;
+
+begin
+  result:=modified;
+end;
+
 (*
   {
     "PLANNING": [
@@ -1000,6 +1040,7 @@ begin
        end;
        normalize;
      end;
+     modified:=false;
 end;
 
 procedure TLPlanning.load(s : String; w, p : longint);
@@ -1062,6 +1103,7 @@ begin
        end;
        freeAndNil(json);
      end;
+     modified:=false;
      normalize;
 end;
 
@@ -1277,6 +1319,12 @@ procedure TLPlanning.setMode(m : char);
 
 begin
      if m='C' then mode:='C' else mode:='W';
+end;
+
+procedure TLPlanning.setModified(m : boolean);
+
+begin
+     modified:=m;
 end;
 
 destructor TLPlanning.destroy();

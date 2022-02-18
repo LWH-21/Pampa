@@ -5,6 +5,7 @@ object GPlanning: TGPlanning
   Width = 840
   ClientHeight = 411
   ClientWidth = 840
+  OnClick = FrameClick
   OnResize = FrameResize
   TabOrder = 0
   DesignLeft = 805
@@ -193,6 +194,10 @@ object GPlanning: TGPlanning
     end
     object MDel: TMenuItem
       Caption = 'Supprimer'
+      OnClick = MDelClick
+    end
+    object MSep01: TMenuItem
+      Caption = '-'
     end
     object Minsert: TMenuItem
       Caption = 'Insérer une ligne'

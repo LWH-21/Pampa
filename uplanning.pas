@@ -29,6 +29,7 @@ type
   TGPlanning = class(TFrame)
       Label_start: TLabel;
       Label_end: TLabel;
+      MSep01: TMenuItem;
       MWorker: TMenuItem;
       Mexcept: TMenuItem;
       MCustomer: TMenuItem;
@@ -60,9 +61,11 @@ type
       TB_refresh: TToolButton;
       TB_zoom: TTrackBar;
       procedure End_planningChange(Sender: TObject);
+      procedure FrameClick(Sender: TObject);
       procedure M2weeksClick(Sender: TObject);
       procedure MchangeClick(Sender: TObject);
       procedure MCustomerClick(Sender: TObject);
+      procedure MDelClick(Sender: TObject);
       procedure MPlanningClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
       procedure MtexteClick(Sender: TObject);
@@ -126,10 +129,12 @@ type
 
   public
     constructor create(aowner: TComponent);override;
+    procedure Delete(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
     function getHint(pt : Tpoint) : string;
     function getCurrent(m : char) : longint;
     function getInfos : string;
     function getStartDate : tdatetime;
+    function ismodified : boolean;
     procedure load(lid : longint; startdate : tdatetime; m : char = '_'; period : char = '_'; display : char='_');
     procedure load(col :  TInterventions;startdate,enddate : tdatetime);
     procedure load(planning_def : string;wid,pid : longint; s,e : tdatetime);
@@ -146,7 +151,7 @@ type
 
 implementation
 
-uses Main, PL_export;
+uses Main, PL_export, UF_planning_01;
 
 {$R *.lfm}
 
@@ -190,6 +195,44 @@ begin
    Label_start.visible:=false;
    label_end.visible:=false;
    setKind(Fkind);
+end;
+
+procedure TGPlanning.delete(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
+
+var i : integer;
+    col,line : integer;
+    oldinter,newinter : Tintervention;
+
+begin
+     assert(length(days)=7,'Invalid parameters : days = '+days);
+     assert(num>0,'Invalid parameters : num='+inttostr(num));
+     assert(he>hs,'Invalid parameters hs='+inttostr(hs)+' he='+inttostr(he));
+     assert(assigned(mat),'Mat not assigned');
+
+     for line:=0 to mat.linescount-1 do
+     begin
+         for col:=0 to mat.colscount-1 do
+         begin
+              if assigned(mat.lines[line].colums) then
+              begin
+                  oldinter:=mat.lines[line].colums[col];
+                  if assigned(oldinter) then
+                  begin
+                      if (oldinter.c_id=num) and (oldinter.h_start=hs) and (oldinter.h_end=he) then
+                      begin
+                          if days[oldinter.week_day]<>'_' then
+                          begin
+                           freeAndNil(mat.lines[line].colums[col]);
+                           mat.setModified(true);
+                          end;
+                      end;
+                  end;
+              end;
+         end;
+     end;
+
+     mat.normalize;
+     refresh;
 end;
 
 
@@ -247,7 +290,12 @@ begin
    if assigned(self.mat) then result:=mat.start_date;
 end;
 
+function TGPlanning.ismodified : boolean;
 
+begin
+   result:=false;
+   if assigned(self.mat) then result:=mat.ismodified();
+end;
 
 procedure TGPlanning.PB_planningMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -377,36 +425,68 @@ begin
   if assigned(mat) then mat.end_date:=End_planning.Date;
 end;
 
+procedure TGPlanning.FrameClick(Sender: TObject);
+begin
+
+end;
+
 procedure TGPlanning.MchangeClick(Sender: TObject);
 
 var inter : TIntervention;
     r : Trect;
+    uid,plid : longint;
+    f: TF_planning_01;
 
 begin
    if not assigned(mat) then exit;
    inter:=getSelInter();
-   if (pl_text in FKind) then
+//   if not assigned(inter) then exit;
+
+
+   if (pl_edit in Fkind)  then
    begin
-       refreshPlanningEnter;
-       EnterPlanning.setInter(selection.Y, selection.X,inter);
-       if assigned(inter) then
+     if (pl_text in FKind) then
+     begin
+         refreshPlanningEnter;
+         EnterPlanning.setInter(selection.Y, selection.X,inter);
+         if assigned(inter) then
+         begin
+              r:=inter.getBounds;
+         end else
+         begin
+             r.top:=header+selection.y*hline;
+             r.right:=margin+selection.x*colwidth;
+             r.left:=r.right - colwidth;
+         end;
+         EnterPlanning.Top :=r.Top;
+         EnterPlanning.Left:=r.Right;
+         if (EnterPlanning.left+EnterPlanning.Width)>(PB_planning.Width) then
+         begin
+           EnterPlanning.left:=r.Left - EnterPlanning.Width;
+         end;
+         if ((EnterPlanning.top+Enterplanning.Height) > self.height) then
+         begin
+           EnterPlanning.top:=r.top-Enterplanning.Height;
+         end;
+     end;
+   end else
+   begin
+       uid := -1;
+       plid:=-1;
+       if (pl_worker in Fkind) then
        begin
-            r:=inter.getBounds;
-       end else
-       begin
-           r.top:=header+selection.y*hline;
-           r.right:=margin+selection.x*colwidth;
-           r.left:=r.right - colwidth;
+         uid:=self.id;
+         if uid<=0 then uid:=mat.getWorkerId();
        end;
-       EnterPlanning.Top :=r.Top;
-       EnterPlanning.Left:=r.Right;
-       if (EnterPlanning.left+EnterPlanning.Width)>(PB_planning.Width) then
+       plid:=inter.planning;
+       if (pl_customer in Fkind) then uid:=inter.getWorkerId();
+       if uid > 0 then
        begin
-         EnterPlanning.left:=r.Left - EnterPlanning.Width;
-       end;
-       if ((EnterPlanning.top+Enterplanning.Height) > self.height) then
-       begin
-         EnterPlanning.top:=r.top-Enterplanning.Height;
+            f := TF_planning_01.Create(MainForm);
+            f.init(uid,plid);
+            f.DefaultMonitor := dmActiveForm;
+            f.ShowModal;
+            self.reload;
        end;
    end;
 end;
@@ -443,6 +523,18 @@ begin
       if assigned(parent) and ((parent is TFrame) or (parent is TForm)) then
          parent.Perform(LM_PLANNING_DEST_CHANGE, 2,uid );
     end;
+end;
+
+procedure TGPlanning.MDelClick(Sender: TObject);
+
+var inter : Tintervention;
+
+begin
+    if not assigned(mat) then exit;
+    inter:=getSelInter();
+    if not assigned(inter) then exit;
+    mat.delete(inter);
+    refresh();
 end;
 
 procedure TGPlanning.MPlanningClick(Sender: TObject);
@@ -540,6 +632,7 @@ procedure TGPlanning.PopM_planningPopup(Sender: TObject);
 
 var l : integer;
     c : integer;
+    inter : tintervention;
 
 begin
    Mchange.visible:=false;
@@ -555,11 +648,22 @@ begin
      l:=selection.y-1;
      if (pl_edit in Fkind)  then
      begin
+          if l>=0 then
+          begin
              Mchange.visible:=true;
-             Mdel.visible:=true;
-             MInsert.visible:=true;
-             MCopy.visible:=true;
-             MPaste.visible:=true;
+             if not assigned(mat.lines[l].colums[selection.X-1]) then
+             begin
+                Mchange.Caption:='Ajouter une intervention';
+                Mdel.visible:=false;
+             end else
+             begin
+                 Mchange.caption:='Modifier';
+                 Mdel.visible:=true;
+             end;
+          end;
+          MInsert.visible:=true;
+          MCopy.visible:=true;
+          MPaste.visible:=true;
      end;
      if  (pl_consult in FKind) then
      begin
@@ -1530,6 +1634,7 @@ begin
      if (pl_customer in FKind) then colplan:=Planning.loadC(id,start, enddate)
      else colplan:=Planning.loadW(id,start, enddate);
      load(colplan,start,endDate);
+     mat.setModified(false);
 end;
 
 procedure TGPlanning.load(col :  TInterventions;startdate,enddate : tdatetime);
@@ -1547,6 +1652,7 @@ begin
      if pl_graphic in Fkind then prepare_graphics else
      if pl_text in FKind then prepare_text;
      PB_planning.Refresh;
+     mat.setModified(false);
 end;
 
 procedure TGPlanning.load(planning_def : string;wid,pid : longint;s,e : tdatetime);
@@ -1564,7 +1670,9 @@ begin
      if pl_graphic in Fkind then prepare_graphics else
      if pl_text in FKind then prepare_text;
      PB_planning.Refresh;
+     mat.setModified(false);
 end;
+
 
 procedure TGPlanning.load(pl_id : longint);
 
@@ -1613,6 +1721,7 @@ begin
 
      PB_planning.Refresh;
      R.close;
+     mat.setModified(false);
 end;
 
 procedure TGPlanning.PB_planningPaint(Sender: TObject);
@@ -1676,6 +1785,7 @@ begin
                mat.add_inter(newinter);
           end;
      end;
+     mat.setModified(true);
      mat.normalize;
      refresh;
 end;
@@ -1684,6 +1794,7 @@ procedure TGPlanning.reload;
 
 begin
      load(id,start);
+     mat.setModified(false);
 end;
 
 procedure TGPlanning.refresh;

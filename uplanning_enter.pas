@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms,dialogs, LCLType,Controls, StdCtrls, EditBtn, ExtCtrls, Buttons,
-  MaskEdit, W_A, DPlanning, DateUtils;
+  MaskEdit, ComCtrls, W_A, DPlanning, DateUtils;
 
 type
 
@@ -20,6 +20,7 @@ type
 
   TFPlanning_enter = class(TFrame)
     Btn_apply: TBitBtn;
+    Btn_del: TBitBtn;
     Btn_cancel: TBitBtn;
     Ckb_monday: TCheckBox;
     Ckb_tuesday: TCheckBox;
@@ -32,10 +33,12 @@ type
     EndTime: TTimeEdit;
     Label1: TLabel;
     Panel1: TPanel;
+    Shape1: TShape;
     SP_add: TSpeedButton;
     StartTime: TTimeEdit;
     procedure Btn_applyClick(Sender: TObject);
     procedure Btn_cancelClick(Sender: TObject);
+    procedure Btn_delClick(Sender: TObject);
     procedure FrameExit(Sender: TObject);
     procedure SP_addClick(Sender: TObject);
     procedure StartTimeChange(Sender: TObject);
@@ -391,6 +394,49 @@ procedure TFPlanning_enter.Btn_cancelClick(Sender: TObject);
 begin
    reset;
    self.visible:=false;
+end;
+
+procedure TFPlanning_enter.Btn_delClick(Sender: TObject);
+
+var days : shortstring;
+    dt : Tdatetime;
+    y,m,d,h,mi,s,ms : word;
+    hs,he : word;
+    num : longint;
+
+begin
+     assert(parent is TGPlanning,'Parent Error');
+     if (test()) and (warning()) then
+     begin
+        if Ckb_monday.checked then days:='M' else days:='_';
+        if Ckb_tuesday.checked then days:=days+'T' else days:=days+'_';
+        if Ckb_wednesday.checked then days:=days+'W' else days:=days+'_';
+        if Ckb_thursday.checked then days:=days+'H' else days:=days+'_';
+        if Ckb_friday.checked then days:=days+'F' else days:=days+'_';
+        if Ckb_saturday.checked then days:=days+'S' else days:=days+'_';
+        if Ckb_sunday.checked then days:=days+'U' else days:=days+'_';
+
+        dt:=StartTime.Time;
+        DecodeDatetime(dt,y,m,d,h,mi,s,ms);
+        hs:=h*100+mi;
+
+        dt:=EndTime.Time;
+        DecodeDatetime(dt,y,m,d,h,mi,s,ms);
+        he:=h*100+mi;
+
+        if CB_user.ItemIndex>=0 then
+        begin
+            s:= CB_user.ItemIndex;
+            if assigned(CB_user.Items.Objects[s]) then
+            begin
+                 if (CB_user.Items.Objects[s] is TLongint) then
+                 num:=TLongint(CB_user.Items.Objects[s]).val;
+            end;
+       end;
+
+        TGPlanning(parent).Delete(num,days,hs,he,inter);
+        self.visible:=false;
+     end;
 end;
 
 destructor TFPlanning_enter.destroy;
