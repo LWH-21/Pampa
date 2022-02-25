@@ -77,6 +77,7 @@ Type TLPlanning = class
           p_id : longint; // Plannind ID
           w_id : longint; // Worker ID
           mode : char; // W=Worker, C=Customer
+          crc  : cardinal;
           modified : boolean;
 
      public
@@ -698,6 +699,7 @@ begin
        setLength(lines[i].colums,colscount);
   end;
   modified:=false;
+  crc:=0;
   setLength(libs,10);
 end;
 
@@ -715,6 +717,7 @@ begin
        add_line;
   end;
   modified:=false;
+  crc:=0;
   setLength(libs,10);
 end;
 
@@ -971,8 +974,19 @@ end;
 
 function TLPlanning.isModified : boolean;
 
+var s : string;
+    crcn : cardinal;
+
 begin
-  result:=modified;
+  if modified then
+  begin
+       s:=CreateJson;
+       crcn:=crc32(0,s+DateToStr(start_date)+DateToStr(end_date));
+       if crcn<>crc then
+       begin
+            result:=true;
+       end else modified:=false;
+  end;
 end;
 
 (*
@@ -1028,6 +1042,7 @@ var  inter : Tintervention;
      i,j : integer;
      found : boolean;
      num_index : integer;
+     s : string;
 
 begin
      reset;
@@ -1040,6 +1055,8 @@ begin
        end;
        normalize;
      end;
+     s:=CreateJson;
+     crc:=crc32(0,s+DateToStr(self.start_date)+DateToStr(self.end_date));
      modified:=false;
 end;
 
@@ -1104,6 +1121,8 @@ begin
        freeAndNil(json);
      end;
      modified:=false;
+     s:=CreateJson;
+     crc:=crc32(0,s+DateToStr(start_date)+DateToStr(end_date));
      normalize;
 end;
 

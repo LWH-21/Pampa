@@ -175,6 +175,10 @@ inherited MainForm: TMainForm
     inherited SP_close: TSpeedButton
       Images = nil
     end
+    inherited PMenu: TPopupMenu
+      Left = 24
+      Top = 480
+    end
   end
   object MainMenu1: TMainMenu[4]
     Images = Images

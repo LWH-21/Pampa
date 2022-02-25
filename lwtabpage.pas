@@ -59,7 +59,8 @@ interface
 
 implementation
 
-uses dw_f;
+
+uses main;
 
 function Darker(MyColor:TColor; Percent : byte) : Tcolor;
 var r,g,b:Byte;
@@ -209,6 +210,8 @@ end;
 procedure TLWPageControl.MouseDown( Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer);
 
 var i : integer;
+    r : trect;
+    pt : tpoint;
 
 
 begin
@@ -217,7 +220,22 @@ begin
           i:=(x div tabsize) + 1;
           if (i>0) and (i<=FPageCount) then
           begin
-               SetActivePageIndex(i);
+               if self.ActivePageIndex<>i then
+               begin
+                    SetActivePageIndex(i);
+               end else
+               begin
+                 r.left:=5+(i-1)*tabsize;r.top:=3;
+                 r.right:=r.left+tabsize-10;r.bottom:=30;
+                 pt.x:=X;pt.y:=Y;
+                 r.left:=r.right-17;r.right:=r.left+9;
+                 r.Top:=r.top+10;r.bottom:=r.Top+9;
+                 if r.Contains(pt) then
+                 begin
+//                      CloseTab(i);
+                      parent.Perform(LM_CLOSE_TAB, 0,0 );
+                 end;
+               end;
           end;
      end;
 end;
@@ -229,30 +247,6 @@ var bmp: TBGRABitmap;
     TS: TTextStyle;
     r : trect;
     i : integer;
-  {c : TCanvas;
-  colbase : Tcolor;
-  col : Tcolor;
-  textstyle : TTextStyle;
-  i, j : integer;
-  r : trect;
-  pts : array[0..6] of Tpoint;
-
-
-  procedure fillpts(x,y : integer);
-
-  begin
-       pts[0].x:=x;pts[0].y:=y;
-       pts[1].x:=x - 2;pts[1].y:=y-5;  // Control Point
-       pts[2].x:=x  -2;pts[2].y:=y-15 ;  // Control Point
-       pts[3].x:=x ;pts[3].y:=y - 30;
-       pts[4].x:=x -5; pts[4].y:=y - 35;  // Control Point
-       pts[5].x:=x - 5 +tabsize ;pts[5].y:=y - 35;  // Control Point
-       pts[6].x:=x + tabsize; pts[6].Y:=y - 30 ;
-       {pts[7].x:=x - 15;pts[7].y:=y-15;  // Control Point
-       pts[8].x:=x + tabsize;pts[8].Y:=y;
-       pts[9].x:=x - 15;pts[9].y:=y - 10;  // Control Point
-       pts[10].x:=x + tabsize + 2;pts[10].y:=y; }
-  end;                        }
 
 begin
 
@@ -276,6 +270,8 @@ begin
          r.left:=5+i*tabsize;r.top:=3;
          r.right:=r.left+tabsize-10;r.bottom:=30;
          bmp.TextRect(r,10+i*tabsize,10,pages[i].caption,ts,bgra(0,0,0));
+         bmp.drawlineantialias(r.right - 10,r.top+12,r.Right-15,r.top+17,bgra(255,0,0),2);
+         bmp.drawlineantialias(r.right - 15,r.top+12,r.Right-10,r.top+17,bgra(255,0,0),2);
     end else
     begin
       r.left:=5+i*tabsize;r.top:=3;
@@ -290,73 +286,7 @@ begin
   bmp.Draw(Canvas, 0, 0, True);
   bmp.free;
 
-{  colbase:=FHeadColor;
-  canvas.brush.Color:=colbase;
-  canvas.FillRect(0,0,width,60);
-  col:=Lighter(colbase, 50);
-  canvas.brush.Color:=col;
-  canvas.FillRect(0,35,width,60);
-  col:=Darker(colbase, 10);
-  Canvas.pen.color:=col;
-  Canvas.Line(0,35,width,35);
-  Canvas.Line(0,59,width,59);
-  canvas.AntialiasingMode:=amOn;
 
-  textstyle.Alignment:=taLeftJustify;
-  textstyle.Clipping:=true;
-  textstyle.SingleLine:=true;
-  textstyle.Opaque:=true;
-
-  for i:=0 to FPageCount-1 do
-  begin
-    if (i=FActivePageIndex - 1) then
-    begin
-        canvas.Brush.Color:=clwhite;
-    end else
-    begin
-        canvas.brush.Color:=colbase;
-    end;
-
-    //canvas.RoundRect(1+i*tabsize,2,-1+(i+1)*tabsize,35,10,10);
-
-    r.Left:=2+i*tabsize;
-    r.top:=3;
-    r.right:=-1+(i+1)*tabsize;
-    r.bottom:=32;
-    if (i=FActivePageIndex - 1) then
-    begin
-        canvas.Pen.color:=clblack;
-        canvas.Pen.Width:=1;
-        canvas.Rectangle(1+i*tabsize,2,-1+(i+1)*tabsize,35);
-        canvas.Font.Color:=clBlack;
-        canvas.Font.Bold:=true;
-        fillpts(500,32);
-        canvas.Pen.color:=clred;
-        canvas.Pen.Width:=3;
-        //canvas.Polyline(pts);
-        canvas.PolyBezier(pts,false,false);
-    end else
-    begin
-        canvas.Line(1+i*tabsize,5,1+i*tabsize,30);
-        canvas.Font.Color:=clDkGray;
-        canvas.Font.Bold:=false;
-    end;
-    canvas.TextRect(r,r.left,r.top,pages[i].caption,textstyle);
-  end;
-  {if FActivePageIndex>0 then
-  begin
-       canvas.Brush.Color:=clwhite;
-       i:=FActivePageIndex - 1;
-       canvas.Rectangle(1+i*tabsize,2,-1+(i+1)*tabsize,35);
-       canvas.Font.Color:=clred;
-       r.Left:=2+i*tabsize;
-       r.top:=3;
-       r.right:=-1+(i+1)*tabsize;
-       r.bottom:=32;
-       canvas.TextRect(r,r.left,r.top,pages[i].caption);
-  end;    }
-  canvas.Brush.Color:=clwhite;
-  canvas.FillRect(0,32,width,35); }
 end;
 
 procedure TLWPageControl.SetActivePage(f : Tframe);
@@ -373,7 +303,8 @@ begin
               break;
           end;
      end;
-     assert((i>=0) and (i<FPageCount),'Frame not found');
+     // todo : erreur ici (fermer planning puis essayer réouvrir)
+     assert((i>=0) and (i<=FPageCount),'Frame not found i='+inttostr(i)+' Fpagecount='+inttostr(FpageCount));
 end;
 
 procedure TLWPageControl.SetActivePageIndex(p: integer);

@@ -43,6 +43,8 @@ inherited F_planning_01: TF_planning_01
     Height = 100
     Top = 48
     Width = 976
+    AlternateColor = clMoneyGreen
+    AutoEdit = False
     ColCount = 4
     Columns = <    
       item
@@ -70,6 +72,7 @@ inherited F_planning_01: TF_planning_01
         Title.Caption = 'Detail'
         Width = 550
       end>
+    ExtendedSelect = False
     FixedCols = 0
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goRowSelect, goSmoothScroll]
     TabOrder = 3

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, DBCtrls,DateUtils,
   DBGrids, StdCtrls, ComCtrls, ExtCtrls, Grids, Menus, ListFilterEdit, W_A, DB,
-  memds, DataAccess, DPlanning, DA_table,UPlanning, UPlanning_enter;
+  memds, DataAccess, DPlanning, DA_table,UPlanning, UPlanning_enter,ressourcesStrings;
 
 type
 
@@ -132,21 +132,53 @@ end;
 procedure TF_planning_01.ListSelection(Sender: TObject; aCol, aRow: Integer);
 
 var s : shortstring;
-    l : longint;
+    l,t,oldrow : longint;
+    i : integer;
+    change : boolean;
 
 begin
   if aRow>0 then
   begin
+       change:=true;
        s:=List.Cells[0,aRow];
        if not trystrtoint(s,l) then l:=-1;
        if currentrow<>l then
        begin
           if Gplan.ismodified then
           begin
-             showmessage('modified');
+             case QuestionDlg(rs_confirm,rs_savechange,mtConfirmation,[mrNo, rs_no,mrYes,rs_yes,'IsDefault',mrCancel,'&Annuler'],0) of
+                mrYes : begin
+                             change:=GPlan.save;
+                        end;
+                mrNo  : change:=true;
+                mrCancel : change:=false
+             else
+               change:=false;
+             end;
           end;
-          currentrow:=l;
-          load_planning(l);
+          if change then
+          begin
+               currentrow:=l;
+               load_planning(l);
+          end else
+          begin
+               oldrow:=-1;
+               for i:=0 to List.RowCount - 1 do
+               begin
+                    if trystrtoint(List.Cells[0,i],t) then
+                    begin
+                       if t=currentrow then
+                       begin
+                            oldrow:=i;
+                            break;
+                       end;
+                    end;
+               end;
+               if oldrow>=0 then
+               begin
+                    List.Row:=oldrow;
+               end;
+          end;
        end;
   end;
 end;

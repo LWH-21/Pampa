@@ -15,6 +15,7 @@ resourcestring
   rs_abandonner_modif = 'Abandonner les modifications ?';
   rs_bookmark = 'Marque-Page';
   rs_bookmarkg = 'Marque-Page commun';
+  rs_confirm = 'Confirmez';
   rs_days_01 = 'Lundi';
   rs_days_02 = 'Mardi';
   rs_days_03 = 'Mercredi';
@@ -51,14 +52,15 @@ resourcestring
   rs_monthyear = 'mmmm YYYY';
   rs_daymonth = 'DD/MM';
   rs_more6 = 'Il y a plus de 6 mois';
-  rs_non='&Non';
+  rs_no='&Non';
   rs_new='Nouveau';
-  rs_oui='&Oui';
+  rs_yes='&Oui';
   rs_period='Du %s au %s';
   rs_planning='Planning';
   rs_quit='Fermeture de Pampa';
   rs_read='Lecture';
   rs_ready='Prêt';
+  rs_savechange='Enregistrer les modifications ?';
   rs_savehisto='Sauvegarde de l''historique...';
   rs_supprimer = 'Supprimer cet enregistrement ?';
   rs_today = 'Aujourd''hui';
@@ -70,6 +72,8 @@ const
   rs_month : array[1..12] of string = (rs_month01,rs_month02,rs_month03,rs_month04,rs_month05,rs_month06,rs_month07,rs_month08,rs_month09,rs_month10,rs_month11,rs_month12);
 
   LM_PLANNING_DEST_CHANGE = LM_USER + 1;
+  LM_CAPTION_CHANGE = LM_USER + 2;
+  LM_CLOSE_TAB = LM_USER + 3;
 
 implementation
 

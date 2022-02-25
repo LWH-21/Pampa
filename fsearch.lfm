@@ -36,6 +36,7 @@ inherited Search: TSearch
     Height = 288
     Top = 120
     Width = 416
+    AlternateColor = clMoneyGreen
     Color = clWindow
     Columns = <    
       item

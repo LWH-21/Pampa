@@ -295,7 +295,7 @@ begin
   if isModified then
   begin
     reply := QuestionDlg(rs_demande_confirmation, rs_abandonner_modif,
-      mtConfirmation, [mrNo, rs_non, 'IsDefault', mrYes, rs_oui], 0);
+      mtConfirmation, [mrNo, rs_no, 'IsDefault', mrYes, rs_yes], 0);
     if reply = mrYes then
     begin
       Result := True;
@@ -533,7 +533,7 @@ begin
   if (assigned(Query)) and (not Query.IsEmpty) then
   begin
     reply := QuestionDlg(rs_demande_confirmation, rs_supprimer,
-       mtConfirmation, [mrNo, rs_non, 'IsDefault', mrYes, rs_oui], 0);
+       mtConfirmation, [mrNo, rs_no, 'IsDefault', mrYes, rs_yes], 0);
      if reply <> mrYes then exit;
 
     self.SetFocus;

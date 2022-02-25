@@ -162,6 +162,7 @@ type
       var Handled: boolean);
     procedure SplitterMoved(Sender: TObject);
     function TabClose(Sender: TObject) : boolean;
+    procedure CloseTab(var Msg: TLMessage); message LM_CLOSE_TAB;
     procedure TabToWindow(Sender: TObject);
     procedure Act_SaveExecute(Sender: TObject);
     procedure Act_workerExecute(Sender: TObject);
@@ -486,6 +487,12 @@ begin
       end else result:=false;
     end;
   end;
+end;
+
+procedure TMainForm.CloseTab(var Msg: TLMessage);
+
+begin
+  Tabclose(self);
 end;
 
 procedure TMainForm.Act_refreshExecute(Sender: TObject);
