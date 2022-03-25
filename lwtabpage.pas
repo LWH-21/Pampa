@@ -32,8 +32,11 @@ interface
             FPageCount: integer;
             serial : integer;
             tabsize : integer;
+            gap : integer;
             procedure SetActivePageIndex(p : integer);
             procedure SetActivePage(f : Tframe);
+            function getIndexAt(x,y : integer) : integer;
+            function getrect(i : integer; var r : trect) : boolean;
        published
        property ActivePageIndex : integer READ FActivePageIndex WRITE SetActivePageIndex;
        property HeadColor : TColor READ FHeadColor WRITE FHeadColor;
@@ -91,6 +94,7 @@ constructor TLWPageControl.create(Aowner : TComponent);
 
 begin
  inherited create(Aowner);
+ gap:=0;
  FHeadColor:=$dee1e6;
  FPageCount:=0;
  FActivePageIndex:=0;
@@ -183,6 +187,29 @@ begin
      end;
 end;
 
+function TLWPageControl.getIndexAt(x,y : integer) : integer;
+
+var i : integer;
+
+begin
+     result:=-1;
+     if (y>=3) and (y<=34) then
+     begin
+        result:=(x div tabsize) + 1+gap;
+     end;
+end;
+
+function TLWPageControl.getrect(i : integer; var r : trect) : boolean;
+
+begin
+     result:=true;
+     i:=i-1-gap;
+     r.left:=2+i*tabsize;
+     r.top:=4;
+     r.right:=r.left - 2 + tabsize;
+     r.bottom:=33;
+end;
+
 procedure TLWPageControl.KeyDown(var Key: Word;Shift: TShiftState);
 
 begin
@@ -198,13 +225,12 @@ begin
          setActivePageIndex(FPageCount);
        end;
  end;
-// showmessage(inttostr(key));
 end;
 
 procedure TLWPageControl.KeyPress(var Key: Char);
 
 begin
- //showmessage('keypress');
+
 end;
 
 procedure TLWPageControl.MouseDown( Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer);
@@ -217,7 +243,7 @@ var i : integer;
 begin
      if (Y>1) and (y<34) then
      begin
-          i:=(x div tabsize) + 1;
+          i:=getIndexAt(x,y);
           if (i>0) and (i<=FPageCount) then
           begin
                if self.ActivePageIndex<>i then
@@ -225,18 +251,37 @@ begin
                     SetActivePageIndex(i);
                end else
                begin
-                 r.left:=5+(i-1)*tabsize;r.top:=3;
-                 r.right:=r.left+tabsize-10;r.bottom:=30;
-                 pt.x:=X;pt.y:=Y;
-                 r.left:=r.right-17;r.right:=r.left+9;
-                 r.Top:=r.top+10;r.bottom:=r.Top+9;
-                 if r.Contains(pt) then
+                 if getrect(i,r) then
                  begin
-//                      CloseTab(i);
-                      parent.Perform(LM_CLOSE_TAB, 0,0 );
+                   pt.x:=X;pt.y:=Y;
+                   r.left:=r.right-17;r.right:=r.left+9;
+                   r.Top:=r.top+10;r.bottom:=r.Top+9;
+                   if r.Contains(pt) then
+                   begin
+                        parent.Perform(LM_CLOSE_TAB, 0,0 );
+                   end;
                  end;
                end;
           end;
+     end;
+
+     if (y>20) and (y<55) then
+     begin
+       if (x>=5) and (x<=20) and (gap>0) then
+       begin
+         dec(gap);
+         refresh;
+       end else
+       begin
+         if (x>=width-20) and (x<= width - 5) then
+         begin
+           if (width div tabsize) <= (FPageCount- gap) then
+           begin
+             inc(gap);
+             Refresh;
+           end;
+         end;
+       end;
      end;
 end;
 
@@ -264,22 +309,26 @@ begin
 
   for i:=0 to FPageCount-1 do
   begin
-    if (i=FActivePageIndex - 1) then
+    if getRect(i+1,r) then
     begin
-         bmp.RoundRectAntialias(2+i*tabsize,4,-2+(i+1)*tabsize,33,10,10,bgra(0,0,0),1,bgra($f1,$f3,$f4));
-         r.left:=5+i*tabsize;r.top:=3;
-         r.right:=r.left+tabsize-10;r.bottom:=30;
-         bmp.TextRect(r,10+i*tabsize,10,pages[i].caption,ts,bgra(0,0,0));
+      if (i=FActivePageIndex - 1) then
+      begin
+         bmp.RoundRectAntialias(r.left,r.top,r.right,r.bottom,10,10,bgra(0,0,0),1,bgra($f1,$f3,$f4));
+         bmp.TextRect(r,r.left+5,10,pages[i].caption,ts,bgra(0,0,0));
          bmp.drawlineantialias(r.right - 10,r.top+12,r.Right-15,r.top+17,bgra(255,0,0),2);
          bmp.drawlineantialias(r.right - 15,r.top+12,r.Right-10,r.top+17,bgra(255,0,0),2);
-    end else
-    begin
-      r.left:=5+i*tabsize;r.top:=3;
-      r.right:=r.left+tabsize-10;r.bottom:=30;
-      bmp.TextRect(r,10+i*tabsize,10,pages[i].caption,ts,bgra(128,128,128));
+      end else
+      begin
+        getRect(i+1,r);
+        bmp.TextRect(r,r.Left+5,10,pages[i].caption,ts,bgra(128,128,128));
+      end;
     end;
   end;
 
+  // Défilement des onglets
+  if gap>0 then bmp.FillRect(5,40,20,55,bgra($00,$00,$77),dmset);
+  if (width div tabsize) <= (FPageCount- gap) then
+  bmp.FillRect(width-20,40,width - 5,55,bgra($00,$00,$77),dmset);
 
   canvas.Brush.Color:=clwhite;
   canvas.FillRect(0,0,width,height);
@@ -331,6 +380,13 @@ begin
         end;
       end;
    end;
+ (*  if (FActivePageIndex>1) then
+   begin
+        if FActivePageIndex*tabsize>self.width then
+        begin
+           gap:=1;
+        end;
+   end else gap:=0;       *)
    refresh;
 end;
 
