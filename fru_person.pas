@@ -510,6 +510,7 @@ begin
                   Caption := '('+TRIM(caption)+') '+Query.FieldByName('SY_LASTNAME').AsString;
                   Caption:=trim(caption)+' '+Query.FieldByName('SY_FIRSTNAME').AsString;
                   Caption:=trim(caption);
+                  parent.Perform(LM_CAPTION_CHANGE, 0,0 );
              end;
            end;
            if Maction='D' then BsearchClick(self);

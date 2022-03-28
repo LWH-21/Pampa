@@ -359,6 +359,7 @@ end;
 procedure TLWPageControl.SetActivePageIndex(p: integer);
 
 var i : integer;
+    m : integer;
 
 begin
    if (p>0) and (p<=FPageCount) then
@@ -380,14 +381,19 @@ begin
         end;
       end;
    end;
- (*  if (FActivePageIndex>1) then
+   if (FActivePageIndex>1) then
    begin
-        if FActivePageIndex*tabsize>self.width then
+        m:=self.width div tabsize;
+        if ((FActivePageIndex-gap)>m) then
         begin
-           gap:=1;
+           gap := FActivePageIndex - m;
+           if FActivePageIndex<FPageCount then gap:=gap + 1;
+           if gap<0 then gap:=0;
         end;
-   end else gap:=0;       *)
+   end else gap:=0;
    refresh;
+   assert(gap>=0,'Gap < 0');
+   assert(gap<=FpageCount,'Gap >= FPageCount('+inttostr(FPageCount)+')');
 end;
 
 procedure TLWPageControl.Resize;
@@ -404,6 +410,13 @@ begin
                pages[i].frame.height:=self.Height - 51;
           end;
      end;
+     i:=self.width div tabsize;
+     if (FPageCount-gap)>i then
+     begin
+              gap := FPageCount - i;
+              if gap<0 then gap:=0;
+      end else gap:=0;
+      refresh;
 end;
 
 destructor TLWPageControl.destroy;
