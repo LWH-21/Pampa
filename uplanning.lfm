@@ -153,6 +153,17 @@ object GPlanning: TGPlanning
     Caption = 'Au'
     ParentColor = False
   end
+  object SB_planning_time: TScrollBar
+    Left = 48
+    Height = 17
+    Top = 368
+    Width = 121
+    Max = 50
+    Min = -50
+    PageSize = 5
+    TabOrder = 4
+    OnChange = SB_planning_timeChange
+  end
   object PopM_export: TPopupMenu
     Left = 712
     Top = 56

@@ -71,7 +71,7 @@
         <PackageName Value="LCL"/>
       </Item10>
     </RequiredPackages>
-    <Units Count="25">
+    <Units Count="22">
       <Unit0>
         <Filename Value="Pampa.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -93,168 +93,144 @@
         <UnitName Value="DataAccess"/>
       </Unit2>
       <Unit3>
-        <Filename Value="dintervenant.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="Intervenant"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="DataModule"/>
-        <UnitName Value="Dintervenant"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="frechintervenant.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="RechIntervenant"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="FRechIntervenant"/>
-      </Unit4>
-      <Unit5>
         <Filename Value="da_table.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="DA_table"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DA_table"/>
-      </Unit5>
-      <Unit6>
+      </Unit3>
+      <Unit4>
         <Filename Value="uexception.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FException"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UException"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="fru_intervenant.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="Fr_Intervenant"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Fru_intervenant"/>
-      </Unit7>
-      <Unit8>
+      </Unit4>
+      <Unit5>
         <Filename Value="uhistomanager.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UHistoManager"/>
-      </Unit8>
-      <Unit9>
+      </Unit5>
+      <Unit6>
         <Filename Value="ressourcesstrings.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="RessourcesStrings"/>
-      </Unit9>
-      <Unit10>
+      </Unit6>
+      <Unit7>
         <Filename Value="fru_planning.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fr_planning"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="Fru_planning"/>
-      </Unit10>
-      <Unit11>
+      </Unit7>
+      <Unit8>
         <Filename Value="ufbdd.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fbdd"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFbdd"/>
-      </Unit11>
-      <Unit12>
+      </Unit8>
+      <Unit9>
         <Filename Value="utw_tab.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="W_Tab"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UTW_Tab"/>
-      </Unit12>
-      <Unit13>
+      </Unit9>
+      <Unit10>
         <Filename Value="ufhistosup.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FHistoSup"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit13>
-      <Unit14>
+      </Unit10>
+      <Unit11>
         <Filename Value="ufbookmark.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FBookmark"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFbookmark"/>
-      </Unit14>
-      <Unit15>
+      </Unit11>
+      <Unit12>
         <Filename Value="ufr_histo.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Fr_Histo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="UFr_histo"/>
-      </Unit15>
-      <Unit16>
+      </Unit12>
+      <Unit13>
         <Filename Value="datapanel.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="DataPanel"/>
-      </Unit16>
-      <Unit17>
+      </Unit13>
+      <Unit14>
         <Filename Value="ufcustomdp.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FCustomDP"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFCustomDp"/>
-      </Unit17>
-      <Unit18>
+      </Unit14>
+      <Unit15>
         <Filename Value="ucfg_table.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FCfg_Table"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UCfg_table"/>
-      </Unit18>
-      <Unit19>
+      </Unit15>
+      <Unit16>
         <Filename Value="ufcnx.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FCnx"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFcnx"/>
-      </Unit19>
-      <Unit20>
+      </Unit16>
+      <Unit17>
         <Filename Value="dcustomer.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Customer"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DCustomer"/>
-      </Unit20>
-      <Unit21>
+      </Unit17>
+      <Unit18>
         <Filename Value="dplanning.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Planning"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DPlanning"/>
-      </Unit21>
-      <Unit22>
+      </Unit18>
+      <Unit19>
         <Filename Value="uf_planning_01.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="F_planning_01"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UF_planning_01"/>
-      </Unit22>
-      <Unit23>
+      </Unit19>
+      <Unit20>
         <Filename Value="uplanning_enter.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FPlanning_enter"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="UPlanning_enter"/>
-      </Unit23>
-      <Unit24>
+      </Unit20>
+      <Unit21>
         <Filename Value="pl_export.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="PL_export"/>
-      </Unit24>
+      </Unit21>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -285,9 +261,6 @@
       </Optimizations>
     </CodeGeneration>
     <Linking>
-      <Debugging>
-        <UseHeaptrc Value="True"/>
-      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>

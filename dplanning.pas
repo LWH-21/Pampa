@@ -31,6 +31,7 @@ type TIntervention = Class
           c_id : longint;
           col_index : integer;
           line_index: integer;
+          width : integer;
 
 
           constructor create (d : tdatetime; hs,he : integer; p,w,c : longint);
@@ -110,6 +111,7 @@ Type TLPlanning = class
           function loadID(s_id : longint) : integer;
           procedure normalize;
           procedure reset;
+          procedure resetWidth;
           function SelLineAt(x,y : integer) : boolean;
           procedure setBounds(line,col : integer;r : trect);
           procedure setMode(m : char);
@@ -277,6 +279,7 @@ constructor TIntervention.create (d : tdatetime;  hs,he : integer; p,w,c : longi
 
 begin
   selected:=false;
+  width:=1;
   dt:=d;
   h_start:=hs;
   h_end:=he;
@@ -293,6 +296,7 @@ constructor TIntervention.create (i_day,hs,he : integer; p,w,c : longint);
 
 begin
      selected:=false;
+     width:=1;
      h_start:=hs;
      h_end:=he;
      planning:=p;
@@ -731,7 +735,7 @@ var
 
 begin
      assert(assigned(inter),'Inter not assigned');
-     assert((mode='W') or (mode='C'),'Mode <> W and mode <> C');
+     assert((mode='W') or (mode='C'),'Mode <> W(orker) and mode <> C(ustomer)');
      nline:=0; found:=false;
      ncol:=inter.col_index - 1;
      inter.setMat(self);
@@ -746,6 +750,10 @@ begin
        end;
        if lines[nline].SY_ID=id then
        begin
+          if ncol>7 then
+          begin
+             showmessage(' '+inttostr(ncol));
+             end;
             if not assigned(lines[nline].colums[ncol]) then
             begin
                  lines[nline].colums[ncol]:=inter;
@@ -1217,12 +1225,27 @@ begin
      end;
 end;
 
+procedure TLPlanning.resetWidth;
+
+var i,j : integer;
+
+begin
+     for i:=0 to linescount - 1 do
+     begin
+       for j:=0 to colscount - 1 do
+       begin
+            if assigned(lines[i].colums[j]) then
+            lines[i].colums[j].width:=1;
+       end;
+     end;
+end;
+
 procedure TLPlanning.normalize;
 
 var swap : boolean;
-    l,c : integer;
+    l,c,l1,c1 : integer;
     tmp_line : Tline;
-    temp : TIntervention;
+    temp, temp1 : TIntervention;
     minl,minl1 : integer;
 
 begin
@@ -1296,6 +1319,43 @@ begin
               end;
 
           end;
+     end;
+     // Set the colwidth
+     // todo colwidth
+     for l:=0 to linescount - 1 do
+     begin
+       if (lines[l].sy_id>0) then
+       begin
+         for c:=0 to colscount -1 do
+         begin
+              temp:=lines[l].colums[c];
+              if assigned(temp) and (temp.width=1) then
+              begin
+                c1:=c+1;
+                while (c1<colscount) and (assigned(lines[l].colums[c1])) and
+                (lines[l].colums[c1].c_id=temp.c_id) and
+                (lines[l].colums[c1].h_start=temp.h_start) and
+                (lines[l].colums[c1].h_end=temp.h_end) do
+                begin
+                     temp1:=lines[l].colums[c1];
+                     if temp1.h_start=1000 then
+                     begin
+                          l1:=0;
+                     end;
+                     inc(temp.width);
+                     temp1.width:=0;
+                     inc(c1);
+                end;
+              end;
+         end;
+       end;
+(*       minl:=l+1;
+       while (min1<linescount) and (lines[l].sy_id=lines[min1].sy_id) do
+       begin
+
+         inc(min1);
+       end;          *)
+       //,minl1 : integer;
      end;
 end;
 

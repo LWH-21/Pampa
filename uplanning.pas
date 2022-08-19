@@ -33,6 +33,7 @@ type
       MWorker: TMenuItem;
       Mexcept: TMenuItem;
       MCustomer: TMenuItem;
+      SB_planning_time: TScrollBar;
       Start_planning: TDateEdit;
       M2weeks: TMenuItem;
       Mchange: TMenuItem;
@@ -78,6 +79,7 @@ type
         WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
       procedure PopM_planningPopup(Sender: TObject);
       procedure SB_planningChange(Sender: TObject);
+      procedure SB_planning_timeChange(Sender: TObject);
       procedure Start_planningChange(Sender: TObject);
       procedure TB_dateChange(Sender: TObject);
       procedure TB_exportClick(Sender: TObject);
@@ -235,8 +237,8 @@ begin
      refresh;
 end;
 
-
-function TGPlanning.getHint(pt : Tpoint) : string;
+{ Get the Hint in relation with the mouse position }
+function TGPlanning.getHint(pt : Tpoint) : string;(* ************************ *)
 
 var ny, lh : integer;
     inter : Tintervention;
@@ -722,6 +724,25 @@ begin
    PB_planning.Refresh;
 end;
 
+procedure TGPlanning.SB_planning_timeChange(Sender: TObject);
+
+var p : integer;
+    d : tdatetime;
+
+begin
+     d:=TB_date.Date;
+     p := SB_planning_time.Position;
+     if p<>0 then
+     begin
+       if pl_week in Fkind  then
+       begin
+            d:=incweek(d,p);
+            d:=StartOfTheWeek(d);
+            TB_date.Date:=d;
+       end;
+     end;
+end;
+
 procedure TGPlanning.Start_planningChange(Sender: TObject);
 begin
   if assigned(mat) then mat.start_date:=Start_planning.Date;
@@ -829,7 +850,8 @@ begin
    bmp.RectangleAntialias(0,0,w-1,h,BGRABlack,1,BGRAWhite);
 end;
 
-procedure TGPlanning.redraw_dest(c : TBGRABitmap; r : trect);
+{ Afficher les destinataires du planning }
+procedure TGPlanning.redraw_dest(c : TBGRABitmap; r : trect); (* ************ *)
 
 var nb_dest : integer;
     j, nline, carwidth : integer;
@@ -863,7 +885,7 @@ begin
   begin
     rect.top := r.top+5;
   end else
-  if (rect.top -10 + (hline*j)* nb_dest)<r.bottom then
+  if (rect.top -10 + (hline*j)* nb_dest)>r.bottom then
   begin
     rect.top := r.bottom - (hline*j* nb_dest) - 10;
   end;
@@ -912,7 +934,7 @@ var x : integer;
     TS: TTextStyle;
 
 begin
-     i:=hline * 25;
+      i:=hline * 25;
      if i<h then i:=h+hline;
      if not assigned(cache) then
      begin
@@ -951,12 +973,12 @@ begin
        if i>0 then
        begin
             cache.DrawLineAntialias(margin-10,i*hline,w-2,i*hline,BGRABlack,1);
-            s:=format('%0.2d:%1.2d',[i,0]);
+            s:=format('%0.2d',[i,0]);
             if carwidth<=0 then
             begin
-                 carwidth:=cache.TextSize(s).Width+10;
+                 carwidth:=cache.TextSize(s).Width;
             end;
-            cache.TextOut(margin-carwidth,i*hline - lineheight,s,BGRABlack,false);
+            cache.TextOut(margin-carwidth - 10 ,i*hline - lineheight,s,BGRABlack,false);
        end;
        if x>5 then
         begin
@@ -997,76 +1019,34 @@ begin
                       rect.top:= round(h1* hline);
                       rect.bottom:=round(h2* hline)+1;
                       mat.setBounds(nline,ncol,rect);
-                      col:=mat.libs[mat.lines[nline].index].color;
-                      cache.Rectangle(rect,BGRABlack,BGRAWhite,dmset);
-                      cache.Rectangle(rect,vgablack,col,dmset,32000);
-                      if  inter.selected then
+                      if (inter.width>0) or ( inter.selected) then
                       begin
-                            cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
-                      end;
-                      s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
-                      rect.Inflate(-1,-1,-1,-1);
-                      if rect.Height>lineheight then
-                      begin
-                        if (col.Lightness<32000) then
+                        rect.right:=rect.left+colwidth*inter.width+1;
+                        col:=mat.libs[mat.lines[nline].index].color;
+                        cache.Rectangle(rect,BGRABlack,BGRAWhite,dmset);
+                        cache.Rectangle(rect,vgablack,col,dmset,32000);
+                        if  inter.selected  then
                         begin
-                           cache.TextRect(rect,rect.left,rect.top,s,ts,BGRAWhite);
-                        end else
+                              rect.right:=rect.left+colwidth+1;
+                              cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                        end;
+                        s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
+                        rect.Inflate(-1,-1,-1,-1);
+                        if (rect.Height>lineheight) and (inter.width>0) then
                         begin
-                           cache.TextRect(rect,rect.left,rect.top,s,ts,BGRABlack);
+                          if (col.Lightness<32000) then
+                          begin
+                             cache.TextRect(rect,rect.left,rect.top,s,ts,BGRAWhite);
+                          end else
+                          begin
+                             cache.TextRect(rect,rect.left,rect.top,s,ts,BGRABlack);
+                          end;
                         end;
                       end;
-
-
                  end;
             end;
        end;
-
-       cache.FontHeight:=14;
-       rect.top:=0;
-       j:=1;
-       if nb_dest<12 then
-       begin
-            j:=2;
-            rect.top := 12*hline - (nb_dest div 2)*hline*j;
-       end else
-       if nb_dest<20 then
-       begin
-            j:=1;
-            rect.top := 12*hline - (nb_dest div 2)*hline;
-       end;
-
-       rect.left:=5;rect.right:=margin - carwidth - 20;
-       for nline:=0 to mat.linescount-1 do
-       begin
-             if (nline=0) or ( mat.lines[nline].sy_id<>mat.lines[nline-1].sy_id) then
-             begin
-                  if mat.lines[nline].sy_id>0 then
-                  begin
-                      rect.bottom:=rect.top + hline*j;
-                      s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
-                      cache.RectangleAntialias(rect.left,rect.top+2,rect.right,rect.bottom-2,BGRABlack,1,BGRAWhite);
-                      textrect:=rect;
-                      mat.lines[nline].bounds:=rect;
-                      if mat.lines[nline].selected then
-                      begin
-                           textrect.Inflate(0,0,-13,0);
-                           cache.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,BGRA($21,$73,$46),3);
-                      end;
-                      textrect:=rect;
-                      textrect.Inflate(-5,-5,-10,-5);
-                      cache.TextRect(textrect, s,taLeftJustify,tlTop,BGRABlack);
-
-                      textrect:=rect;
-                      textrect.Inflate(-(rect.width - 10),-2,0,-2);
-                      cache.RectangleAntialias(textrect.left,textrect.Top,textrect.Right,textrect.Bottom,mat.libs[mat.lines[nline].index].color,1,mat.libs[mat.lines[nline].index].color);
-
-                  end;
-                 rect.top:=rect.Top+hline*j;
-             end;
-       end;
-
-     end;
+   end;
 end;
 
 
@@ -1086,12 +1066,14 @@ begin
      i:=round((SB_planning.position / SB_planning.max)*(cache.height - lh));
 
      rect.Top :=i ;
+
      rect.Bottom:=rect.top+lh;
 
      rect1:=rect;
-     rect1.Right := margin;
+     rect1.Right := margin - 25;
 
      assert(not rect.isEmpty,'Destination rectangle is empty');
+     { Redessine les destinataires du planning }
      redraw_dest(cache,rect1);
 
      bmp.PutImagePart(1,header+1,cache,rect,dmSet);
@@ -1253,7 +1235,9 @@ begin
          r.left:=r.right;
     end;
 
+
     r.left:=margin;
+    d:=mat.start_date;
     dow:=dayOfTheWeek(d);
     for c:=1 to FColNumber do
     begin
@@ -1324,6 +1308,8 @@ var nb,x,i : integer;
     s : string;
     selrect : Trect;
     bkcolor : TBGRAPixel;
+    fontheight : integer;
+    marginfontheight : integer;
 
 begin
      if assigned(mat) then nb:=mat.linescount + 5 else nb:=10;
@@ -1338,16 +1324,27 @@ begin
        cache.SetSize(w,nb);
        cache.Fill(BGRAWhite);
      end;
+
+     fontheight:=14;
+     marginfontheight:=14;
+
      cache.FontHeight:=14;
      cache.fontname:='Helvetica';
      cache.FontStyle:=[];
      cache.FontQuality:=fqFineClearTypeRGB;
-     if colwidth<120 then cache.FontHeight:=12;
-     if colwidth<100 then cache.FontHeight:=11;
-     if colwidth<80 then cache.FontHeight:=10;
-     if colwidth<60 then cache.FontHeight:=9;
+     if colwidth<120 then FontHeight:=12;
+     if colwidth<100 then FontHeight:=11;
+     if colwidth<80 then FontHeight:=10;
+     if colwidth<60 then FontHeight:=9;
+
+     if margin<220 then  marginfontheight:=13;
+     if margin<200 then  marginfontheight:=12;
+     if margin<180 then  marginfontheight:=11;
+
+
      ts.RightToLeft:=false;
      ts.Clipping:=true;
+     cache.FontHeight:=FontHeight;
 
      x:=margin;
      cache.DrawLineAntialias(margin,0,margin,cache.height,BGRABlack,2);
@@ -1382,10 +1379,12 @@ begin
                     ts.Alignment:=taLeftJustify;
                     c:=mat.lines[linenum].index;
                     s:=mat.libs[c].code+' '+mat.libs[c].caption;
+                    cache.fontHeight:=MarginFontHeight;
                     cache.TextRect(rect,rect.left+5,rect.top+5,s,ts,BGRABlack);
                end;
 
                ts.Alignment:=taCenter;
+               cache.fontHeight:=FontHeight;
                for c:=0 to mat.colscount-1 do
                begin
                     rect.Left:=margin + c*colwidth;
@@ -1492,10 +1491,19 @@ begin
      SB_planning.Top:=PToolbar.Height + 1;
      SB_planning.Left:=self.Width - SB_planning.Width - 1;
      SB_planning.height:=Self.Height -  SB_planning.Top - 1;
+
+
+
      PB_planning.Top:=PToolbar.Height + 1;  ;
      PB_planning.left:=0;
-     PB_planning.Height:=self.height -  SB_planning.Top - 1;
+     PB_planning.Height:=self.height -  SB_planning.Top - 5 - SB_planning_time.Height;
      PB_planning.Width:=SB_planning.Left - 10;
+
+     SB_planning_time.Left:=3;
+     SB_planning_time.Width:=SB_planning.Left - 10;
+     SB_planning_time.top:= PB_planning.Top + PB_planning.Height;
+     SB_planning_time.Min:=-50;SB_planning_time.Max:=50;//SB_planning_time.Position:=0;
+
      PToolbar.width:=SB_planning.Left;
      margin:=PB_planning.Width div 4;
      w:=PB_planning.Width;
