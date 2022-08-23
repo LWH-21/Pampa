@@ -98,6 +98,8 @@ type
     id : longint;
     colplan : TInterventions;
     start : tdatetime;
+    dateref : tdatetime;
+    update_scrollbar : boolean;
     FKind: TPlanning_kind;
     FColNumber : integer;
     w, h : integer;
@@ -127,6 +129,7 @@ type
     property Mode : TPlanning_kind READ FKind WRITE SetKind;
     procedure FrameResize(Sender: TObject);
     procedure PB_planningPaint(Sender: TObject);
+    procedure TimeScroll(var Msg: TLMessage); message LM_SCROLL;
 
 
   public
@@ -147,6 +150,7 @@ type
     procedure refresh;
     procedure refreshPlanningEnter;
     function save : boolean;
+    procedure setDateref(d : tdatetime);
     procedure setEditMode;
     destructor destroy; override;
   end;
@@ -192,10 +196,13 @@ begin
    hline:=30;
    selection.x:=-1;
    selection.y:=-1;
+   dateref := start;
+   update_scrollbar:=true;
    start_planning.visible:=false;
    end_planning.visible:=false;
    Label_start.visible:=false;
    label_end.visible:=false;
+   SB_planning_time.Min:=-50;SB_planning_time.Max:=50;SB_planning_time.Position:=0;
    setKind(Fkind);
 end;
 
@@ -730,16 +737,12 @@ var p : integer;
     d : tdatetime;
 
 begin
-     d:=TB_date.Date;
+     d:=dateref;
      p := SB_planning_time.Position;
      if p<>0 then
      begin
-       if pl_week in Fkind  then
-       begin
-            d:=incweek(d,p);
-            d:=StartOfTheWeek(d);
-            TB_date.Date:=d;
-       end;
+       Application.ProcessMessages;
+       Perform(LM_SCROLL, P, 0);
      end;
 end;
 
@@ -761,6 +764,10 @@ begin
      if  CompareDate(start,d) <> 0 then
      begin
          load(id,d);
+     end;
+     if update_scrollbar then
+     begin
+         setDateRef(start);
      end;
 end;
 
@@ -1502,7 +1509,7 @@ begin
      SB_planning_time.Left:=3;
      SB_planning_time.Width:=SB_planning.Left - 10;
      SB_planning_time.top:= PB_planning.Top + PB_planning.Height;
-     SB_planning_time.Min:=-50;SB_planning_time.Max:=50;//SB_planning_time.Position:=0;
+
 
      PToolbar.width:=SB_planning.Left;
      margin:=PB_planning.Width div 4;
@@ -1732,6 +1739,48 @@ begin
      mat.setModified(false);
 end;
 
+procedure TGPlanning.TimeScroll(var Msg: TLMessage);
+
+
+var d : tdatetime;
+    p : integer;
+
+begin
+     update_scrollbar:=false;
+     sb_planning_time.Enabled:=false;
+     p:=Round(Msg.wParam.ToSingle);
+     d:=dateref;
+     if pl_week in Fkind  then
+     begin
+          d:=incweek(d,p);
+          d:=StartOfTheWeek(d);
+          if compareDate(d,TB_date.Date)<>0 then
+          begin
+                 load(id,d);
+           end;
+     end else
+     if pl_2weeks in Fkind then
+     begin
+       d:=incweek(d,p * 2);
+       d:=StartOfTheWeek(d);
+       if compareDate(d,TB_date.Date)<>0 then
+       begin
+            load(id,d);
+       end;
+     end else
+     if pl_month in Fkind then
+     begin
+       d:=incmonth(d,p);
+       d:=StartOfTheMonth(d);
+       if compareDate(d,TB_date.Date)<>0 then
+       begin
+            load(id,d);
+       end;
+     end;
+     sb_planning_time.Enabled:=true;
+     update_scrollbar:=true;
+end;
+
 procedure TGPlanning.PB_planningPaint(Sender: TObject);
 
 var bmp: TBGRABitmap;
@@ -1853,6 +1902,13 @@ begin
       EnterPlanning.top:=0;
       EnterPlanning.visible:=false;
    end;
+end;
+
+procedure TGPlanning.setDateref(d : tdatetime);
+
+begin
+   dateref:=d;
+   SB_Planning_Time.Position:=0;
 end;
 
 procedure TGPlanning.SetKind(k : TPlanning_kind);

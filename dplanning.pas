@@ -750,10 +750,8 @@ begin
        end;
        if lines[nline].SY_ID=id then
        begin
-          if ncol>7 then
+          if (ncol>=0) and (ncol<=high(lines[nline].colums) ) then
           begin
-             showmessage(' '+inttostr(ncol));
-             end;
             if not assigned(lines[nline].colums[ncol]) then
             begin
                  lines[nline].colums[ncol]:=inter;
@@ -761,6 +759,10 @@ begin
                  inter.line_index:=nline;
                  found:=true;
             end;
+          end else
+          begin
+            exit;
+          end;
        end;
        if not found then
        begin

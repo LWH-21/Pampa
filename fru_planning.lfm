@@ -1,11 +1,11 @@
 inherited Fr_planning: TFr_planning
-  Height = 485
+  Height = 512
   Width = 1000
-  ClientHeight = 485
+  ClientHeight = 512
   ClientWidth = 1000
   OnResize = FrameResize
-  DesignLeft = -1465
-  DesignTop = 57
+  DesignLeft = 460
+  DesignTop = 50
   object Ed_code: TEdit[0]
     Left = 8
     Height = 23

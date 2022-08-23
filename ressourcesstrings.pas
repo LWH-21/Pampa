@@ -74,6 +74,7 @@ const
   LM_PLANNING_DEST_CHANGE = LM_USER + 1;
   LM_CAPTION_CHANGE = LM_USER + 2;
   LM_CLOSE_TAB = LM_USER + 3;
+  LM_SCROLL = LM_USER + 4;
 
 implementation
 

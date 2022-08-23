@@ -220,7 +220,7 @@ begin
   if uid > 0 then
   begin
     f := TF_planning_01.Create(MainForm);
-    f.w_id := uid;
+    f.init(uid,-1);
     f.DefaultMonitor := dmActiveForm;
     f.ShowModal;
     GPlan.reload;
@@ -342,6 +342,7 @@ begin
     display := 'T';
   if id > 0 then
   begin
+    Gplan.setDateref(startdate);
     Gplan.load(id, startdate, mode, period, display);
   end;
 end;

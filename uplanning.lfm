@@ -158,6 +158,7 @@ object GPlanning: TGPlanning
     Height = 17
     Top = 368
     Width = 121
+    LargeChange = 10
     Max = 50
     Min = -50
     PageSize = 5
