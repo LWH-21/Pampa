@@ -68,6 +68,8 @@ begin
      Gplan.save();
 end;
 
+
+
 procedure TF_planning_01.FormActivate(Sender: TObject);
 begin
   inherited;

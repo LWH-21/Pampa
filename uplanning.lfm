@@ -201,12 +201,16 @@ object GPlanning: TGPlanning
     Left = 712
     Top = 184
     object Mchange: TMenuItem
-      Caption = 'Modifier'
+      Caption = 'Saisie du planning'
       OnClick = MchangeClick
     end
     object MDel: TMenuItem
       Caption = 'Supprimer'
       OnClick = MDelClick
+    end
+    object MReset: TMenuItem
+      Caption = 'Vider'
+      OnClick = MResetClick
     end
     object MSep01: TMenuItem
       Caption = '-'

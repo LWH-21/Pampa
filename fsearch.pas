@@ -187,7 +187,7 @@ begin
             last_name:=Requete.FieldByName('SY_LASTNAME').AsString;
             first_name:=Requete.FieldByName('SY_FIRSTNAME').AsString;
             code:=Requete.FieldByName('SY_CODE').AsString;
-            if num_int>0 then
+            if num_int>=0 then
             begin
                  ModalResult:=mrOk;
             end;

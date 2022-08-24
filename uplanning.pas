@@ -29,6 +29,7 @@ type
   TGPlanning = class(TFrame)
       Label_start: TLabel;
       Label_end: TLabel;
+      MReset: TMenuItem;
       MSep01: TMenuItem;
       MWorker: TMenuItem;
       Mexcept: TMenuItem;
@@ -69,6 +70,7 @@ type
       procedure MDelClick(Sender: TObject);
       procedure MPlanningClick(Sender: TObject);
       procedure MexcelClick(Sender: TObject);
+      procedure MResetClick(Sender: TObject);
       procedure MtexteClick(Sender: TObject);
       procedure MWeekClick(Sender: TObject);
       procedure MMonthClick(Sender: TObject);
@@ -411,6 +413,15 @@ begin
 
 end;
 
+procedure TGPlanning.MResetClick(Sender: TObject);
+
+
+begin
+    if not assigned(mat) then exit;
+    mat.reset();
+    refresh();
+end;
+
 procedure TGPlanning.MtexteClick(Sender: TObject);
 begin
    export_planning(mat,FKind);
@@ -487,8 +498,11 @@ begin
          uid:=self.id;
          if uid<=0 then uid:=mat.getWorkerId();
        end;
-       plid:=inter.planning;
-       if (pl_customer in Fkind) then uid:=inter.getWorkerId();
+       if assigned(inter) then
+       begin
+              plid:=inter.planning;
+              if (pl_customer in Fkind) then uid:=inter.getWorkerId();
+       end;
        if uid > 0 then
        begin
             f := TF_planning_01.Create(MainForm);
@@ -644,7 +658,9 @@ var l : integer;
     inter : tintervention;
 
 begin
-   Mchange.visible:=false;
+   Mchange.visible:=true;
+   Mchange.Caption:='Saisie du planning';
+   if  self.id<=0 then Mchange.visible:=false;
    Mdel.visible:=false;
    MInsert.visible:=false;
    MCopy.visible:=false;
@@ -680,7 +696,7 @@ begin
        begin
          if (selection.x=0) then
          begin
-           if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) then
+           if (l<length(mat.lines)) and (mat.lines[l].sy_id>=0) then
            begin
                     if (pl_worker in FKind) then MCustomer.visible:=true
                     else Mworker.visible:=true;
@@ -688,7 +704,7 @@ begin
          end else
          begin
               MExcept.visible:=true;
-              if (l<length(mat.lines)) and (mat.lines[l].sy_id>0) and assigned(mat.lines[l].colums[selection.x-1]) then Mchange.visible:=true;
+              if (l<length(mat.lines)) and (mat.lines[l].sy_id>=0) and assigned(mat.lines[l].colums[selection.x-1]) then Mchange.visible:=true;
          end;
        end else
        if (pl_graphic in Fkind) then
@@ -1594,6 +1610,7 @@ procedure TGPlanning.load(lid : longint; startdate : tdatetime; m : char = '_'; 
 var endDate : tdatetime;
     k : TPlanning_kind;
 
+
 begin
      id:=lid;
      self.start:=startdate;
@@ -1648,6 +1665,7 @@ begin
      end;
      if (pl_customer in FKind) then colplan:=Planning.loadC(id,start, enddate)
      else colplan:=Planning.loadW(id,start, enddate);
+
      load(colplan,start,endDate);
      mat.setModified(false);
 end;

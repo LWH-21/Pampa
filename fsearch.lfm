@@ -1,7 +1,7 @@
 inherited Search: TSearch
-  Left = 755
+  Left = 783
   Height = 468
-  Top = 270
+  Top = 273
   Width = 449
   BorderIcons = [biSystemMenu, biHelp]
   Caption = 'Recherche Intervenant'

@@ -523,7 +523,6 @@ begin
   dend:=mat.getEnd;
   s:=mat.CreateJson;
   crc:=crc32(0,s+DateToStr(dstart)+DateToStr(Dend));
-
   sql:='';
   if (dstart<>old_start_date) or (dend<>old_end_date) then
   begin

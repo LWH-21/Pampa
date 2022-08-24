@@ -340,7 +340,7 @@ begin
     period := 'W';
   if (display <> 'T') and (display <> 'G') then
     display := 'T';
-  if id > 0 then
+  if id >= 0 then
   begin
     Gplan.setDateref(startdate);
     Gplan.load(id, startdate, mode, period, display);
