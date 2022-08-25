@@ -468,7 +468,7 @@ end;
 procedure TFr_Person.open;
 
 begin
-  assert(id>0,'ID NOT > 0');
+  assert(id>=0,'ID NOT >= 0');
   Maction:='R';
   updatemode:=um_read;
   try

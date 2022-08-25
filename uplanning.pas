@@ -496,14 +496,14 @@ begin
        if (pl_worker in Fkind) then
        begin
          uid:=self.id;
-         if uid<=0 then uid:=mat.getWorkerId();
+         if uid<0 then uid:=mat.getWorkerId();
        end;
        if assigned(inter) then
        begin
               plid:=inter.planning;
               if (pl_customer in Fkind) then uid:=inter.getWorkerId();
        end;
-       if uid > 0 then
+       if uid >= 0 then
        begin
             f := TF_planning_01.Create(MainForm);
             f.init(uid,plid);
@@ -660,7 +660,7 @@ var l : integer;
 begin
    Mchange.visible:=true;
    Mchange.Caption:='Saisie du planning';
-   if  self.id<=0 then Mchange.visible:=false;
+   if  self.id<0 then Mchange.visible:=false;
    Mdel.visible:=false;
    MInsert.visible:=false;
    MCopy.visible:=false;
@@ -673,7 +673,7 @@ begin
      l:=selection.y-1;
      if (pl_edit in Fkind)  then
      begin
-          if l>=0 then
+          if (l>=0) and (selection.X>0) and (l<high(mat.lines)) then
           begin
              Mchange.visible:=true;
              if not assigned(mat.lines[l].colums[selection.X-1]) then
