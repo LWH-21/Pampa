@@ -219,7 +219,7 @@ var R : TDataSet;
 begin
   Ed_code.Clear;
   Ed_lib.Clear;
-  if w_id>0 then
+  if w_id>=0 then
   begin
        R:=nil;
        sql:=Maindata.getQuery('Q0015','SELECT SY_CODE, SY_FIRSTNAME, SY_LASTNAME FROM WORKER WHERE SY_ID=%id');

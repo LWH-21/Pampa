@@ -15,6 +15,8 @@ resourcestring
   rs_abandonner_modif = 'Abandonner les modifications ?';
   rs_bookmark = 'Marque-Page';
   rs_bookmarkg = 'Marque-Page commun';
+  rs_caption_search_worker = 'Recherche d''un intervenant';
+  rs_caption_search_customer = 'Recherche d''un bénéficiaire';
   rs_confirm = 'Confirmez';
   rs_days_01 = 'Lundi';
   rs_days_02 = 'Mardi';

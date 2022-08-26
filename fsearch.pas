@@ -55,7 +55,7 @@ var
 
 implementation
 
-uses Main,UException;
+uses Main,UException,RessourcesStrings;
 
 {$R *.lfm}
 
@@ -75,6 +75,11 @@ begin
          table.search(s,Requete);
          if Requete.isempty=false then Requete.RecNo:=1;
          oldcrit:=s;
+         if t.table='WORKER' then  caption:=rs_caption_search_worker
+         else
+         if t.table='CUSTOMER' then caption:=rs_caption_search_customer
+         else
+         caption:=t.table;
     end;
 end;
 
