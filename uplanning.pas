@@ -210,9 +210,8 @@ end;
 
 procedure TGPlanning.delete(num : longint; days : shortstring; hs,he : word; inter : Tintervention);
 
-var i : integer;
-    col,line : integer;
-    oldinter,newinter : Tintervention;
+var col,line : integer;
+    oldinter : Tintervention;
 
 begin
      assert(length(days)=7,'Invalid parameters : days = '+days);
@@ -655,7 +654,6 @@ procedure TGPlanning.PopM_planningPopup(Sender: TObject);
 
 var l : integer;
     c : integer;
-    inter : tintervention;
 
 begin
    Mchange.visible:=true;
@@ -750,10 +748,8 @@ end;
 procedure TGPlanning.SB_planning_timeChange(Sender: TObject);
 
 var p : integer;
-    d : tdatetime;
 
 begin
-     d:=dateref;
      p := SB_planning_time.Position;
      if p<>0 then
      begin
@@ -953,7 +949,7 @@ var x : integer;
     inter : TIntervention;
     h1,h2 : real;
     nb_dest: integer;
-    rect, textrect : trect;
+    rect : trect;
     TS: TTextStyle;
 
 begin
@@ -1046,12 +1042,18 @@ begin
                       begin
                         rect.right:=rect.left+colwidth*inter.width+1;
                         col:=mat.libs[mat.lines[nline].index].color;
+
+
                         cache.Rectangle(rect,BGRABlack,BGRAWhite,dmset);
                         cache.Rectangle(rect,vgablack,col,dmset,32000);
+
+                        cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,vgablack,2);
                         if  inter.selected  then
                         begin
-                              rect.right:=rect.left+colwidth+1;
-                              cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
+                             col.Lightness:=round(col.lightness*0.7) ;
+                             rect.right:=rect.left+colwidth+1;
+                             cache.Rectangle(rect,vgablack,col,dmset,32000);
+                             cache.RectangleAntialias(rect.Left,rect.Top,rect.Right,rect.bottom,BGRA($21,$73,$46),3);
                         end;
                         s:= mat.libs[mat.lines[nline].index].code+' '+mat.libs[mat.lines[nline].index].caption;
                         rect.Inflate(-1,-1,-1,-1);
